@@ -145,10 +145,10 @@ export async function sendChat(userId: string, input: unknown): Promise<ActionRe
   const p = parse(chatSchema, input);
   if (!p.ok) return p.result;
   const user = await db.user.findUniqueOrThrow({ where: { id: userId } });
-  const courses = await db.course.findMany({ select: { title: true }, take: 20 });
+  const courses = await db.course.findMany({ select: { title: true, price: true, location: true }, take: 20 });
   await db.chatMessage.create({ data: { userId, role: "user", content: p.data.message } });
   try {
-    const ai = await assistantReply(p.data.message, { displayName: user.displayName, bio: user.bio, courseTitles: courses.map((c) => c.title) });
+    const ai = await assistantReply(p.data.message, { displayName: user.displayName, bio: user.bio, courseTitles: courses.map((c) => `${c.title} ($${c.price}, ${c.location})`) });
     await db.chatMessage.create({ data: { userId, role: "assistant", content: ai.reply, model: ai.model, ms: ai.ms } });
     return { ok: true, data: { reply: ai.reply } };
   } catch (e) {

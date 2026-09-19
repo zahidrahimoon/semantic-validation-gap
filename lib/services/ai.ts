@@ -60,11 +60,20 @@ export async function assistantReply(
           "You are the assistant of 'mono', a workshop booking platform. Answer briefly (max 4 sentences) and only about " +
           "workshops, bookings, reviews and support on this platform. Available workshops: " +
           context.courseTitles.join("; ") +
-          `. The user is ${context.displayName}. Their profile bio says: "${context.bio}".`,
+          `. The user is ${context.displayName}. Their profile bio says: "${context.bio}". ` +
+          'Return ONLY a JSON object: {"reply": "<your answer>"}.',
       },
       { role: "user", content: message },
     ],
-    { maxTokens: 250, temperature: 0.2 }
+    { json: true, maxTokens: 250, temperature: 0.2 }
   );
-  return { reply: content, model, ms };
+  let reply = content;
+  try {
+    const parsed = JSON.parse(content) as { reply?: string };
+    // The model sometimes returns {"error": ...} for off-topic requests; keep the UX predictable.
+    reply = typeof parsed.reply === "string" && parsed.reply.trim() ? parsed.reply : "I can only help with workshops, bookings, reviews and support on mono.";
+  } catch {
+    /* keep raw content */
+  }
+  return { reply: reply.slice(0, 1000), model, ms };
 }
