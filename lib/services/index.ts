@@ -10,6 +10,8 @@
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { assistantReply, triageTicket } from "@/lib/services/ai";
+// E4 only: inert unless SEMANTIC_LAYER is set (see lib/semantic/index.ts freeze note).
+import { checkSemantic } from "@/lib/semantic";
 import {
   ActionResult,
   bookingSchema,
@@ -32,6 +34,7 @@ function parse<S extends z.ZodTypeAny>(schema: S, input: unknown): { ok: true; d
 export async function updateProfile(userId: string, input: unknown): Promise<ActionResult> {
   const p = parse(profileSchema, input);
   if (!p.ok) return p.result;
+  await checkSemantic("bio", p.data.bio ?? "");
   const taken = await db.user.findFirst({ where: { username: p.data.username, NOT: { id: userId } } });
   if (taken) return { ok: false, message: "Validation failed", errors: { username: ["Username already taken"] } };
   const u = await db.user.update({
@@ -45,6 +48,7 @@ export async function updateProfile(userId: string, input: unknown): Promise<Act
 export async function createCourse(input: unknown): Promise<ActionResult> {
   const p = parse(courseSchema, input);
   if (!p.ok) return p.result;
+  await checkSemantic("title", p.data.title);
   const c = await db.course.create({
     data: {
       ...p.data,
@@ -89,6 +93,7 @@ export async function getCourse(id: string) {
 export async function createBooking(userId: string, input: unknown): Promise<ActionResult<{ id: string; ref: string; totalPrice: number }>> {
   const p = parse(bookingSchema, input);
   if (!p.ok) return p.result;
+  await checkSemantic("notes", p.data.notes ?? "");
   const course = await getCourse(p.data.courseId);
   if (!course) return { ok: false, message: "Validation failed", errors: { courseId: ["Course not found"] } };
   // BUSINESS RULE B-BK-1 (enforced): seats must not exceed remaining capacity
@@ -113,6 +118,7 @@ export async function createBooking(userId: string, input: unknown): Promise<Act
 export async function createReview(userId: string, input: unknown): Promise<ActionResult> {
   const p = parse(reviewSchema, input);
   if (!p.ok) return p.result;
+  await checkSemantic("body", p.data.body);
   const course = await db.course.findUnique({ where: { id: p.data.courseId } });
   if (!course) return { ok: false, message: "Validation failed", errors: { courseId: ["Course not found"] } };
   // B-RV-1 (NOT enforced): reviewer must have a booking for the course
@@ -125,6 +131,7 @@ export async function createTicket(userId: string, input: unknown): Promise<Acti
   const p = parse(ticketSchema, input);
   if (!p.ok) return p.result;
   // B-TK-1 (NOT enforced): bookingRef, if given, must belong to this user
+  await checkSemantic("description", p.data.description);
   const t = await db.ticket.create({ data: { ...p.data, bookingRef: p.data.bookingRef ?? "", userId } });
   let aiOk = false;
   try {
@@ -144,6 +151,7 @@ export async function createTicket(userId: string, input: unknown): Promise<Acti
 export async function sendChat(userId: string, input: unknown): Promise<ActionResult<{ reply: string }>> {
   const p = parse(chatSchema, input);
   if (!p.ok) return p.result;
+  await checkSemantic("message", p.data.message);
   const user = await db.user.findUniqueOrThrow({ where: { id: userId } });
   const courses = await db.course.findMany({ select: { title: true, price: true, location: true }, take: 20 });
   await db.chatMessage.create({ data: { userId, role: "user", content: p.data.message } });
