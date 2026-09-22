@@ -21,7 +21,8 @@ Testbed: main @ 62a7267 (v1.0-frozen), checked out; E4 branch e4-semantic-layer 
 Repository: project root under git since 2026-09-22 (after data collection); testbed has its own repo
 Regenerate all results: see 16_RESULTS/analysis/README.md
 Next actions (ordered):
-  1. HUMAN: TH-10 review of groups A/G; annotation of 200 items (then re-run import-labels, merge, analysis, make_numbers)
+  1. HUMAN: open http://127.0.0.1:8765 (service svg-review) — task 1 review 272 values + sign-off, task 2 annotate 220 items;
+     then run `bash 17_CODE/review_app/finish_review.sh` and tell Claude "review finished" (paper wording switches automatically)
   2. HUMAN: author email/ORCID, venue choice (then /rs-venue), IEEE Thesaurus keywords, repository URL + licences, similarity check
   3. HUMAN: resolve saleem2026layered author order; confirm breck2019datavalidation author order
   4. OPTIONAL (~1 h CPU): re-judge the 7 context-dependent rules with the full record (removes a stated limitation)

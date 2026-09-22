@@ -151,8 +151,17 @@ async function cmdJudge() {
   const supplementTargets = (flag("supplement", "") ?? "").split(",").filter(Boolean);
   const perStratum = Number(flag("per-stratum", "14"));
   if (existsSync(frozenFile)) {
-    const fz = JSON.parse(readFileSync(frozenFile, "utf8")) as { ids: string[]; supplement: string[] } & Record<string, unknown>;
-    const inTarget = new Set([...fz.ids, ...(fz.supplement ?? [])]);
+    const fz = JSON.parse(readFileSync(frozenFile, "utf8")) as { ids: string[]; supplement: string[]; replacements?: string[] } & Record<string, unknown>;
+    // Replacement values the researcher wrote while reviewing groups A/G (TH-10) are judged in full:
+    // `--ids-file <json array>` appends them, once, to the frozen file under "replacements".
+    const idsFile = flag("ids-file", "");
+    if (idsFile) {
+      const extra = JSON.parse(readFileSync(idsFile, "utf8")) as string[];
+      fz.replacements = [...new Set([...(fz.replacements ?? []), ...extra])];
+      writeFileSync(frozenFile, JSON.stringify(fz, null, 1));
+      console.log(`  replacement inputs added to the judged set: ${extra.length}`);
+    }
+    const inTarget = new Set([...fz.ids, ...(fz.supplement ?? []), ...(fz.replacements ?? [])]);
     if (supplementTargets.length && !(fz.supplement ?? []).length) {
       const strata = new Map<string, StructRecord[]>();
       for (const x of [...s].sort((a, b) => a.input_id.localeCompare(b.input_id))) {
@@ -217,7 +226,13 @@ function cmdMerge() {
   const struct = readJsonl<StructRecord>(join(dir, "validation_results.jsonl"));
   const r1 = new Map(readJsonl<{ input_id: string; verdicts: Record<string, Verdict> }>(join(dir, "rule_verdicts.jsonl")).map((r) => [r.input_id, r.verdicts]));
   const r2 = new Map(readJsonl<JudgeRecord>(join(dir, "judge_verdicts.jsonl")).map((r) => [r.input_id, r.verdicts]));
-  const rows = struct.map((s) => mergeLabel({ input_id: s.input_id, target_id: s.target_id, group: s.group, prompt_family: s.prompt_family, structural_pass: s.structural_pass, applicableRules: byId(s.target_id).rules, r1: r1.get(s.input_id) ?? {}, r2: r2.get(s.input_id) ?? {} }));
+  // R3: the researcher's annotation takes precedence over the judge for judgement rules (Algorithm 1).
+  // First annotations only (the "#repeat" copies measure intra-annotator agreement); latest import wins.
+  const hf = join(dir, "human_verdicts.jsonl");
+  type HumanRow = { input_id: string; verdicts: Record<string, "PASS" | "FAIL" | "AMBIGUOUS">; repeat: boolean };
+  const r3 = new Map((existsSync(hf) ? readJsonl<HumanRow>(hf) : []).filter((r) => !r.repeat).map((r) => [r.input_id, r.verdicts]));
+  if (r3.size) console.log(`  using ${r3.size} human-annotated inputs (R3)`);
+  const rows = struct.map((s) => mergeLabel({ input_id: s.input_id, target_id: s.target_id, group: s.group, prompt_family: s.prompt_family, structural_pass: s.structural_pass, applicableRules: byId(s.target_id).rules, r1: r1.get(s.input_id) ?? {}, r2: r2.get(s.input_id) ?? {}, r3: r3.get(s.input_id) }));
   appendJsonl(join(dir, "semantic_labels.jsonl"), rows);
   console.log(`merge done: ${rows.length} labels → ${join(dir, "semantic_labels.jsonl")}`);
 }
@@ -270,6 +285,23 @@ function cmdSample() {
   console.log(`  fill the verdict_per_rule column as e.g. B-RV-3=PASS;B-RV-4=FAIL (or =AMBIGUOUS), save as annotation_filled.csv, then: tsx cli.ts import-labels --exp ${exp} --run ${runId}`);
 }
 
+/** One CSV line → cells, honouring quotes and empty cells (the earlier regex dropped cells after an empty one). */
+function parseCsvLine(line: string): string[] {
+  const cells: string[] = []; let cur = "", q = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (q) {
+      if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+      else if (ch === '"') q = false;
+      else cur += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === ",") { cells.push(cur); cur = ""; }
+    else cur += ch;
+  }
+  cells.push(cur);
+  return cells;
+}
+
 function cmdImportLabels() {
   const exp = flag("exp", "E1")!, runId = flag("run")!;
   const dir = runDir(exp, runId);
@@ -277,7 +309,7 @@ function cmdImportLabels() {
   if (!existsSync(f)) { console.error(`missing ${f}`); return; }
   const lines = readFileSync(f, "utf8").split("\n").slice(1).filter((l) => l.trim());
   const rows = lines.map((l) => {
-    const cells = l.match(/("([^"]|"")*"|[^,]*)/g)!.filter((_, i) => i % 2 === 0);
+    const cells = parseCsvLine(l);
     const item = cells[0], verdicts: Record<string, string> = {};
     for (const part of (cells[5] ?? "").replace(/^"|"$/g, "").split(";")) {
       const [k, v] = part.split("=");

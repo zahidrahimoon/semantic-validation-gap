@@ -21,7 +21,7 @@ import json, pathlib
 import numpy as np, pandas as pd
 from scipy.stats import fisher_exact
 from statsmodels.stats.multitest import multipletests
-from defects import key_mismatch_ids  # DV-14
+from defects import key_mismatch_ids, excluded_ids  # DV-14
 
 RAW = pathlib.Path(__file__).resolve().parents[1] / "raw"
 OUT = pathlib.Path(__file__).parent
@@ -52,7 +52,7 @@ def load(label, folder, runs):
     lab, raw, fails = jl(folder, "semantic_labels.jsonl"), jl(folder, "raw_inputs.jsonl"), jl(folder, "generation_failures.jsonl")
     df = lab.merge(raw[["input_id", "model", "temperature", "run"]], on="input_id", how="left")
     df = df[df["target_id"].isin(SUBSET) & df["prompt_family"].isin(FAMILIES) & df["group"].isin(["D", "E"])]
-    km = key_mismatch_ids(RAW / folder)  # DV-14
+    km = excluded_ids(RAW / folder)  # DV-14
     n_km = int(df["input_id"].isin(km).sum()); df = df[~df["input_id"].isin(km)]
     if runs is not None: df = df[df["run"].isin(runs)]
     failed = set() if fails.empty else set(zip(fails["target"], fails["group"], fails["family"], fails["run"]))

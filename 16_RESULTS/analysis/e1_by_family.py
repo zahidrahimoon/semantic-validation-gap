@@ -15,13 +15,13 @@ Usage: .venv/bin/python e1_by_family.py <E1 run folder>
 """
 import json, sys, pathlib
 import numpy as np, pandas as pd
-from defects import key_mismatch_ids  # DV-14
+from defects import key_mismatch_ids, excluded_ids  # DV-14
 
 RUN = pathlib.Path(sys.argv[1]); OUT = pathlib.Path(__file__).parent
 jl = lambda n: pd.DataFrame([json.loads(l) for l in open(RUN / n) if l.strip()])
 lab, raw, fails = jl("semantic_labels.jsonl"), jl("raw_inputs.jsonl"), jl("generation_failures.jsonl")
 df = lab.merge(raw[["input_id", "run"]], on="input_id", how="left")
-df = df[~df["input_id"].isin(key_mismatch_ids(RUN))]  # DV-14
+df = df[~df["input_id"].isin(excluded_ids(RUN))]  # DV-14
 failed = set(zip(fails["target"], fails["group"], fails["family"], fails["run"]))
 df = df[[(t, g, f, r) not in failed for t, g, f, r in zip(df["target_id"], df["group"], df["prompt_family"], df["run"])]]
 df = df[df["group"].isin(["D", "E"]) & (df["prompt_family"] != "P5")].copy()

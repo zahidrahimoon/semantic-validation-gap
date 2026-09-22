@@ -44,9 +44,7 @@ On a four-core CPU, the rule layer added at most \R{e4.R.c8.maxadd}\,ms to p97.5
 layer \R{e4.EMB.c1.minadd}--\R{e4.EMB.c1.maxadd}\,ms for a single client; at the median, the small
 language model added about half a second and the LLM judge \R{e4.JUDGE.c1.minp50add.s}--\R{e4.JUDGE.c1.maxp50add.s}\,s,
 and the judge saturated on two of three endpoints at eight concurrent clients.
-The study uses one application and CPU-only open models; \ifhumanlabels the judge agreed with the
-researcher's blind annotation at Cohen's $\kappa=\R{kappa.judge}$\ifjudgeweak, so judgement-rule results
-are exploratory\fi.\else its judge is not yet validated against a human.\fi
+The study uses one application, CPU-only open models, and a judge not yet validated against a human.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -288,11 +286,8 @@ with no attempt at meaning; \textbf{C} rule-based adversarial values, one templa
 the field's purpose and rules; \textbf{F} boundary values at schema edges; \textbf{G} benign but
 unusual reference values. Conditions A and G were specified as human-written; in this execution
 their \R{e1.refvalues} values were drafted by an AI assistant at the researcher's request, before the main
-generation, and checked against the schemas and objective rules. \ifreviewed The researcher then
-reviewed every value, keeping \R{review.keep}, replacing \R{review.change} with values of their own
-and deleting \R{review.delete}, and confirmed that the kept values are ones they would have written;
-we therefore call these conditions human-curated rather than human-written.\else The researcher's
-review of them is outstanding (Section~\ref{sec:threats}).\fi
+generation, and checked against the schemas and objective rules. The researcher's review of them is
+outstanding (Section~\ref{sec:threats}).
 
 \subsection{LLM generation}
 Conditions D and E use qwen3:4b (Q4\_K\_M) through Ollama on a four-core CPU, temperature 0.8,
@@ -320,11 +315,8 @@ have one. Judgement rules are decided by a judge model from a different family t
 (gemma3:4b, temperature 0), given the field purpose, the rule text and the submitted value of the
 target's fields, and never the condition, prompt family or intent. The judge does not see the rest of
 the record, so seven judgement rules that depend on other fields (e.g.\ capacity plausible for the
-location) were judged without that context; a sensitivity analysis excludes them. \ifhumanlabels
-The researcher annotated \R{ann.items} structurally valid inputs blind to condition, with
-\R{ann.repeats} repeated to estimate their own consistency; where a human verdict exists it takes
-precedence over the judge.\else A planned human annotation of 200 inputs, which would validate the
-judge, has not been completed.\fi{} An input is
+location) were judged without that context; a sensitivity analysis excludes them. A planned human
+annotation of 200 inputs, which would validate the judge, has not been completed. An input is
 \emph{decided} when every applicable rule has a verdict. The judge was applied to a stratified sample
 for compute reasons: \R{judge.base} structurally valid inputs drawn round-robin across target
 $\times$ condition with a fixed seed, plus \R{judge.supplement} (up to 14 per stratum, as many as were
@@ -416,9 +408,7 @@ violation were lower for LLM inputs with context than for random inputs (odds ra
 inputs exceeded random ones (\R{cmh.CvB.or}, \R{cmh.CvB.ci}). Field context lowered the odds relative
 to the schema alone (\R{cmh.EvD.or}, \R{cmh.EvD.ci}). LLM inputs with context and benign-unusual
 reference inputs did not differ detectably (\R{cmh.EvG.or}, \R{cmh.EvG.ci}, \R{cmh.EvG.p}); the
-interval is wide, and \ifreviewed the reference inputs are AI-drafted values curated by the researcher,
-so this compares model input with human-curated rather than human-written input.\else the reference
-inputs are AI-drafted, so this is not an AI-versus-human result.\fi
+interval is wide, and the reference inputs are AI-drafted, so this is not an AI-versus-human result.
 Fig.~\ref{fig:by-condition} shows the rates by condition.
 
 \IfFileExists{tables/tab_e2b.tex}{\input{tables/tab_e2b}}{}
@@ -435,7 +425,7 @@ judge sample, this indicates only that a smaller model may widen the gap.
 \includegraphics[width=\columnwidth]{../09_DIAGRAMS/rendered/fig_svsi_by_condition.pdf}
 \caption{Conditional SV-SI rate by generation condition with Wilson 95\,\% intervals, over decided
 structural passes (P5 excluded). C is the designed adversarial condition; A and G are the
-\ifreviewed human-curated\else AI-drafted\fi{} reference conditions for legitimate input.}
+AI-drafted reference conditions for legitimate input.}
 \label{fig:by-condition}
 \end{figure}}{}
 
@@ -449,16 +439,9 @@ ticket priority inconsistent with its text (\R{rule.B-TK-4}) and duration plausi
 family and \R{ai.llm.nonp5} from the other prompt families.
 
 \subsection{Ground-truth agreement}
-\ifhumanlabels On judgement rules, the judge agreed with the researcher on \R{agree.judge}\,\% of
-\R{n.judge} rule verdicts where both gave a verdict (Cohen's $\kappa=\R{kappa.judge}$); the researcher
-was unsure on \R{unsure.judge}\,\% of judgement-rule verdicts. \ifjudgeweak Agreement is below the
-pre-registered 0.4, so every judgement-rule result in this paper is exploratory.\else Agreement meets
-the pre-registered 0.4 threshold.\fi{} The rule functions agreed with the researcher on
-\R{agree.rules}\,\% of objective-rule verdicts ($\kappa=\R{kappa.rules}$), and the researcher's
-repeated annotations agreed with each other on \R{agree.self}\,\% ($\kappa=\R{kappa.self}$).\else
 Judge--human agreement is not reported, because the human annotation was not completed
 (\texttt{TODO-HUMAN}); judgement-rule results therefore rest on the judge alone. Objective-rule
-results, which cover every structurally valid input, do not.\fi
+results, which cover every structurally valid input, do not.
 
 \subsection{Detection quality (RQ5)}
 \IfFileExists{tables/tab_detection.tex}{\input{tables/tab_detection}}{}
@@ -523,8 +506,8 @@ drawn at its lower bound.}
 structurally valid LLM inputs broke an unenforced rule, a quarter when the model was asked only for
 legitimate values, and under a tenth on objective rules alone. The rate extends output-side
 findings~\cite{li2026orderbench,singh2026sob,wrenn2026enterprise} to inputs that an application would
-persist, but its magnitude is sensitive to prompt intent, to one date-dependent target, and to
-\ifhumanlabels the judge (human agreement $\kappa=\R{kappa.judge}$)\else an unvalidated judge\fi, so the claim that survives every check is that the gap is above the 5\,\% bound rather
+persist, but its magnitude is sensitive to prompt intent, to one date-dependent target, and to an
+unvalidated judge, so the claim that survives every check is that the gap is above the 5\,\% bound rather
 than any single figure.
 
 \textbf{RQ2: where it occurs is uneven.} Category is moderately associated with the outcome, but
@@ -564,9 +547,8 @@ in code and treat judgement rules as an open problem, rather than add a model to
 \textbf{Alternative explanations.} The six explanations fixed in advance fare as follows.
 \emph{Weak business rules rather than AI:} consistent with the data; the gap appears for every
 producer that does not know the rules. \emph{Random inputs produce the same effect:} consistent, and
-random inputs exceed model inputs. \emph{Unusual human inputs behave the same:} \ifreviewed consistent with
-the data for human-curated inputs, which did not differ detectably from context-aware model inputs\else
-not tested, because the reference inputs are AI-drafted\fi. \emph{Confined to free text:} not supported; structured and
+random inputs exceed model inputs. \emph{Unusual human inputs behave the same:} not tested, because
+the reference inputs are AI-drafted. \emph{Confined to free text:} not supported; structured and
 cross-field targets also show high rates, though driven by single targets. \emph{Prompt injection
 under another name:} not supported; injection prompts are excluded from all rates and account for
 \R{ai.llm.p5} of \R{ai.llm.svsi} LLM violations on AI-facing fields. \emph{Too expensive to deploy:} supported for the model-based layers on CPU hardware, not for rules.
@@ -575,8 +557,7 @@ under another name:} not supported; injection prompts are excluded from all rate
 \label{sec:threats}
 
 \textbf{Internal validity.} Labelling is the main threat. Judgement rules were decided by one 4B judge
-\ifhumanlabels (agreement with the researcher $\kappa=\R{kappa.judge}$)\else without human validation\fi,
-and seven of them without the fields they depend on; excluding those seven
+without human validation, and seven of them without the fields they depend on; excluding those seven
 lowers the LLM rate to \R{s.llm.nocontext}\,\% and the random rate more (Table~\ref{tab:sensitivity}),
 leaving the RQ3 direction intact. Agreement on semantic judgements can be low even between
 humans~\cite{calo2026semanticgap}. The judge sample gives conditions different target mixes;
@@ -610,10 +591,8 @@ The category mapping assigns dual-tagged fields to one category, decided before 
 at the time. Only the three pre-declared contrasts are confirmatory.
 
 \textbf{Provenance.} The reference conditions A and G were specified as human-written and were
-drafted by an AI assistant; \ifreviewed the researcher reviewed and curated them, so H3b compares
-model input with human-curated input, not with input a person wrote unaided.\else until the
-researcher's review is recorded, H3b is exploratory and the alternative explanation that unusual
-human inputs behave similarly is not tested.\fi
+drafted by an AI assistant; until the researcher's review is recorded, H3b is exploratory and the
+alternative explanation that unusual human inputs behave similarly is not tested.
 
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
@@ -628,9 +607,8 @@ detected the pre-registered share of violations at a tolerable false-positive ra
 On a four-core CPU, rules added at most \R{e4.R.c8.maxadd}\,ms at p97.5 and embeddings tens of
 milliseconds; at the median a small language model added about half a second and an LLM judge several
 seconds, and the judge saturated on two of three endpoints with eight concurrent clients.
-Future work should \ifreviewed\else complete the review of the reference conditions, \fi
-\ifhumanlabels\else validate the judge against human annotation, \fi collect reference inputs written
-by several people unaided, re-judge context-dependent rules with the full record, state the current date to generators,
+Future work should complete the human-written reference conditions and the human validation of the
+judge, re-judge context-dependent rules with the full record, state the current date to generators,
 and repeat the protocol on an existing open-source application.
 
 \section*{Artifact Availability}

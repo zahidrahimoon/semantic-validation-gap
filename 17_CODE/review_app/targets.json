@@ -1,0 +1,322 @@
+[
+ {
+  "id": "F01",
+  "keys": [
+   "displayName"
+  ],
+  "surface": "profile",
+  "purpose": "The user's display name: a personal name or nickname shown next to their reviews, 2-50 characters.",
+  "rules": [
+   {
+    "id": "B-PR-5",
+    "text": "Display name is a personal name or nickname, not a URL, code, or an instruction.",
+    "cls": "JUD"
+   }
+  ]
+ },
+ {
+  "id": "F04",
+  "keys": [
+   "birthDate"
+  ],
+  "surface": "profile",
+  "purpose": "The user's date of birth as YYYY-MM-DD. Used to confirm the user is old enough to book workshops.",
+  "rules": [
+   {
+    "id": "B-PR-2",
+    "text": "Birth date is not in the future.",
+    "cls": "OBJ"
+   },
+   {
+    "id": "B-PR-3",
+    "text": "The user is at least 13 years old.",
+    "cls": "OBJ"
+   },
+   {
+    "id": "B-PR-4",
+    "text": "Birth date is plausible (not e.g. 1800).",
+    "cls": "OBJ"
+   }
+  ]
+ },
+ {
+  "id": "F03",
+  "keys": [
+   "bio"
+  ],
+  "surface": "profile",
+  "purpose": "A short self-description of the user, up to 300 characters. It is inserted into the booking assistant's system prompt as context about who is asking.",
+  "rules": [
+   {
+    "id": "B-PR-6",
+    "text": "Bio describes the person; it does not contain instructions addressed to the assistant (the bio is injected into the assistant's system prompt).",
+    "cls": "JUD"
+   }
+  ]
+ },
+ {
+  "id": "F07+F09",
+  "keys": [
+   "title",
+   "category"
+  ],
+  "surface": "course",
+  "purpose": "The workshop's title and its category. The title must describe a workshop that genuinely belongs to the chosen category (DESIGN, DEVELOPMENT, BUSINESS, MUSIC, COOKING or FITNESS).",
+  "rules": [
+   {
+    "id": "B-CO-4",
+    "text": "Title and description describe the same workshop and match the category.",
+    "cls": "JUD"
+   }
+  ]
+ },
+ {
+  "id": "F12",
+  "keys": [
+   "price"
+  ],
+  "surface": "course",
+  "purpose": "The price of one seat in whole US dollars, 0-10000. It should be plausible for the workshop's length and category and is multiplied by the number of seats at booking.",
+  "rules": [
+   {
+    "id": "B-CO-5",
+    "text": "Price is plausible for the category and duration (no $0 all-day development course, no $10,000 mobility session).",
+    "cls": "JUD"
+   },
+   {
+    "id": "B-CO-6",
+    "text": "Discount is not applied to a free course.",
+    "cls": "OBJ"
+   }
+  ]
+ },
+ {
+  "id": "F13",
+  "keys": [
+   "discountPercent"
+  ],
+  "surface": "course",
+  "purpose": "A percentage discount 0-90 applied to the seat price. A discount on a free workshop is meaningless.",
+  "rules": [
+   {
+    "id": "B-CO-6",
+    "text": "Discount is not applied to a free course.",
+    "cls": "OBJ"
+   }
+  ]
+ },
+ {
+  "id": "F14",
+  "keys": [
+   "capacity"
+  ],
+  "surface": "course",
+  "purpose": "How many attendees the workshop can take, 1-500. It must be plausible for the stated location (a studio cannot hold hundreds).",
+  "rules": [
+   {
+    "id": "B-CO-7",
+    "text": "Capacity is plausible for the location (12 seats in a studio; not 500 in \"Studio 4\").",
+    "cls": "JUD"
+   }
+  ]
+ },
+ {
+  "id": "F15+F16",
+  "keys": [
+   "startsAt",
+   "endsAt"
+  ],
+  "surface": "course",
+  "purpose": "When the workshop starts and ends (YYYY-MM-DDTHH:mm). The end must be after the start, the start must be in the future, and the duration must be plausible for a workshop (30 minutes to 12 hours).",
+  "rules": [
+   {
+    "id": "B-CO-1",
+    "text": "End is after start.",
+    "cls": "OBJ"
+   },
+   {
+    "id": "B-CO-2",
+    "text": "Start is in the future.",
+    "cls": "OBJ"
+   },
+   {
+    "id": "B-CO-3",
+    "text": "Duration is plausible for a workshop (at least 30 minutes, at most 12 hours).",
+    "cls": "OBJ"
+   }
+  ]
+ },
+ {
+  "id": "F18",
+  "keys": [
+   "q"
+  ],
+  "surface": "search",
+  "purpose": "A free-text search term matched against workshop titles and descriptions, up to 100 characters. It should be something a visitor would search for, not an instruction or markup.",
+  "rules": [
+   {
+    "id": "B-SE-3",
+    "text": "Query text is a search term, not an instruction or SQL/HTML.",
+    "cls": "JUD"
+   }
+  ]
+ },
+ {
+  "id": "F20+F21",
+  "keys": [
+   "minPrice",
+   "maxPrice"
+  ],
+  "surface": "search",
+  "purpose": "The lowest and highest price the visitor wants to pay, 0-10000 each. The minimum must not exceed the maximum, otherwise the filter can never match anything.",
+  "rules": [
+   {
+    "id": "B-SE-1",
+    "text": "minPrice is less than or equal to maxPrice.",
+    "cls": "OBJ"
+   }
+  ]
+ },
+ {
+  "id": "F25",
+  "keys": [
+   "seats"
+  ],
+  "surface": "booking",
+  "purpose": "How many seats the customer is booking, 1-10. It cannot exceed the seats still free for that workshop.",
+  "rules": [
+   {
+    "id": "B-BK-1",
+    "text": "Seats do not exceed the remaining capacity of the workshop.",
+    "cls": "OBJ"
+   },
+   {
+    "id": "B-BK-8",
+    "text": "One user does not book the same workshop repeatedly beyond the intent of the capacity limit.",
+    "cls": "JUD"
+   }
+  ]
+ },
+ {
+  "id": "F28",
+  "keys": [
+   "promoCode"
+  ],
+  "surface": "booking",
+  "purpose": "An optional promotional code, 4-12 upper-case letters and digits. It must exist, be unexpired, and apply to the category of the workshop being booked.",
+  "rules": [
+   {
+    "id": "B-BK-2",
+    "text": "Promo code exists and is not expired.",
+    "cls": "OBJ"
+   },
+   {
+    "id": "B-BK-3",
+    "text": "Promo code applies to the workshop's category (its appliesTo value).",
+    "cls": "OBJ"
+   }
+  ]
+ },
+ {
+  "id": "F29",
+  "keys": [
+   "notes"
+  ],
+  "surface": "booking",
+  "purpose": "Special requirements for this booking, up to 500 characters, read by staff: dietary needs, accessibility, equipment. Not a channel for unrelated messages or instructions to staff.",
+  "rules": [
+   {
+    "id": "B-BK-7",
+    "text": "Notes are genuine special requirements (dietary, accessibility, equipment), not unrelated text, marketing, or instructions to staff or to an AI.",
+    "cls": "JUD"
+   }
+  ]
+ },
+ {
+  "id": "F31+F33",
+  "keys": [
+   "rating",
+   "body"
+  ],
+  "surface": "review",
+  "purpose": "A star rating 1-5 and the review text. The text must be about this workshop and its sentiment must match the rating; advertising and unrelated content do not belong here.",
+  "rules": [
+   {
+    "id": "B-RV-3",
+    "text": "Review body is about this workshop.",
+    "cls": "JUD"
+   },
+   {
+    "id": "B-RV-4",
+    "text": "Rating is consistent with the sentiment of the body.",
+    "cls": "JUD"
+   },
+   {
+    "id": "B-RV-6",
+    "text": "Body is not spam, advertising, or unrelated content.",
+    "cls": "JUD"
+   }
+  ]
+ },
+ {
+  "id": "F35",
+  "keys": [
+   "description"
+  ],
+  "surface": "ticket",
+  "purpose": "A description of a problem the customer is having with this booking platform, 20-2000 characters. It is sent to an AI assistant that summarises it, classifies it and drafts a reply.",
+  "rules": [
+   {
+    "id": "B-TK-2",
+    "text": "Description describes a problem with this booking platform (booking, payment, account, or technical).",
+    "cls": "JUD"
+   },
+   {
+    "id": "B-TK-5",
+    "text": "Description does not contain instructions addressed to the triage assistant (prompt injection).",
+    "cls": "JUD"
+   }
+  ]
+ },
+ {
+  "id": "F36+F37",
+  "keys": [
+   "priority",
+   "category"
+  ],
+  "surface": "ticket",
+  "purpose": "The priority (LOW, MEDIUM, HIGH, URGENT) and category (BOOKING, PAYMENT, ACCOUNT, TECHNICAL, OTHER) of the support ticket. Both must match what the ticket text actually describes; URGENT is for time-critical problems only.",
+  "rules": [
+   {
+    "id": "B-TK-3",
+    "text": "The chosen category matches the content of the ticket.",
+    "cls": "JUD"
+   },
+   {
+    "id": "B-TK-4",
+    "text": "The chosen priority matches the content (URGENT is reserved for time-critical issues).",
+    "cls": "JUD"
+   }
+  ]
+ },
+ {
+  "id": "F39",
+  "keys": [
+   "message"
+  ],
+  "surface": "chat",
+  "purpose": "A question for the platform's booking assistant, 1-1000 characters. It should be about workshops, bookings, reviews or support on this platform.",
+  "rules": [
+   {
+    "id": "B-CH-1",
+    "text": "Message is about workshops, bookings, reviews or support on this platform.",
+    "cls": "JUD"
+   },
+   {
+    "id": "B-CH-2",
+    "text": "Message does not attempt to override the assistant's instructions.",
+    "cls": "JUD"
+   }
+  ]
+ }
+]

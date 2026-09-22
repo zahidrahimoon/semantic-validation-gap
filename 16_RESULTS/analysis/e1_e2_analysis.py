@@ -7,7 +7,7 @@ Every statistic here is pre-committed in 08_EXPERIMENT_PLAN.md (frozen at Gate B
 Usage: ../../../../.venv/bin/python e1_e2_analysis.py <run_folder>
 """
 import json, sys, pathlib, itertools
-from defects import key_mismatch_ids  # DV-14
+from defects import key_mismatch_ids, review_excluded_ids  # DV-14, TH-10
 import pandas as pd, numpy as np
 from scipy import stats
 from statsmodels.stats.proportion import proportion_confint
@@ -42,6 +42,11 @@ KEY_MISMATCH = key_mismatch_ids(RUN)
 n_key_mismatch = int(df["input_id"].isin(KEY_MISMATCH).sum())
 df = df[~df["input_id"].isin(KEY_MISMATCH)].copy()
 print(f"key-mismatch records excluded (DV-14): {n_key_mismatch}")
+# TH-10: reference values the researcher deleted or replaced during review
+REVIEW_EXCLUDED = review_excluded_ids()
+n_review_excluded = int(df["input_id"].isin(REVIEW_EXCLUDED).sum())
+df = df[~df["input_id"].isin(REVIEW_EXCLUDED)].copy()
+if n_review_excluded: print(f"reference values removed by the researcher's review: {n_review_excluded}")
 
 # DV-07: records produced by RETRYING a prompt family that had failed. A failed call yields no
 # records, so any record in a (target, condition, family, run) cell that also has a recorded failure
@@ -176,7 +181,7 @@ if not fails.empty:
                         successful_calls=int(calls),
                         failure_rate=float(len(fails) / (len(fails) + calls)) if calls else None)
 
-summary = dict(run=str(RUN.name), key_mismatch_excluded=n_key_mismatch, retried_records=n_retried, retried_included=INCLUDE_RETRIED, generation_failures=fail_summary,
+summary = dict(run=str(RUN.name), key_mismatch_excluded=n_key_mismatch, review_excluded=n_review_excluded, retried_records=n_retried, retried_included=INCLUDE_RETRIED, generation_failures=fail_summary,
                analysis_population=dict(structural_passes=int(len(all_passes)), decided=int(len(passes)),
                                         undecided_not_judged=int(undecided)), n_inputs=int(len(df)), n_primary=int(len(primary)),
                n_struct_pass=int(len(passes)), H1=h1, H2=h2,

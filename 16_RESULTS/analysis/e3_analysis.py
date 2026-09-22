@@ -9,12 +9,12 @@ Usage: ../../../../.venv/bin/python e3_analysis.py <run_folder>
 """
 import json, sys, pathlib
 import numpy as np, pandas as pd
-from defects import key_mismatch_ids  # DV-14
+from defects import key_mismatch_ids, excluded_ids  # DV-14
 
 RUN = pathlib.Path(sys.argv[1]); OUT = pathlib.Path(__file__).parent
 rows = [json.loads(l) for l in open(RUN / "e3_decisions.jsonl")]
 d = pd.DataFrame(rows)
-_km = key_mismatch_ids(RUN)  # DV-14
+_km = excluded_ids(RUN)  # DV-14
 print(f"key-mismatch records excluded (DV-14): {d[d['design'] == 'R']['input_id'].isin(_km).sum()}")
 d = d[~d["input_id"].isin(_km)].copy()
 if d.empty: sys.exit("no e3 decisions")

@@ -8,7 +8,7 @@ Usage: .venv/bin/python e1_by_target.py <E1 run folder>
 """
 import json, sys, pathlib
 import pandas as pd
-from defects import key_mismatch_ids
+from defects import key_mismatch_ids, excluded_ids
 
 RUN = pathlib.Path(sys.argv[1]); OUT = pathlib.Path(__file__).parent
 CATEGORY = {"F01": "simple", "F04": "simple", "F03": "aifacing", "F07+F09": "crossfield", "F12": "financial",
@@ -18,7 +18,7 @@ CATEGORY = {"F01": "simple", "F04": "simple", "F03": "aifacing", "F07+F09": "cro
 jl = lambda n: pd.DataFrame([json.loads(l) for l in open(RUN / n) if l.strip()])
 lab, raw, fails = jl("semantic_labels.jsonl"), jl("raw_inputs.jsonl"), jl("generation_failures.jsonl")
 df = lab.merge(raw[["input_id", "run"]], on="input_id", how="left")
-df = df[~df["input_id"].isin(key_mismatch_ids(RUN))]
+df = df[~df["input_id"].isin(excluded_ids(RUN))]
 fs = set(zip(fails["target"], fails["group"], fails["family"], fails["run"]))
 df = df[[(t, g, f, r) not in fs for t, g, f, r in zip(df["target_id"], df["group"], df["prompt_family"], df["run"])]]
 df = df[(df["prompt_family"] != "P5") & df["structural_pass"] & df["final_label"].isin(["VALID", "SV-SI"])].copy()
