@@ -1,0 +1,29 @@
+{
+  "experiment_id": "E0",
+  "run_id": "20260920T0810",
+  "step": "generate",
+  "groups": [
+    "D",
+    "E"
+  ],
+  "runs": 1,
+  "model": "qwen3:4b",
+  "temperature": 0.8,
+  "families": [
+    "P1",
+    "P2",
+    "P3"
+  ],
+  "perFamily": 2,
+  "nRandom": 25,
+  "targets": [
+    "F01",
+    "F29",
+    "F28",
+    "F35"
+  ],
+  "testbed_commit": "62a726720bc81ee498acee8f1b1fc0924b8ca598",
+  "generated": 46,
+  "failures": 1,
+  "at": "2026-09-20T08:20:20.735Z"
+}

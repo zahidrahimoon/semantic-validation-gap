@@ -1,0 +1,22 @@
+\begin{table}[t]
+\caption{Exploratory: SV-SI by generator size and temperature on the same 10 targets, prompt families
+P1--P4, conditions D and E. The objective-rule rate is decided for every structural pass and so is
+comparable across rows; the all-rules rate uses the judge, which labelled 100 inputs per E2b run
+against a 1{,}200-input sample in E1. $p_{\mathrm{Holm}}$: two-sided Fisher test against the E1
+generator ($^{\dagger}$qwen3:4b, $T=0.8$, the E1 reference), Holm-corrected across three comparisons.
+Obj.: SV-SI on objective rules among structural passes. All: SV-SI among decided passes.}
+\label{tab:e2b}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lrrrrrrr}
+\toprule
+qwen3 & Runs & $n$ & Pass & Obj.\ (\%) & $p_{\mathrm{H}}$ & All (\%) & $p_{\mathrm{H}}$ \\
+\midrule
+1.7b, $T$=0.8 & 1 & 340 & 334 & 16 (4.8) & 0.00 & 48/137 (35.0) & 0.05 \\
+4b, $T$=0.8$^{\dagger}$ & 3 & 878 & 798 & 9 (1.1) & ref. & 74/312 (23.7) & ref. \\
+8b, $T$=0.8 & 1 & 394 & 355 & 5 (1.4) & 0.77 & 30/130 (23.1) & 1.00 \\
+4b, $T$=0 & 1 & 274 & 252 & 7 (2.8) & 0.15 & 26/99 (26.3) & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,264 @@
+{
+  "run": "E4_20260922T1142",
+  "runs": 108,
+  "H6": {
+    "part1_R_EMB_le_50ms": "fails",
+    "part2_JUDGE_ge_1000ms": "holds",
+    "cells": [
+      {
+        "config": "R",
+        "concurrency": 1,
+        "endpoint": "courses",
+        "added_p97_5": 1.0,
+        "added_p95_lo": -4.0,
+        "added_p95_hi": 5.0,
+        "h6": "holds",
+        "h6_p95_bracket": "holds"
+      },
+      {
+        "config": "EMB",
+        "concurrency": 1,
+        "endpoint": "courses",
+        "added_p97_5": 65.0,
+        "added_p95_lo": 33.0,
+        "added_p95_hi": 69.0,
+        "h6": "fails",
+        "h6_p95_bracket": "undetermined"
+      },
+      {
+        "config": "JUDGE",
+        "concurrency": 1,
+        "endpoint": "courses",
+        "added_p97_5": 10186.0,
+        "added_p95_lo": 10186.0,
+        "added_p95_hi": 10190.0,
+        "h6": "holds",
+        "h6_p95_bracket": "holds"
+      },
+      {
+        "config": "R",
+        "concurrency": 1,
+        "endpoint": "profile",
+        "added_p97_5": 1.0,
+        "added_p95_lo": -6.0,
+        "added_p95_hi": 8.0,
+        "h6": "holds",
+        "h6_p95_bracket": "holds"
+      },
+      {
+        "config": "EMB",
+        "concurrency": 1,
+        "endpoint": "profile",
+        "added_p97_5": 70.0,
+        "added_p95_lo": 39.0,
+        "added_p95_hi": 77.0,
+        "h6": "fails",
+        "h6_p95_bracket": "undetermined"
+      },
+      {
+        "config": "JUDGE",
+        "concurrency": 1,
+        "endpoint": "profile",
+        "added_p97_5": 7683.0,
+        "added_p95_lo": 2096.0,
+        "added_p95_hi": 7690.0,
+        "h6": "holds",
+        "h6_p95_bracket": "holds"
+      },
+      {
+        "config": "R",
+        "concurrency": 1,
+        "endpoint": "reviews",
+        "added_p97_5": 0.0,
+        "added_p95_lo": -5.0,
+        "added_p95_hi": 6.0,
+        "h6": "holds",
+        "h6_p95_bracket": "holds"
+      },
+      {
+        "config": "EMB",
+        "concurrency": 1,
+        "endpoint": "reviews",
+        "added_p97_5": 96.0,
+        "added_p95_lo": 54.0,
+        "added_p95_hi": 102.0,
+        "h6": "fails",
+        "h6_p95_bracket": "fails"
+      },
+      {
+        "config": "JUDGE",
+        "concurrency": 1,
+        "endpoint": "reviews",
+        "added_p97_5": 10824.0,
+        "added_p95_lo": 10824.0,
+        "added_p95_hi": 10830.0,
+        "h6": "holds",
+        "h6_p95_bracket": "holds"
+      },
+      {
+        "config": "R",
+        "concurrency": 8,
+        "endpoint": "courses",
+        "added_p97_5": -5.0,
+        "added_p95_lo": -47.0,
+        "added_p95_hi": 47.0,
+        "h6": "holds",
+        "h6_p95_bracket": "holds"
+      },
+      {
+        "config": "EMB",
+        "concurrency": 8,
+        "endpoint": "courses",
+        "added_p97_5": 122.0,
+        "added_p95_lo": -13.0,
+        "added_p95_hi": 174.0,
+        "h6": "fails",
+        "h6_p95_bracket": "undetermined"
+      },
+      {
+        "config": "JUDGE",
+        "concurrency": 8,
+        "endpoint": "courses",
+        "added_p97_5": Infinity,
+        "added_p95_lo": Infinity,
+        "added_p95_hi": Infinity,
+        "h6": "holds",
+        "h6_p95_bracket": "holds"
+      },
+      {
+        "config": "R",
+        "concurrency": 8,
+        "endpoint": "profile",
+        "added_p97_5": -136.0,
+        "added_p95_lo": -185.0,
+        "added_p95_hi": 47.0,
+        "h6": "holds",
+        "h6_p95_bracket": "holds"
+      },
+      {
+        "config": "EMB",
+        "concurrency": 8,
+        "endpoint": "profile",
+        "added_p97_5": 310.0,
+        "added_p95_lo": -36.0,
+        "added_p95_hi": 493.0,
+        "h6": "fails",
+        "h6_p95_bracket": "undetermined"
+      },
+      {
+        "config": "JUDGE",
+        "concurrency": 8,
+        "endpoint": "profile",
+        "added_p97_5": 23474.0,
+        "added_p95_lo": 21664.0,
+        "added_p95_hi": 23657.0,
+        "h6": "holds",
+        "h6_p95_bracket": "holds"
+      },
+      {
+        "config": "R",
+        "concurrency": 8,
+        "endpoint": "reviews",
+        "added_p97_5": 14.0,
+        "added_p95_lo": -38.0,
+        "added_p95_hi": 57.0,
+        "h6": "holds",
+        "h6_p95_bracket": "undetermined"
+      },
+      {
+        "config": "EMB",
+        "concurrency": 8,
+        "endpoint": "reviews",
+        "added_p97_5": 751.0,
+        "added_p95_lo": 229.0,
+        "added_p95_hi": 794.0,
+        "h6": "fails",
+        "h6_p95_bracket": "fails"
+      },
+      {
+        "config": "JUDGE",
+        "concurrency": 8,
+        "endpoint": "reviews",
+        "added_p97_5": Infinity,
+        "added_p95_lo": Infinity,
+        "added_p95_hi": Infinity,
+        "h6": "holds",
+        "h6_p95_bracket": "holds"
+      }
+    ],
+    "note": "evaluated on added p97.5 (autocannon does not report p95); p95 bracket as sensitivity; DV-12",
+    "H6_supported": false
+  },
+  "pareto": [
+    {
+      "config": "EMB",
+      "concurrency": 1,
+      "recall": 0.0466101694915254,
+      "worst_added_p97_5": 96.0,
+      "pareto_optimal": false
+    },
+    {
+      "config": "EMB",
+      "concurrency": 8,
+      "recall": 0.0466101694915254,
+      "worst_added_p97_5": 751.0,
+      "pareto_optimal": false
+    },
+    {
+      "config": "HYB",
+      "concurrency": 1,
+      "recall": 0.2711864406779661,
+      "worst_added_p97_5": 82.0,
+      "pareto_optimal": true
+    },
+    {
+      "config": "HYB",
+      "concurrency": 8,
+      "recall": 0.2711864406779661,
+      "worst_added_p97_5": 396.0,
+      "pareto_optimal": true
+    },
+    {
+      "config": "JUDGE",
+      "concurrency": 1,
+      "recall": 0.2372881355932203,
+      "worst_added_p97_5": 10824.0,
+      "pareto_optimal": false
+    },
+    {
+      "config": "JUDGE",
+      "concurrency": 8,
+      "recall": 0.2372881355932203,
+      "worst_added_p97_5": Infinity,
+      "pareto_optimal": false
+    },
+    {
+      "config": "R",
+      "concurrency": 1,
+      "recall": 0.2245762711864407,
+      "worst_added_p97_5": 1.0,
+      "pareto_optimal": true
+    },
+    {
+      "config": "R",
+      "concurrency": 8,
+      "recall": 0.2245762711864407,
+      "worst_added_p97_5": 14.0,
+      "pareto_optimal": true
+    },
+    {
+      "config": "SLM",
+      "concurrency": 1,
+      "recall": 0.0127118644067796,
+      "worst_added_p97_5": 761.0,
+      "pareto_optimal": false
+    },
+    {
+      "config": "SLM",
+      "concurrency": 8,
+      "recall": 0.0127118644067796,
+      "worst_added_p97_5": 7180.0,
+      "pareto_optimal": false
+    }
+  ]
+}

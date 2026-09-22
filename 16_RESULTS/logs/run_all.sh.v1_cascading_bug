@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+# Runs the ENTIRE remaining pipeline for E1-E4 unattended. Every step is resumable: re-running this
+# script after any interruption skips work already written to the run folder.
+#
+# Order matters: E1-E3 must run against the frozen subject (main @ v1.0-frozen); only E4 switches to
+# the v1.1-semantic branch, and the checkout is always restored afterwards.
+set -u
+P=/home/zahid/ResearchWork/projects/semantic-validation-gap
+H=$P/17_CODE/harness
+T=$P/17_CODE/testbed
+L=$P/16_RESULTS/logs
+VENV=/home/zahid/ResearchWork/.venv/bin/python
+RUN=E1_20260920T0847
+mkdir -p "$L"
+cd "$H"
+
+step() { echo; echo "[$(date -Is)] ========== $* =========="; }
+
+wait_for_app() {
+  for i in $(seq 1 60); do
+    curl -s -m 5 -o /dev/null http://localhost:3000/api/health 2>/dev/null && return 0
+    sleep 3
+  done
+  echo "!! app not responding"; return 1
+}
+
+# Start the dev server if it is not already up (after a reboot or a closed session it will not be).
+ensure_app() {
+  curl -s -m 5 -o /dev/null http://localhost:3000/api/health 2>/dev/null && return 0
+  echo "  app is down; starting the dev server on the frozen subject"
+  (cd "$T" && nohup npm run dev -- --port 3000 > "$L/devserver.log" 2>&1 < /dev/null &)
+  wait_for_app
+}
+
+step "guard: testbed must be on the frozen subject for E1-E3"
+cd "$T" && CURRENT=$(git describe --tags 2>/dev/null || echo unknown)
+if [ "$CURRENT" != "v1.0-frozen" ]; then
+  echo "!! testbed is at '$CURRENT', expected v1.0-frozen. Refusing to measure. Run: git checkout main"
+  exit 1
+fi
+cd "$H"; ensure_app || exit 1
+
+step "E1 generation (groups A,G,B,C,F then D,E x 3 runs)"
+npx tsx cli.ts generate --exp E1 --run "$RUN" --groups A,G,B,C,F --nrandom 25
+npx tsx cli.ts generate --exp E1 --run "$RUN" --groups D,E --runs 3 --model qwen3:4b --temp 0.8 --perfamily 5
+
+step "E1 structural measurement (real HTTP path)"
+npx tsx cli.ts structural --exp E1 --run "$RUN"
+
+step "E1 objective rule verdicts (R1)"
+npx tsx cli.ts rules --exp E1 --run "$RUN"
+
+step "E1 judge verdicts (R2, gemma3:4b - different family from the generator)"
+npx tsx cli.ts judge --exp E1 --run "$RUN" --model gemma3:4b --sample 1200
+
+step "E1 merge labels + counts"
+npx tsx cli.ts merge --exp E1 --run "$RUN"
+npx tsx cli.ts report --exp E1 --run "$RUN"
+
+step "E1 annotation sample for the researcher (R3)"
+npx tsx cli.ts sample --exp E1 --run "$RUN" --n 200 --repeats 20
+
+step "E1/E2 analysis + figures"
+cd "$P/16_RESULTS/analysis"
+"$VENV" e1_e2_analysis.py "$P/16_RESULTS/raw/E1_$RUN" || echo "!! e1_e2 analysis failed"
+"$VENV" make_figures.py || echo "!! figures failed"
+
+step "E2b model-size and temperature variation (10-target subset, exploratory)"
+cd "$H"
+SUB="F01,F04,F03,F12,F14,F18,F25,F29,F35,F39"
+for M in qwen3:1.7b qwen3:8b; do
+  if curl -s http://localhost:11434/api/tags | grep -q "\"$M\""; then
+    npx tsx cli.ts generate --exp E2b --run "$RUN" --groups D,E --runs 1 --model "$M" --temp 0.8 \
+      --perfamily 5 --targets "$SUB" --families P1,P2,P3,P4 || echo "!! E2b $M generation failed"
+  else
+    echo "  skipping $M (not pulled)"
+  fi
+done
+npx tsx cli.ts generate --exp E2b --run "${RUN}_T0" --groups D,E --runs 1 --model qwen3:4b --temp 0 \
+  --perfamily 5 --targets "$SUB" --families P1,P2,P3,P4 || echo "!! E2b T=0 generation failed"
+for R in "$RUN" "${RUN}_T0"; do
+  npx tsx cli.ts structural --exp E2b --run "$R" || true
+  npx tsx cli.ts rules --exp E2b --run "$R" || true
+  npx tsx cli.ts judge --exp E2b --run "$R" --model gemma3:4b || true
+  npx tsx cli.ts merge --exp E2b --run "$R" || true
+done
+
+step "E3 semantic layer designs (R, EMB, HYB, SLM, JUDGE) on the E1 corpus"
+DESIGNS=R,HYB,SLM,JUDGE
+curl -s http://localhost:11434/api/tags | grep -q '"nomic-embed-text' && DESIGNS=R,EMB,HYB,SLM,JUDGE
+echo "  designs: $DESIGNS"
+npx tsx semantic/run_e3.ts --exp E1 --run "$RUN" --designs "$DESIGNS" || echo "!! E3 failed"
+cd "$P/16_RESULTS/analysis"
+"$VENV" e3_analysis.py "$P/16_RESULTS/raw/E1_$RUN" || echo "!! E3 analysis failed"
+
+step "E4 overhead: switching the testbed to v1.1-semantic (production build)"
+cd "$T"
+pkill -f "next dev" || true
+sleep 3
+git checkout -q e4-semantic-layer && npm run build > "$L/e4_build.log" 2>&1 && \
+  (setsid nohup npm run start -- --port 3000 > "$L/e4_server.log" 2>&1 < /dev/null &) && sleep 8 && \
+  cd "$H" && wait_for_app && DUR=60 REPS=3 bash perf/run_e4.sh > "$L/e4_run.log" 2>&1 || echo "!! E4 failed (see $L)"
+
+step "E4 done: restoring the frozen subject and the dev server"
+cd "$T"
+pkill -f "next start" || true
+sleep 3
+git checkout -q main
+git describe --tags
+setsid nohup npm run dev -- --port 3000 > "$L/devserver.log" 2>&1 < /dev/null &
+cd "$H"; wait_for_app || true
+
+step "PIPELINE COMPLETE"
+echo "tables : $P/16_RESULTS/analysis/*.csv"
+echo "figures: $P/09_DIAGRAMS/rendered/*.pdf"
+echo "summary: $P/16_RESULTS/analysis/e1_e2_summary.json and e3_summary.json"
+echo "researcher tasks remaining: annotate $P/16_RESULTS/raw/E1_$RUN/annotation_sample.csv;"
+echo "                            sign $P/10_DATASETS/human_inputs/PROVENANCE.md"

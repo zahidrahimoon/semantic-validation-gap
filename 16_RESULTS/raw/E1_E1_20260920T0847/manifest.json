@@ -1,0 +1,46 @@
+{
+  "experiment_id": "E1",
+  "run_id": "E1_20260920T0847",
+  "step": "generate",
+  "groups": [
+    "D",
+    "E"
+  ],
+  "runs": 3,
+  "model": "qwen3:4b",
+  "temperature": 0.8,
+  "families": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5",
+    "P6",
+    "P7"
+  ],
+  "perFamily": 5,
+  "nRandom": 25,
+  "targets": [
+    "F01",
+    "F04",
+    "F03",
+    "F07+F09",
+    "F12",
+    "F13",
+    "F14",
+    "F15+F16",
+    "F18",
+    "F20+F21",
+    "F25",
+    "F28",
+    "F29",
+    "F31+F33",
+    "F35",
+    "F36+F37",
+    "F39"
+  ],
+  "testbed_commit": "62a726720bc81ee498acee8f1b1fc0924b8ca598",
+  "generated": 0,
+  "failures": 0,
+  "at": "2026-09-22T05:14:16.442Z"
+}

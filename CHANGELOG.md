@@ -1,0 +1,33 @@
+# CHANGELOG — Semantic Validation Gaps in AI-Driven Web Applications
+
+## Version milestones
+
+| Version | Milestone | Date reached |
+|---|---|---|
+| v0.1 | Intake & brief | 2026-09-20 (intake; brief pending) |
+| v0.2 | Literature collected | 2026-09-20 |
+| v0.3 | Synthesis & gap | 2026-09-20 (draft) |
+| v0.4 | Novelty (Gate A) | 2026-09-20 (presented) |
+| v0.5 | Methodology | 2026-09-20 (draft) |
+| v0.6 | Experiment plan approved (Gate B) | 2026-09-20 |
+| v0.7 | Results ingested | |
+| v0.8 | First full draft | |
+| v0.9 | Reviewed & revised | |
+| v1.0 | Ready for human verification | |
+
+## Change history
+
+> Preservation rule: before a significant rewrite, copy the file to `<name>_v<version>.md`
+> and record it here.
+
+| Date | Version | File(s) | Change | Previous copy kept as | Reason |
+|---|---|---|---|---|---|
+| 2026-09-20 | v0.0 | all | Project created from template | — | — |
+| 2026-09-20 | v0.1 | USER_WORKFLOW_SPEC.md, RESEARCH_PLAN.md, 17_CODE/testbed/*, 17_CODE/ollama/*, 17_CODE/README.md, 17_CODE/ENVIRONMENT.md | Intake recorded; plan approved; testbed app v0.1 built and committed (d4d6f69) | — | Human asked for the app first (D-005) |
+| 2026-09-20 | v0.2 | 00_RESEARCH_BRIEF.md, 02_SEARCH_STRATEGY.md, 03_LITERATURE_MATRIX.csv, 06_INPUT_SURFACE_INVENTORY.md, GLOSSARY.md, 11_PAPERS/*, 12_REFERENCES/*.bib, TESTBED_OBSERVATIONS.md, 17_CODE/testbed @ 21d347a | Stage 1 brief; Stage 2 strategy + 78 logged searches; Stage 3 screening (70 included) + 20 notes; Stage 5 bib (70 entries); testbed v0.2 verified with Ollama | — | Literature stages per plan |
+| 2026-09-20 | v0.3 | 04_LITERATURE_REVIEW.md, 05_RESEARCH_GAP.md, 02_SEARCH_STRATEGY.md (D1–D5) | Stage 6 thematic synthesis (6 themes, cross-RQ table); Stage 7 gaps G1–G5 with disconfirmation searches | — | Human: "continue with the synthesis and gap analysis" |
+| 2026-09-20 | v0.4 | 06_NOVELTY.md, 14_REVIEWS/critic_report.md, DECISIONS_LOG.md (Gate A, D-006), PROJECT_STATE.md | Stage 8 novelty (5 nearest neighbours, kill search K1–K6, C1–C5, risk MEDIUM); early critic run 1; Gate A presented | — | Human: "continue with novelty analysis and gate A" |
+| 2026-09-20 | v0.5 | 01_RESEARCH_QUESTIONS.md, TRACEABILITY_MATRIX.md, 07_METHODOLOGY.md, 08_EXPERIMENT_PLAN.md, EXPERIMENT_SAFETY.md, DECISIONS_LOG.md (D-007–D-009, Gate B) | Gate A = GO WITH CHANGES; Stages 9–11 drafted; Gate B presented | — | Human: "proceed" |
+| 2026-09-20 | v0.6 | DECISIONS_LOG.md (D-010, Gate B APPROVED), 17_CODE/testbed (tag v1.0-frozen, 62a7267), BUSINESS_RULES.md (frozen OBJ/JUD classes), 17_CODE/prompts/P1–P7, 17_CODE/harness/*, 10_DATASETS/human_inputs/*, 16_RESULTS/RESULTS_LOG.md | Gate B approved; testbed frozen; harness built and typechecked; E0 pilot generation + structural run | — | Human: "continue this please" |
+| 2026-09-20 | v0.8-partial | 10_DATASETS/human_inputs/group_A.csv, group_G.csv, PROVENANCE.md; 13_DRAFT/paper.tex, paper.pdf, paper.md, references.bib; CLAIMS_LEDGER.csv; DECISIONS_LOG.md (DV-03) | Groups A/G drafted by AI (272 values, validated, provenance flagged); full pre-results IEEE manuscript written and compiled (8 pp, 65 refs); claims ledger populated (26 claims, 7 pending) | — | Human: "fill the CSVs yourself and give me the complete research article" |
+| 2026-09-22 | v0.8 (in progress) | 13_DRAFT/paper.tex (previous kept as paper_v0.8-partial-RQ1-4.tex); 16_RESULTS/analysis/e3_analysis.py (DV-11), e2b_analysis.py, e4_analysis.py (DV-12), make_latex_tables.py | E3 threshold bug fixed and re-analysed (H5 not supported); E2b analysed; E4 analysis written; Results RQ5/E2b drafted | paper_v0.8-partial-RQ1-4.tex | Human: "complete whatever is running ... then complete whole procedure" |

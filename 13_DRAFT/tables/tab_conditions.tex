@@ -1,0 +1,23 @@
+\begin{table*}[t]
+\caption{Structural and semantic outcomes by input-generation condition. The conditional SV-SI rate is
+the share of structurally valid inputs that violate at least one business rule; it is the primary
+outcome, computed over \emph{decided} passes: those whose every applicable rule received a verdict
+(passes outside the judge sample are undecided and excluded). Prompt family P5 (injection) and retried
+records are excluded. Intervals are Wilson 95\% confidence intervals.
+$^{*}$Specified as human-written; values AI-drafted, researcher review outstanding.}
+\label{tab:conditions}
+\centering
+\begin{tabular}{lrrrrrrr}
+\toprule
+Condition & $n$ & Struct.\ pass (\%) & Passes & Decided & SV-SI & Cond.\ SV-SI (\%) & 95\% CI \\
+\midrule
+A valid human$^{*}$ & 136 & 100.0 & 136 & 131 & 5 & 3.8 & [1.6, 8.6] \\
+B random & 425 & 93.6 & 398 & 359 & 196 & 54.6 & [49.4, 59.7] \\
+C rule-based adversarial & 85 & 96.5 & 82 & 82 & 64 & 78.0 & [67.9, 85.6] \\
+D LLM context-free & 1268 & 84.0 & 1065 & 521 & 202 & 38.8 & [34.7, 43.0] \\
+E LLM context-aware & 1108 & 92.8 & 1028 & 555 & 138 & 24.9 & [21.4, 28.6] \\
+F boundary & 85 & 96.5 & 82 & 79 & 20 & 25.3 & [17.0, 35.9] \\
+G benign-unusual human$^{*}$ & 136 & 100.0 & 136 & 132 & 24 & 18.2 & [12.5, 25.6] \\
+\bottomrule
+\end{tabular}
+\end{table*}

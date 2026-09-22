@@ -1,0 +1,21 @@
+# third-party papers: legal copies for reading, not ours to redistribute
+11_PAPERS/pdfs/
+# the testbed is its own git repository (tags v1.0-frozen, v1.2-semantic)
+17_CODE/testbed/
+# dependencies, builds, caches
+node_modules/
+.next/
+__pycache__/
+*.pyc
+# LaTeX intermediates
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+# local secrets
+.env
+.env.*

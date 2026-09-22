@@ -1,0 +1,108 @@
+{
+  "run": "E1_E1_20260920T0847",
+  "key_mismatch_excluded": 430,
+  "retried_records": 131,
+  "retried_included": false,
+  "generation_failures": {
+    "total": 88,
+    "by_group": {
+      "E": 53,
+      "D": 35
+    },
+    "by_reason": {
+      "call_error": 75,
+      "unparseable_or_empty": 13
+    },
+    "by_target": {
+      "F39": 11,
+      "F28": 9,
+      "F03": 8,
+      "F07+F09": 8,
+      "F20+F21": 8,
+      "F31+F33": 8,
+      "F35": 8,
+      "F29": 7,
+      "F13": 5,
+      "F18": 5,
+      "F12": 3,
+      "F36+F37": 3,
+      "F01": 3,
+      "F04": 1,
+      "F14": 1
+    },
+    "successful_calls": 610,
+    "failure_rate": 0.12607449856733524
+  },
+  "analysis_population": {
+    "structural_passes": 2927,
+    "decided": 1859,
+    "undecided_not_judged": 1068
+  },
+  "n_inputs": 3317,
+  "n_primary": 3243,
+  "n_struct_pass": 1859,
+  "H1": {
+    "k": 340,
+    "n": 1076,
+    "rate": 0.3159851301115242,
+    "ci_lo": 0.28890302523105055,
+    "ci_hi": 0.34437647449062564,
+    "threshold": 0.05,
+    "H1_supported": true
+  },
+  "H2": {
+    "chi2": 179.77664752613788,
+    "p": 3.784737512557021e-36,
+    "dof": 6,
+    "cramers_v": 0.31097605068924467,
+    "H2_supported": true
+  },
+  "contrasts": [
+    {
+      "contrast": "E>B",
+      "k1": 138.0,
+      "n1": 555.0,
+      "rate1": 0.24864864864864866,
+      "k2": 196.0,
+      "n2": 359.0,
+      "rate2": 0.5459610027855153,
+      "odds_ratio": 0.2752165614447218,
+      "p_raw": 1.0,
+      "p_holm": 1.0,
+      "significant": 0.0
+    },
+    {
+      "contrast": "E>G",
+      "k1": 138.0,
+      "n1": 555.0,
+      "rate1": 0.24864864864864866,
+      "k2": 24.0,
+      "n2": 132.0,
+      "rate2": 0.18181818181818182,
+      "odds_ratio": 1.4892086330935252,
+      "p_raw": 0.06299991467324775,
+      "p_holm": 0.18899974401974326,
+      "significant": 0.0
+    },
+    {
+      "contrast": "D>B",
+      "k1": 202.0,
+      "n1": 521.0,
+      "rate1": 0.3877159309021113,
+      "k2": 196.0,
+      "n2": 359.0,
+      "rate2": 0.5459610027855153,
+      "odds_ratio": 0.5266137803083616,
+      "p_raw": 0.9999987406574552,
+      "p_holm": 1.0,
+      "significant": 0.0
+    }
+  ],
+  "ai_facing": {
+    "ai_facing_passes": 604,
+    "svsi_all": 134,
+    "svsi_p5": 20,
+    "svsi_non_p5": 114
+  },
+  "ambiguous_share": 0.0
+}

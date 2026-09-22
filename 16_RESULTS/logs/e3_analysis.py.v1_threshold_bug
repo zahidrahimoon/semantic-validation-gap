@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+"""E3 analysis: detection quality of each semantic-layer design, leave-fields-out.
+
+Thresholds are chosen on training-fold fields at FPR <= 0.05 on VALID inputs and applied to held-out
+fields, so no design is tuned on the fields it is scored on (08_EXPERIMENT_PLAN.md, frozen).
+Primary metric: recall at FPR <= 0.05 on held-out fields. H5: some non-JUDGE design reaches >= 0.70.
+
+Usage: ../../../../.venv/bin/python e3_analysis.py <run_folder>
+"""
+import json, sys, pathlib
+import numpy as np, pandas as pd
+
+RUN = pathlib.Path(sys.argv[1]); OUT = pathlib.Path(__file__).parent
+rows = [json.loads(l) for l in open(RUN / "e3_decisions.jsonl")]
+d = pd.DataFrame(rows)
+if d.empty: sys.exit("no e3 decisions")
+d["y"] = (d["label"] == "SV-SI").astype(int)
+
+# DV-08: the model-based designs (SLM, JUDGE) were scored on a stratified sample; the fast designs on
+# everything. The PRIMARY comparison restricts every design to that same sample so it is like for
+# like; full-corpus figures for the fast designs are reported separately.
+_sf = RUN / "e3_sample_ids.json"
+SAMPLE = set(json.loads(_sf.read_text())["ids"]) if _sf.exists() else None
+FULL = d.copy()
+if SAMPLE is not None:
+    d = d[d["input_id"].isin(SAMPLE)].copy()
+    print(f"primary comparison on the shared stratified sample: {d['input_id'].nunique()} inputs")
+
+FOLDS = 5
+targets = sorted(FULL["target_id"].unique())
+fold_of = {t: i % FOLDS for i, t in enumerate(targets)}
+d["fold"] = d["target_id"].map(fold_of)
+FULL["fold"] = FULL["target_id"].map(fold_of)
+
+def threshold_at_fpr(scores_valid, max_fpr=0.05):
+    """Lowest threshold whose FPR on VALID inputs is <= max_fpr (ties broken conservatively)."""
+    if len(scores_valid) == 0: return 0.5
+    return float(np.quantile(scores_valid, 1 - max_fpr))
+
+def metrics(y, s, thr):
+    pred = (s >= thr).astype(int)
+    tp = int(((pred == 1) & (y == 1)).sum()); fp = int(((pred == 1) & (y == 0)).sum())
+    fn = int(((pred == 0) & (y == 1)).sum()); tn = int(((pred == 0) & (y == 0)).sum())
+    rec = tp / (tp + fn) if tp + fn else np.nan
+    prec = tp / (tp + fp) if tp + fp else np.nan
+    fpr = fp / (fp + tn) if fp + tn else np.nan
+    f1 = 2 * prec * rec / (prec + rec) if prec and rec and not np.isnan(prec) and not np.isnan(rec) and (prec + rec) else np.nan
+    return dict(tp=tp, fp=fp, fn=fn, tn=tn, recall=rec, precision=prec, fpr=fpr, fnr=1 - rec if rec == rec else np.nan, f1=f1)
+
+results, per_fold = [], []
+for design, dd in d.groupby("design"):
+    ys, ss = [], []
+    for f in range(FOLDS):
+        tr, te = dd[dd["fold"] != f], dd[dd["fold"] == f]
+        if te.empty or tr.empty: continue
+        thr = threshold_at_fpr(tr.loc[tr["y"] == 0, "score"].values)
+        m = metrics(te["y"].values, te["score"].values, thr)
+        per_fold.append(dict(design=design, fold=f, threshold=thr, n=len(te), **m))
+        ys.append(te["y"].values); ss.append((te["score"].values >= thr).astype(int))
+    if not ys: continue
+    y = np.concatenate(ys); pred = np.concatenate(ss)
+    tp = int(((pred == 1) & (y == 1)).sum()); fp = int(((pred == 1) & (y == 0)).sum())
+    fn = int(((pred == 0) & (y == 1)).sum()); tn = int(((pred == 0) & (y == 0)).sum())
+    rec = tp / (tp + fn) if tp + fn else np.nan
+    prec = tp / (tp + fp) if tp + fp else np.nan
+    fpr = fp / (fp + tn) if fp + tn else np.nan
+    # stratified bootstrap over inputs
+    rng = np.random.default_rng(2026); boot = []
+    idx = np.arange(len(y))
+    for _ in range(1000):
+        b = rng.choice(idx, len(idx), replace=True)
+        yb, pb = y[b], pred[b]
+        t_, f_ = ((pb == 1) & (yb == 1)).sum(), ((pb == 0) & (yb == 1)).sum()
+        boot.append(t_ / (t_ + f_) if t_ + f_ else np.nan)
+    lo, hi = np.nanpercentile(boot, [2.5, 97.5])
+    results.append(dict(design=design, n=len(y), tp=tp, fp=fp, fn=fn, tn=tn,
+        recall_at_fpr05=rec, recall_ci_lo=lo, recall_ci_hi=hi, precision=prec, fpr=fpr,
+        f1=2 * prec * rec / (prec + rec) if prec and rec and (prec + rec) else np.nan,
+        median_ms=float(dd["ms"].median()), p95_ms=float(dd["ms"].quantile(0.95))))
+
+res = pd.DataFrame(results).sort_values("recall_at_fpr05", ascending=False)
+res["population"] = "shared stratified sample" if SAMPLE is not None else "all decided inputs"
+res.to_csv(OUT / "table6_detection.csv", index=False)
+
+# Secondary: fast designs on the full corpus (more precise, but not directly comparable to SLM/JUDGE).
+if SAMPLE is not None:
+    full_rows = []
+    for design, dd in FULL[FULL["design"].isin(["R", "EMB", "HYB"])].groupby("design"):
+        ys, ps = [], []
+        for f in range(FOLDS):
+            tr, te = dd[dd["fold"] != f], dd[dd["fold"] == f]
+            if te.empty or tr.empty: continue
+            thr = threshold_at_fpr(tr.loc[tr["y"] == 0, "score"].values)
+            ys.append(te["y"].values); ps.append((te["score"].values >= thr).astype(int))
+        if not ys: continue
+        y = np.concatenate(ys); pr = np.concatenate(ps)
+        tp = int(((pr == 1) & (y == 1)).sum()); fp = int(((pr == 1) & (y == 0)).sum())
+        fn = int(((pr == 0) & (y == 1)).sum()); tn = int(((pr == 0) & (y == 0)).sum())
+        full_rows.append(dict(design=design, n=len(y), recall=tp / (tp + fn) if tp + fn else np.nan,
+                              fpr=fp / (fp + tn) if fp + tn else np.nan, population="all decided inputs"))
+    pd.DataFrame(full_rows).to_csv(OUT / "table6c_detection_full_corpus_fast_designs.csv", index=False)
+pd.DataFrame(per_fold).to_csv(OUT / "table6b_detection_per_fold.csv", index=False)
+
+non_judge = res[res["design"] != "JUDGE"]
+h5 = dict(best_non_judge=None if non_judge.empty else str(non_judge.iloc[0]["design"]),
+          best_recall=None if non_judge.empty else float(non_judge.iloc[0]["recall_at_fpr05"]),
+          threshold=0.70,
+          H5_supported=bool(not non_judge.empty and non_judge.iloc[0]["recall_at_fpr05"] >= 0.70))
+(OUT / "e3_summary.json").write_text(json.dumps(dict(H5=h5, designs=results), indent=2, default=str))
+print(res.to_string(index=False)); print("\nH5:", json.dumps(h5, indent=2))

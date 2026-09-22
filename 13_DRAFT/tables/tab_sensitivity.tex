@@ -1,0 +1,23 @@
+\begin{table}[t]
+\caption{Sensitivity of the conditional SV-SI rate to design choices. LLM: conditions D and E pooled;
+B: random; G: benign-unusual (AI-drafted). ``Without context rules'' drops seven judgement rules the
+judge had to decide without the rest of the record. ``Objective rules only'' uses no judge. Target-weighted averages
+per-target rates by each target's share of structural passes. P1 and P3 apply to model conditions only.}
+\label{tab:sensitivity}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrr}
+\toprule
+Variant & LLM (\%) & 95\% CI & B (\%) & G (\%) \\
+\midrule
+Pre-registered (all rules) & 31.6 & [28.9, 34.4] & 54.6 & 18.2 \\
+P1 (legitimate) prompts only & 23.2 & [17.8, 29.6] & -- & -- \\
+Without P3 (asks for violations) & 29.5 & [26.6, 32.5] & 54.6 & 18.2 \\
+Without dates (F15+F16) & 22.1 & [19.6, 24.9] & 51.8 & 18.5 \\
+Objective rules only & 7.9 & [6.8, 9.2] & 10.3 & 0.7 \\
+Without context rules & 25.0 & [22.5, 27.7] & 36.9 & 9.1 \\
+Target-weighted & 30.9 & -- & 54.7 & 17.9 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,24 @@
+{
+  "name": "svg-harness",
+  "private": true,
+  "type": "module",
+  "description": "Experiment harness for the semantic-validation-gap study (E0-E4).",
+  "scripts": {
+    "gen": "tsx cli.ts generate",
+    "structural": "tsx cli.ts structural",
+    "rules": "tsx cli.ts rules",
+    "judge": "tsx cli.ts judge",
+    "merge": "tsx cli.ts merge",
+    "sample": "tsx cli.ts sample",
+    "report": "tsx cli.ts report"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "autocannon": "^8.0.0",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
+  }
+}

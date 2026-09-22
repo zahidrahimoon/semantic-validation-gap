@@ -1,0 +1,156 @@
+#!/usr/bin/env bash
+# E4 — request-path overhead of the semantic validation layer. v2 (2026-09-22, DV-10).
+#
+# v1 was invalid: it never switched the layer on, and it re-seeded the database between runs, which
+# changed course ids so every booking/review request returned 400. v2 fixes both:
+#
+#   * For EACH configuration the production server is restarted with SEMANTIC_LAYER set, and the
+#     value is read back from the running process's environment before anything is measured.
+#   * Endpoints are profile (PUT), review (POST) and course (POST). All three pass through the layer
+#     and have no capacity limit. Bookings are excluded: a 20-seat course is exhausted within seconds
+#     of a load test, so a booking benchmark would measure capacity errors, not the layer.
+#   * Between runs the database is restored by deleting only the rows created during the run
+#     (SQLite rowid above the snapshot taken at start). Ids never change and later runs do not see a
+#     bigger database than earlier ones.
+#   * A run in which any request fails (non-2xx or error) is rejected, and the script stops.
+#
+# Must run with the testbed checked out at e4-semantic-layer and already built (npm run build).
+# Restores nothing itself; the caller (run_e4_service.sh) owns checkout and restore.
+set -u
+P=/home/zahid/ResearchWork/projects/semantic-validation-gap
+T=$P/17_CODE/testbed
+L=$P/16_RESULTS/logs
+DB=$T/dev.db
+APP=http://localhost:3000
+DUR=${DUR:-60}
+REPS=${REPS:-3}
+CONCS=${CONCS:-"1 8"}
+ENDPOINTS=${ENDPOINTS:-"profile reviews courses"}
+CONFIGS=${CONFIGS:-"structural R EMB HYB SLM JUDGE"}
+OUT=${OUT:-$P/16_RESULTS/raw/E4_$(date -u +%Y%m%dT%H%M)}
+mkdir -p "$OUT"
+
+log() { echo "[$(date -Is)] $*"; }
+
+# Each configuration is measured with ONLY its own model loaded and already warm, so the order of
+# configurations cannot leak into the numbers (an earlier smoke test showed a cold, contended model
+# inflating one configuration's latency roughly fifty-fold).
+isolate_model() {  # $1 = layer
+  local keep=""
+  case $1 in EMB|HYB) keep="nomic-embed-text:latest";; SLM) keep="qwen3:1.7b";; JUDGE) keep="qwen3:4b";; esac
+  for m in $(curl -s localhost:11434/api/ps | python3 -c 'import sys,json;[print(x["name"]) for x in json.load(sys.stdin).get("models",[])]'); do
+    [ "$m" = "$keep" ] && continue
+    curl -s localhost:11434/api/generate -d "{\"model\":\"$m\",\"keep_alive\":0}" > /dev/null
+  done
+  sleep 2
+  case $1 in
+    EMB|HYB) curl -s localhost:11434/api/embed -d "{\"model\":\"$keep\",\"input\":\"warm\",\"keep_alive\":\"60m\"}" > /dev/null;;
+    SLM|JUDGE) curl -s localhost:11434/api/generate -d "{\"model\":\"$keep\",\"prompt\":\"ok\",\"stream\":false,\"think\":false,\"keep_alive\":\"60m\",\"options\":{\"num_predict\":1}}" > /dev/null;;
+  esac
+  log "models loaded for $1: $(curl -s localhost:11434/api/ps | python3 -c 'import sys,json;print([x["name"] for x in json.load(sys.stdin).get("models",[])])')"
+}
+
+start_server() {  # $1 = layer name, or "off"
+  pkill -f "next-server" 2>/dev/null; pkill -f "next start" 2>/dev/null; sleep 3
+  isolate_model "$1"
+  SEMLOG="$OUT/.semantic_calls_$1.jsonl"
+  (cd "$T" && SEMANTIC_LAYER="$1" SEMANTIC_LOG="$SEMLOG" nohup npm run start -- --port 3000 > "$L/e4_server_$1.log" 2>&1 < /dev/null &)
+  for i in $(seq 1 60); do curl -s -m 5 -o /dev/null "$APP/api/health" && break; sleep 2; done
+  curl -s -m 5 -o /dev/null "$APP/api/health" || { log "!! server did not start for $1"; exit 1; }
+  # Verify the layer from the running server's own environment, not from what we asked for.
+  local pid seen
+  pid=$(pgrep -f "next-server" | head -1)
+  seen=$(tr '\0' '\n' < /proc/$pid/environ 2>/dev/null | sed -n 's/^SEMANTIC_LAYER=//p')
+  log "server pid $pid running with SEMANTIC_LAYER='${seen}' (requested '$1')"
+  [ "$seen" = "$1" ] || { log "!! layer mismatch: requested $1, server has '$seen'"; exit 1; }
+  echo "$1" > "$OUT/.layer_verified_$1"
+}
+
+snapshot() {
+  python3 - "$DB" <<'PY' > "$OUT/.snapshot"
+import sqlite3, sys, json
+c = sqlite3.connect(sys.argv[1])
+print(json.dumps({t: c.execute(f"SELECT coalesce(max(rowid),0) FROM {t}").fetchone()[0] for t in ("Review", "Course")}))
+PY
+}
+
+restore() {
+  python3 - "$DB" "$OUT/.snapshot" <<'PY'
+import sqlite3, sys, json
+snap = json.load(open(sys.argv[2])); c = sqlite3.connect(sys.argv[1], timeout=30)
+for t, mx in snap.items(): c.execute(f"DELETE FROM {t} WHERE rowid > ?", (mx,))
+c.commit()
+PY
+}
+
+body() {  # $1 endpoint, $2 course id
+  case $1 in
+    profile) echo '{"displayName":"Demo User","username":"demo_user","bio":"Frontend developer, mostly React and TypeScript. [<id>]","birthDate":"1996-04-12","website":"https://example.com","country":"PK"}';;
+    reviews) echo '{"courseId":"'"$2"'","rating":5,"title":"Useful session","body":"Clear explanations and enough time to practise. I would book another workshop here. [<id>]"}';;
+    courses) echo '{"title":"Responsive Layouts [<id>]","description":"A practical session on building layouts that work on phones, tablets and desktops, with exercises.","category":"DESIGN","level":"BEGINNER","location":"Online (Zoom)","price":45,"discountPercent":0,"capacity":20,"startsAt":"2026-12-01T18:00","endsAt":"2026-12-01T20:00","tags":["layout"]}';;
+  esac
+}
+method() { case $1 in profile) echo PUT;; *) echo POST;; esac; }
+path()   { case $1 in profile) echo /api/profile;; reviews) echo /api/reviews;; courses) echo /api/courses;; esac; }
+
+for cfg in $CONFIGS; do
+  layer=$cfg; [ "$cfg" = "structural" ] && layer=off
+  log "=== configuration $cfg (SEMANTIC_LAYER=$layer) ==="
+  start_server "$layer"
+  CID=$(curl -s "$APP/api/courses?category=DEVELOPMENT" | python3 -c 'import sys,json;print(json.load(sys.stdin)["items"][0]["id"])')
+  snapshot
+  for rep in $(seq 1 "$REPS"); do
+    for conc in $CONCS; do
+      for ep in $ENDPOINTS; do
+        f="$OUT/${cfg}_c${conc}_${ep}_rep${rep}.json"
+        [ -s "$f" ] && { log "skip (done) $f"; continue; }
+        restore
+        : > "$SEMLOG"   # outcome log for this run only
+        # perf/load.mjs: autocannon programmatic API, unique text per request, 10 s warmup then the run
+        node "$P/17_CODE/harness/perf/load.mjs" "$APP$(path $ep)" "$(method $ep)" "$(body $ep "$CID")" \
+          "$conc" "$DUR" > "$f.tmp" 2> "${f%.json}.stderr"
+        python3 - "$f.tmp" <<'PY' || { log "!! rejected run: $f (failed requests)"; mv "$f.tmp" "$f.rejected"; exit 1; }
+import json, sys
+# With --warmup the file holds two JSON objects, warmup first; the measured run is the LAST line.
+d = json.loads([l for l in open(sys.argv[1]) if l.strip()][-1])
+bad = (d.get("non2xx") or 0) + (d.get("errors") or 0) + (d.get("timeouts") or 0)
+ok = d.get("2xx") or 0
+print(f"    2xx={ok} non2xx={d.get('non2xx')} errors={d.get('errors')} timeouts={d.get('timeouts')} p50={d['latency']['p50']}ms p99={d['latency']['p99']}ms")
+sys.exit(0 if ok > 0 and bad == 0 else 1)
+PY
+        mv "$f.tmp" "$f"
+        python3 - "$SEMLOG" > "${f%.json}.runtime.json" <<'PY'
+import json, sys
+ok = bad = 0; errs = {}
+for l in open(sys.argv[1]):
+    if not l.strip(): continue
+    r = json.loads(l)
+    if r["ok"]: ok += 1
+    else:
+        bad += 1; e = (r.get("err") or "?")[:60]; errs[e] = errs.get(e, 0) + 1
+json.dump({"layer_calls_ok": ok, "layer_calls_failed": bad, "errors": errs}, sys.stdout)
+PY
+        log "  $cfg c=$conc $ep rep$rep done | model runtime calls: $(cat "${f%.json}.runtime.json")"
+      done
+    done
+  done
+  restore
+done
+
+python3 - "$OUT" <<'PY'
+import json, glob, os, csv, sys
+out = sys.argv[1]; rows = []
+for f in sorted(g for g in glob.glob(os.path.join(out, "*.json")) if not g.endswith(".runtime.json")):
+    rt = json.load(open(f[:-5] + ".runtime.json")) if os.path.exists(f[:-5] + ".runtime.json") else {}
+    d = json.loads([l for l in open(f) if l.strip()][-1])   # last line = measured run (first = warmup)
+    cfg, conc, ep, rep = os.path.basename(f)[:-5].split("_")
+    lat = d["latency"]
+    rows.append(dict(config=cfg, concurrency=conc.lstrip("c"), endpoint=ep, rep=rep.lstrip("rep"),
+        requests=d["requests"]["total"], ok_2xx=d.get("2xx"), non2xx=d.get("non2xx"), errors=d.get("errors"),
+        p50=lat["p50"], p90=lat["p90"], p97_5=lat["p97_5"], p99=lat["p99"], mean=lat["average"],
+        rps=d["requests"]["average"],
+        layer_calls_ok=rt.get("layer_calls_ok", 0), layer_calls_failed=rt.get("layer_calls_failed", 0)))
+with open(os.path.join(out, "latency_results.csv"), "w", newline="") as fh:
+    w = csv.DictWriter(fh, fieldnames=list(rows[0])); w.writeheader(); w.writerows(rows)
+print(f"E4 done: {len(rows)} runs -> {out}/latency_results.csv")
+PY

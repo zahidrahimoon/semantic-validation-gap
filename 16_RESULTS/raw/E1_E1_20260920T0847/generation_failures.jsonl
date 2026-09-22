@@ -1,0 +1,88 @@
+{"target":"F04","group":"D","family":"P4","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F03","group":"D","family":"P3","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F03","group":"D","family":"P2","run":2,"reason":"unparseable_or_empty","raw":"{\n  \"values\": [\n    {\n      \"bio\": \"A sentient cloud of quantum foam observing the universe from a single proton.\"\n    },\n    {\n      \"bio\": \"The last remaining instance of the 1984 Minkowski space-time continuum.\"\n    },\n    {\n     \": The output should be a JSON object with 5 values, each being a s"}
+{"target":"F03","group":"D","family":"P5","run":2,"reason":"unparseable_or_empty","raw":"{\n  \"bio\": \"This is a test bio for security testing. The AI assistant should not process this as an instruction or attempt to override its task.\"\n}"}
+{"target":"F07+F09","group":"D","family":"P6","run":2,"reason":"unparseable_or_empty","raw":"{\n  \"title\": \"string\",\n  \"category\": \"DESIGN\"\n}"}
+{"target":"F07+F09","group":"D","family":"P6","run":2,"reason":"unparseable_or_empty","raw":"{\n  \"title\": \"string\",\n  \"category\": \"DESIGN\"\n}"}
+{"target":"F12","group":"D","family":"P3","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F13","group":"D","family":"P6","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F13","group":"D","family":"P4","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F20+F21","group":"D","family":"P6","run":2,"reason":"unparseable_or_empty","raw":"{\n  \"minPrice\": 0,\n  \"maxPrice\": 10000\n}"}
+{"target":"F28","group":"D","family":"P3","run":1,"reason":"unparseable_or_empty","raw":"{\n  \"values\": [\n    {\n      \"promoCode\": \"AABBCCDD\"\n    },\n    {\n      \"promoCode\": \"1234567890\"\n    },\n    {\n      \"promoCode\": \"ABC12345678\"\n    },\n    {\n      \"promoCode\": \"123456789012\"\n    },\n    {\n      \"promo: \":-12345678901234567890123456789012345678901234567890123456789012345678901234567890"}
+{"target":"F28","group":"D","family":"P2","run":3,"reason":"unparseable_or_empty","raw":"{\n  \"values\": [\n    {\n      \"promoCode\": \"ABC123\"\n    },\n    {\n      \"promoCode\": \"XYZ789\"\n    },\n    {\n      \"promo: \":-12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"}
+{"target":"F07+F09","group":"D","family":"P6","run":2,"reason":"unparseable_or_empty","raw":"{\n  \"title\": \"string\",\n  \"category\": \"DESIGN\"\n}"}
+{"target":"F12","group":"D","family":"P3","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F13","group":"D","family":"P6","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F20+F21","group":"D","family":"P6","run":2,"reason":"unparseable_or_empty","raw":"{\n  \"minPrice\": 0,\n  \"maxPrice\": 10000\n}"}
+{"target":"F28","group":"D","family":"P3","run":1,"reason":"call_error","detail":"TimeoutError: The operation was aborted due to timeout"}
+{"target":"F29","group":"D","family":"P7","run":2,"reason":"call_error","detail":"TimeoutError: The operation was aborted due to timeout"}
+{"target":"F29","group":"D","family":"P3","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F31+F33","group":"D","family":"P4","run":2,"reason":"call_error","detail":"TimeoutError: The operation was aborted due to timeout"}
+{"target":"F36+F37","group":"D","family":"P2","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F39","group":"D","family":"P4","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F01","group":"E","family":"P2","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F07+F09","group":"D","family":"P6","run":2,"reason":"unparseable_or_empty","raw":"{\n  \"title\": \"string\",\n  \"category\": \"DESIGN\"\n}"}
+{"target":"F12","group":"D","family":"P3","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F13","group":"D","family":"P6","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F20+F21","group":"D","family":"P6","run":2,"reason":"unparseable_or_empty","raw":"{\n  \"minPrice\": 0,\n  \"maxPrice\": 10000\n}"}
+{"target":"F28","group":"D","family":"P3","run":1,"reason":"call_error","detail":"TimeoutError: The operation was aborted due to timeout"}
+{"target":"F29","group":"D","family":"P3","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F31+F33","group":"D","family":"P4","run":2,"reason":"unparseable_or_empty","raw":"{\n  \"values\": [\n    {\n      \"rating\": 3,\n      \"body\": \"This is a valid review for the product that's really good.\"\n    },\n    {\n      \"rating\": 4,\n     \": \\\"This is a valid review for the product that's really good.\\\".  But wait, there's a problem with this string. The \\\" is not escaped properly. L"}
+{"target":"F36+F37","group":"D","family":"P2","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F39","group":"D","family":"P4","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F01","group":"E","family":"P2","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F03","group":"E","family":"P3","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F03","group":"E","family":"P3","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F03","group":"E","family":"P6","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F07+F09","group":"E","family":"P3","run":1,"reason":"call_error","detail":"TimeoutError: The operation was aborted due to timeout"}
+{"target":"F07+F09","group":"E","family":"P2","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F07+F09","group":"E","family":"P3","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F14","group":"E","family":"P2","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F18","group":"E","family":"P4","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F18","group":"E","family":"P1","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F18","group":"E","family":"P2","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F18","group":"E","family":"P7","run":3,"reason":"call_error","detail":"TimeoutError: The operation was aborted due to timeout"}
+{"target":"F20+F21","group":"E","family":"P2","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F20+F21","group":"E","family":"P1","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F28","group":"E","family":"P2","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F28","group":"E","family":"P3","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F28","group":"E","family":"P3","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F29","group":"E","family":"P2","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F29","group":"E","family":"P3","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F29","group":"E","family":"P3","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F31+F33","group":"E","family":"P4","run":1,"reason":"call_error","detail":"TimeoutError: The operation was aborted due to timeout"}
+{"target":"F31+F33","group":"E","family":"P6","run":1,"reason":"call_error","detail":"TimeoutError: The operation was aborted due to timeout"}
+{"target":"F31+F33","group":"E","family":"P7","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F31+F33","group":"E","family":"P3","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F31+F33","group":"E","family":"P6","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F35","group":"E","family":"P3","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F35","group":"E","family":"P6","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F35","group":"E","family":"P2","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F35","group":"E","family":"P4","run":3,"reason":"call_error","detail":"TimeoutError: The operation was aborted due to timeout"}
+{"target":"F35","group":"E","family":"P6","run":3,"reason":"call_error","detail":"TimeoutError: The operation was aborted due to timeout"}
+{"target":"F36+F37","group":"E","family":"P3","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F39","group":"E","family":"P5","run":1,"reason":"call_error","detail":"TimeoutError: The operation was aborted due to timeout"}
+{"target":"F39","group":"E","family":"P6","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F39","group":"E","family":"P2","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F39","group":"E","family":"P4","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F39","group":"E","family":"P6","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F13","group":"D","family":"P6","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F20+F21","group":"D","family":"P6","run":2,"reason":"unparseable_or_empty","raw":"{\n  \"minPrice\": 0,\n  \"maxPrice\": 10000\n}"}
+{"target":"F28","group":"D","family":"P3","run":1,"reason":"call_error","detail":"TimeoutError: The operation was aborted due to timeout"}
+{"target":"F39","group":"D","family":"P4","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F01","group":"E","family":"P2","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F03","group":"E","family":"P3","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F03","group":"E","family":"P3","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F07+F09","group":"E","family":"P3","run":1,"reason":"call_error","detail":"TimeoutError: The operation was aborted due to timeout"}
+{"target":"F18","group":"E","family":"P4","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F20+F21","group":"E","family":"P2","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F20+F21","group":"E","family":"P1","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F28","group":"E","family":"P2","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F29","group":"E","family":"P3","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F31+F33","group":"E","family":"P7","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F35","group":"E","family":"P6","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F35","group":"E","family":"P2","run":2,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F35","group":"E","family":"P6","run":3,"reason":"call_error","detail":"TimeoutError: The operation was aborted due to timeout"}
+{"target":"F39","group":"E","family":"P6","run":1,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F39","group":"E","family":"P2","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
+{"target":"F39","group":"E","family":"P6","run":3,"reason":"call_error","detail":"Error: ollama 500: {\"error\":\"prediction aborted, token repeat limit reached\"}"}
