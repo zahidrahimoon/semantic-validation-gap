@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research Review</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #fff; color: #000; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { border-bottom: 2px solid #000; padding: 12px 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  header h1 { font-size: 18px; margin: 0 auto 0 0; }
+  main { max-width: 860px; margin: 0 auto; padding: 18px 16px 60px; }
+  button { font: inherit; cursor: pointer; border: 2px solid #000; background: #fff; color: #000; padding: 7px 14px; }
+  button.dark, .choice.on { background: #000; color: #fff; }
+  button:disabled { opacity: .35; cursor: default; }
+  .help { border: 1px dashed #000; padding: 12px 14px; font-size: 14px; }
+  .bar { height: 10px; border: 2px solid #000; margin: 6px 0 4px; } .bar > div { height: 100%; background: #000; width: 0; }
+  .meta { color: #555; font-size: 14px; }
+  .card { border: 2px solid #000; padding: 18px; margin-top: 14px; }
+  .label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: #555; margin-top: 14px; }
+  .value { font-family: ui-monospace, Menlo, monospace; background: #f2f2f2; border: 1px solid #000; padding: 10px 12px;
+           white-space: pre-wrap; word-break: break-word; margin-top: 4px; }
+  .rule { border-top: 1px solid #000; padding: 12px 0; } .rule:first-of-type { border-top: 0; }
+  .choices { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; } .choice { min-width: 110px; }
+  .nav { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  input[type=text], textarea { width: 100%; font: inherit; border: 2px solid #000; padding: 8px; margin-top: 4px; }
+  textarea { font-family: ui-monospace, Menlo, monospace; }
+  kbd { border: 1px solid #000; padding: 0 5px; font-size: 12px; }
+  .msg { min-height: 22px; font-size: 14px; margin-top: 10px; } .hidden { display: none; }
+  ul { margin: 4px 0 0; padding-left: 20px; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Research Review</h1>
+  <button id="loadBtn">Load earlier results</button>
+  <button class="dark" id="dlBtn">Download results</button>
+  <input type="file" id="fileIn" accept=".json,application/json" class="hidden">
+</header>
+<main>
+  <div class="help" id="help"></div>
+  <div class="label">Your name</div>
+  <input type="text" id="name" placeholder="Full name (recorded with your answers)">
+  <div class="meta" id="progress" style="margin-top:12px"></div>
+  <div class="bar"><div id="bar"></div></div>
+  <div class="card" id="card"></div>
+  <div class="card hidden" id="signoff">
+    <b>Confirmation</b>
+    <p>Of the values you kept: are they values you would have written yourself for these fields?</p>
+    <div class="choices">
+      <button class="choice" data-c="YES">YES</button><button class="choice" data-c="NO">NO</button>
+    </div>
+    <div class="msg">When done, press <b>Download results</b> (top right) and send the file back.</div>
+  </div>
+  <div class="msg" id="msg"></div>
+</main>
+<script>
+const CONFIG = /*__CONFIG__*/null;
+const KEY = `review:${CONFIG.task}:${CONFIG.package}`;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const pretty = (v) => { try { return JSON.stringify(JSON.parse(v), null, 2); } catch { return v; } };
+let S = { name: "", answers: {}, confirmation: null, started: new Date().toISOString() };
+let idx = 0, draft = {};
+
+function save() { S.saved = new Date().toISOString(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* private mode: use Download */ } }
+function load() { try { const x = JSON.parse(localStorage.getItem(KEY) || "null"); if (x) S = x; } catch {} }
+function flash(t) { $("msg").textContent = t; setTimeout(() => { if ($("msg").textContent === t) $("msg").textContent = ""; }, 3000); }
+const items = CONFIG.items, done = () => items.filter((i) => S.answers[i.number]).length;
+const firstOpen = (from = -1) => { let n = items.findIndex((x, i) => i > from && !S.answers[x.number]); if (n < 0) n = items.findIndex((x) => !S.answers[x.number]); return n; };
+
+function progress() {
+  $("progress").textContent = `${done()} of ${items.length} done`;
+  $("bar").style.width = `${(100 * done()) / items.length}%`;
+  $("signoff").classList.toggle("hidden", CONFIG.task !== "reference" || done() < items.length);
+  document.querySelectorAll("[data-c]").forEach((b) => b.classList.toggle("on", b.dataset.c === S.confirmation));
+}
+function advance() { const n = firstOpen(idx); idx = n >= 0 ? n : Math.min(idx + 1, items.length - 1); render(); if (n < 0) flash("All items done. Press “Download results”."); }
+
+function render() {
+  progress();
+  const it = items[idx], a = S.answers[it.number];
+  if (CONFIG.task === "annotation") {
+    const d = draft[it.number] || (draft[it.number] = { ...(a?.verdicts || {}) });
+    $("card").innerHTML = `<div class="meta">Item ${it.number} of ${items.length}</div>
+      <div class="label">Field purpose</div><div>${esc(it.purpose)}</div>
+      <div class="label">Submitted value</div><div class="value">${esc(pretty(it.value))}</div>
+      <div class="label">Does the value respect each rule?</div>
+      ${it.rules.map((r) => `<div class="rule"><div>${esc(r.text)}</div><div class="choices">${[["PASS", "Respects it"], ["FAIL", "Breaks it"], ["AMBIGUOUS", "Unsure"]]
+        .map(([v, t]) => `<button class="choice ${d[r.id] === v ? "on" : ""}" data-r="${r.id}" data-v="${v}">${t}</button>`).join("")}</div></div>`).join("")}
+      <div class="nav"><button id="prev" ${idx === 0 ? "disabled" : ""}>← Previous</button><button class="dark" id="next">Save &amp; next →</button></div>`;
+    document.querySelectorAll("[data-r]").forEach((b) => (b.onclick = () => { d[b.dataset.r] = b.dataset.v; render(); }));
+    $("next").onclick = () => {
+      if (it.rules.some((r) => !d[r.id])) return flash("Answer every rule first.");
+      S.answers[it.number] = { verdicts: { ...d }, at: new Date().toISOString() }; save(); advance();
+    };
+  } else {
+    $("card").innerHTML = `<div class="meta">Item ${it.number} of ${items.length} · field ${esc(it.target)}</div>
+      <div class="label">This value is meant to be</div><div>${esc(it.meaning)}</div>
+      <div class="label">Field purpose</div><div>${esc(it.purpose)}</div>
+      <div class="label">Rules the site expects</div><ul>${it.rules.map((r) => `<li>${esc(r.text)}</li>`).join("")}</ul>
+      <div class="label">Value</div><div class="value">${esc(pretty(it.value))}</div>
+      <div class="choices">${["keep", "change", "delete"].map((c) => `<button class="choice ${a?.decision === c ? "on" : ""}" data-d="${c}">${c[0].toUpperCase() + c.slice(1)}</button>`).join("")}</div>
+      <div id="chg" class="${a?.decision === "change" ? "" : "hidden"}"><div class="label">What you would write instead (same JSON shape)</div>
+        <textarea id="nv" rows="4">${esc(a?.new_value || pretty(it.value))}</textarea>
+        <div class="nav"><span></span><button class="dark" id="saveChg">Save change &amp; next</button></div></div>
+      <div class="nav"><button id="prev" ${idx === 0 ? "disabled" : ""}>← Previous</button><button id="next">Next open item →</button></div>`;
+    document.querySelectorAll("[data-d]").forEach((b) => (b.onclick = () => decide(b.dataset.d)));
+    $("next").onclick = advance;
+    $("saveChg").onclick = () => decide("change", $("nv").value);
+  }
+  $("prev").onclick = () => { idx = Math.max(0, idx - 1); render(); };
+}
+function decide(c, nv) {
+  const it = items[idx];
+  if (c === "change" && nv === undefined) { $("chg").classList.remove("hidden"); $("nv").focus(); return; }
+  if (c === "change") { try { JSON.parse(nv); } catch { return flash("The new value must keep the same JSON shape, e.g. {\"displayName\": \"...\"}"); } }
+  S.answers[it.number] = { decision: c, new_value: c === "change" ? nv : null, at: new Date().toISOString() }; save(); advance();
+}
+
+document.querySelectorAll("[data-c]").forEach((b) => (b.onclick = () => { S.confirmation = b.dataset.c; save(); progress(); }));
+$("name").oninput = (e) => { S.name = e.target.value; save(); };
+$("dlBtn").onclick = () => {
+  if (!S.name.trim()) return flash("Please enter your name first.");
+  const out = { task: CONFIG.task, package: CONFIG.package, reviewer: S.name.trim(), confirmation: S.confirmation,
+                started: S.started, saved: new Date().toISOString(), completed: done(), total: items.length, answers: S.answers };
+  const blob = new Blob([JSON.stringify(out, null, 1)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = `${CONFIG.task === "annotation" ? "annotation" : "reference_review"}_results_${S.name.trim().replace(/[^A-Za-z0-9]+/g, "_")}.json`;
+  a.click(); flash(`Downloaded (${done()} of ${items.length} done). Send this file back.`);
+};
+$("loadBtn").onclick = () => $("fileIn").click();
+$("fileIn").onchange = async (e) => {
+  try {
+    const x = JSON.parse(await e.target.files[0].text());
+    if (x.task !== CONFIG.task || x.package !== CONFIG.package) return flash("That results file belongs to a different task or package.");
+    S = { name: x.reviewer, answers: x.answers, confirmation: x.confirmation, started: x.started }; save();
+    $("name").value = S.name; idx = Math.max(0, firstOpen()); render(); flash("Earlier results loaded.");
+  } catch { flash("Could not read that file."); }
+};
+document.addEventListener("keydown", (e) => {
+  if (["TEXTAREA", "INPUT"].includes(e.target.tagName)) return;
+  const it = items[idx];
+  if (CONFIG.task === "annotation") {
+    const v = { p: "PASS", f: "FAIL", u: "AMBIGUOUS" }[e.key.toLowerCase()], d = draft[it.number];
+    if (v) { const r = it.rules.find((x) => !d[x.id]) || it.rules[it.rules.length - 1]; d[r.id] = v; render(); }
+    else if (e.key === "Enter") $("next").click();
+  } else {
+    if (e.key === "1") decide("keep"); else if (e.key === "2") decide("change"); else if (e.key === "3") decide("delete");
+  }
+  if (e.key === "ArrowRight") { idx = Math.min(idx + 1, items.length - 1); render(); }
+  if (e.key === "ArrowLeft") { idx = Math.max(0, idx - 1); render(); }
+});
+
+$("title").textContent = CONFIG.title;
+$("help").innerHTML = CONFIG.task === "annotation"
+  ? `Each value below was accepted by a web form's format checks, so ignore format and length. For every rule, decide whether the value <b>respects</b> it, <b>breaks</b> it, or you are <b>unsure</b> (choose Unsure whenever you cannot tell from what is shown). Some items appear twice on purpose. Keys: <kbd>P</kbd> respects · <kbd>F</kbd> breaks · <kbd>U</kbd> unsure · <kbd>Enter</kbd> save &amp; next · <kbd>←</kbd>/<kbd>→</kbd> move.`
+  : `These values were drafted by an AI assistant to stand in for values a person would write. For each one: <b>Keep</b> it if you would write it yourself, <b>Change</b> it to what you would write, or <b>Delete</b> it. Keys: <kbd>1</kbd> keep · <kbd>2</kbd> change · <kbd>3</kbd> delete · <kbd>←</kbd>/<kbd>→</kbd> move.`;
+load(); $("name").value = S.name || ""; idx = Math.max(0, firstOpen()); render();
+</script>
+</body>
+</html>

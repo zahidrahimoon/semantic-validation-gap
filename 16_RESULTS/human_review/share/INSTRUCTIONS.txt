@@ -1,0 +1,33 @@
+RESEARCH REVIEW - INSTRUCTIONS FOR THE REVIEWER
+================================================
+
+Thank you for helping. You need only a web browser (Chrome, Firefox, Edge or Safari). No internet,
+no installation and no account. Nothing you enter leaves your computer until you send the results file.
+
+There are two tasks. Do them in this order:
+
+  1. annotation_task.html         (about 2-3 hours, 220 items)
+     A web form accepted each value below. For every rule shown, decide whether the value
+     RESPECTS it, BREAKS it, or you are UNSURE. Judge only what you see; if you cannot tell, choose
+     Unsure. Some items appear twice on purpose. Do not try to guess where a value came from.
+
+  2. reference_review_task.html   (about 1-1.5 hours, 272 values)
+     Each value is meant to be a normal (or unusual but legitimate) value a real user would type.
+     Keep it if you would write it yourself, Change it to what you would write, or Delete it.
+     At the end, enter your name and answer the confirmation question.
+
+How to work:
+  - Double-click the .html file; it opens in your browser.
+  - Enter your name at the top of each task.
+  - Your progress is saved in that browser automatically. Close it and reopen the same file in the
+    same browser to continue. To move to another computer, use "Download results" and then
+    "Load earlier results" on the other computer.
+  - Keyboard shortcuts are shown at the top of each page.
+
+When you finish (or want to hand over part-way):
+  - Press "Download results" in each task. You get one file per task:
+        annotation_results_<yourname>.json
+        reference_review_results_<yourname>.json
+  - Send those files back to the researcher (e-mail, WhatsApp, USB - any way is fine).
+
+Package ids: annotation b28fc832c73e, reference review b1d122de12b5

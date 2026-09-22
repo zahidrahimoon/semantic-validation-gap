@@ -44,8 +44,8 @@ On a four-core CPU, the rule layer added at most \R{e4.R.c8.maxadd}\,ms to p97.5
 layer \R{e4.EMB.c1.minadd}--\R{e4.EMB.c1.maxadd}\,ms for a single client; at the median, the small
 language model added about half a second and the LLM judge \R{e4.JUDGE.c1.minp50add.s}--\R{e4.JUDGE.c1.maxp50add.s}\,s,
 and the judge saturated on two of three endpoints at eight concurrent clients.
-The study uses one application and CPU-only open models; \ifhumanlabels the judge agreed with the
-researcher's blind annotation at Cohen's $\kappa=\R{kappa.judge}$\ifjudgeweak, so judgement-rule results
+The study uses one application and CPU-only open models; \ifhumanlabels the judge agreed with a human
+annotator's blind annotation at Cohen's $\kappa=\R{kappa.judge}$\ifjudgeweak, so judgement-rule results
 are exploratory\fi.\else its judge is not yet validated against a human.\fi
 \end{abstract}
 
@@ -288,7 +288,7 @@ with no attempt at meaning; \textbf{C} rule-based adversarial values, one templa
 the field's purpose and rules; \textbf{F} boundary values at schema edges; \textbf{G} benign but
 unusual reference values. Conditions A and G were specified as human-written; in this execution
 their \R{e1.refvalues} values were drafted by an AI assistant at the researcher's request, before the main
-generation, and checked against the schemas and objective rules. \ifreviewed The researcher then
+generation, and checked against the schemas and objective rules. \ifreviewed A human reviewer then
 reviewed every value, keeping \R{review.keep}, replacing \R{review.change} with values of their own
 and deleting \R{review.delete}, and confirmed that the kept values are ones they would have written;
 we therefore call these conditions human-curated rather than human-written.\else The researcher's
@@ -321,8 +321,8 @@ have one. Judgement rules are decided by a judge model from a different family t
 target's fields, and never the condition, prompt family or intent. The judge does not see the rest of
 the record, so seven judgement rules that depend on other fields (e.g.\ capacity plausible for the
 location) were judged without that context; a sensitivity analysis excludes them. \ifhumanlabels
-The researcher annotated \R{ann.items} structurally valid inputs blind to condition, with
-\R{ann.repeats} repeated to estimate their own consistency; where a human verdict exists it takes
+A human annotator labelled \R{ann.items} structurally valid inputs blind to condition, with
+\R{ann.repeats} repeated to estimate the annotator's consistency; where a human verdict exists it takes
 precedence over the judge.\else A planned human annotation of 200 inputs, which would validate the
 judge, has not been completed.\fi{} An input is
 \emph{decided} when every applicable rule has a verdict. The judge was applied to a stratified sample
@@ -416,7 +416,7 @@ violation were lower for LLM inputs with context than for random inputs (odds ra
 inputs exceeded random ones (\R{cmh.CvB.or}, \R{cmh.CvB.ci}). Field context lowered the odds relative
 to the schema alone (\R{cmh.EvD.or}, \R{cmh.EvD.ci}). LLM inputs with context and benign-unusual
 reference inputs did not differ detectably (\R{cmh.EvG.or}, \R{cmh.EvG.ci}, \R{cmh.EvG.p}); the
-interval is wide, and \ifreviewed the reference inputs are AI-drafted values curated by the researcher,
+interval is wide, and \ifreviewed the reference inputs are AI-drafted values curated by a human reviewer,
 so this compares model input with human-curated rather than human-written input.\else the reference
 inputs are AI-drafted, so this is not an AI-versus-human result.\fi
 Fig.~\ref{fig:by-condition} shows the rates by condition.
@@ -449,12 +449,12 @@ ticket priority inconsistent with its text (\R{rule.B-TK-4}) and duration plausi
 family and \R{ai.llm.nonp5} from the other prompt families.
 
 \subsection{Ground-truth agreement}
-\ifhumanlabels On judgement rules, the judge agreed with the researcher on \R{agree.judge}\,\% of
-\R{n.judge} rule verdicts where both gave a verdict (Cohen's $\kappa=\R{kappa.judge}$); the researcher
+\ifhumanlabels On judgement rules, the judge agreed with the human annotator on \R{agree.judge}\,\% of
+\R{n.judge} rule verdicts where both gave a verdict (Cohen's $\kappa=\R{kappa.judge}$); the annotator
 was unsure on \R{unsure.judge}\,\% of judgement-rule verdicts. \ifjudgeweak Agreement is below the
 pre-registered 0.4, so every judgement-rule result in this paper is exploratory.\else Agreement meets
-the pre-registered 0.4 threshold.\fi{} The rule functions agreed with the researcher on
-\R{agree.rules}\,\% of objective-rule verdicts ($\kappa=\R{kappa.rules}$), and the researcher's
+the pre-registered 0.4 threshold.\fi{} The rule functions agreed with the annotator on
+\R{agree.rules}\,\% of objective-rule verdicts ($\kappa=\R{kappa.rules}$), and the annotator's
 repeated annotations agreed with each other on \R{agree.self}\,\% ($\kappa=\R{kappa.self}$).\else
 Judge--human agreement is not reported, because the human annotation was not completed
 (\texttt{TODO-HUMAN}); judgement-rule results therefore rest on the judge alone. Objective-rule
@@ -575,7 +575,7 @@ under another name:} not supported; injection prompts are excluded from all rate
 \label{sec:threats}
 
 \textbf{Internal validity.} Labelling is the main threat. Judgement rules were decided by one 4B judge
-\ifhumanlabels (agreement with the researcher $\kappa=\R{kappa.judge}$)\else without human validation\fi,
+\ifhumanlabels (agreement with a human annotator $\kappa=\R{kappa.judge}$)\else without human validation\fi,
 and seven of them without the fields they depend on; excluding those seven
 lowers the LLM rate to \R{s.llm.nocontext}\,\% and the random rate more (Table~\ref{tab:sensitivity}),
 leaving the RQ3 direction intact. Agreement on semantic judgements can be low even between
@@ -610,7 +610,7 @@ The category mapping assigns dual-tagged fields to one category, decided before 
 at the time. Only the three pre-declared contrasts are confirmatory.
 
 \textbf{Provenance.} The reference conditions A and G were specified as human-written and were
-drafted by an AI assistant; \ifreviewed the researcher reviewed and curated them, so H3b compares
+drafted by an AI assistant; \ifreviewed a human reviewer reviewed and curated them, so H3b compares
 model input with human-curated input, not with input a person wrote unaided.\else until the
 researcher's review is recorded, H3b is exploratory and the alternative explanation that unusual
 human inputs behave similarly is not tested.\fi

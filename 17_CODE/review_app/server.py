@@ -55,8 +55,10 @@ def load_annotation_items():
     items = []
     for n, j in enumerate(order, start=1):
         r = rows[j]
+        # rules are written "B-XX-1: text | B-XX-2: text" (cli.ts sample)
+        parts = re.split(r"\s*\|\s*(?=B-[A-Z]+-\d+: )", r["rules_to_check"].strip())
         rules = [dict(id=m.group(1), text=m.group(2).strip())
-                 for m in re.finditer(r"(B-[A-Z]+-\d+): (.*?)(?=;\s*B-[A-Z]+-\d+: |$)", r["rules_to_check"], flags=re.S)]
+                 for m in (re.match(r"(B-[A-Z]+-\d+): (.*)", x, flags=re.S) for x in parts) if m]
         items.append(dict(key=r["item_id"], number=n, target=r["target_id"], purpose=r["field_purpose"],
                           rules=rules, value=r["submitted_value"]))
     return items
