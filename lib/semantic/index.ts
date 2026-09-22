@@ -9,7 +9,19 @@
  * The designs mirror 17_CODE/harness/semantic/designs.ts. Detection quality is measured offline in
  * E3; this copy exists only so E4 can measure the cost of running it inside a real request.
  */
+import { appendFileSync } from "node:fs";
 import { ollamaChat } from "@/lib/ollama";
+
+/**
+ * Outcome log for the E4 overhead benchmark (DV-10). The layer fails open by design, so a failing
+ * model call still lets the request succeed and would otherwise look FAST. When SEMANTIC_LOG is set,
+ * each call appends {layer, ok, ms, err}. Nothing is written when the layer is off.
+ */
+const SEM_LOG = process.env.SEMANTIC_LOG;
+function record(layer: string, ok: boolean, ms: number, err?: string) {
+  if (!SEM_LOG) return;
+  try { appendFileSync(SEM_LOG, JSON.stringify({ layer, ok, ms: Math.round(ms), err }) + "\n"); } catch { /* never affect the request */ }
+}
 
 export type LayerName = "off" | "R" | "EMB" | "SLM" | "HYB" | "JUDGE";
 export type SemanticOutcome = { checked: boolean; layer: LayerName; flagged: boolean; ms: number };
@@ -87,9 +99,12 @@ export async function checkSemantic(field: string, value: unknown): Promise<Sema
       );
       flagged = (JSON.parse(content) as { appropriate?: boolean }).appropriate === false;
     }
-  } catch {
-    flagged = false; // fail open during measurement; the failure is visible in the latency record
+  } catch (e) {
+    flagged = false; // fail open, as a production layer would; the failure is recorded below
+    record(layer, false, performance.now() - started, String(e).slice(0, 120));
+    return { checked: true, layer, flagged, ms: performance.now() - started };
   }
+  record(layer, true, performance.now() - started);
   return { checked: true, layer, flagged, ms: performance.now() - started };
 }
 
