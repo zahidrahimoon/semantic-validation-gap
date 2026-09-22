@@ -41,8 +41,9 @@ Five candidate semantic validation layers were evaluated. None reached the pre-r
 at a 5\,\% false-positive rate; the best fast design detected \R{e3.HYB.recall}\,\%, mostly
 violations of objective rules the application could enforce directly.
 On a four-core CPU, the rule layer added at most \R{e4.R.c8.maxadd}\,ms to p97.5 latency, the embedding
-layer \R{e4.EMB.c1.minadd}--\R{e4.EMB.c1.maxadd}\,ms for a single client, the small language model
-about half a second and the LLM judge several seconds, the judge saturating at eight concurrent clients.
+layer \R{e4.EMB.c1.minadd}--\R{e4.EMB.c1.maxadd}\,ms for a single client; at the median, the small
+language model added about half a second and the LLM judge \R{e4.JUDGE.c1.minp50add.s}--\R{e4.JUDGE.c1.maxp50add.s}\,s,
+and the judge saturated on two of three endpoints at eight concurrent clients.
 The study uses one application, CPU-only open models, and a judge not yet validated against a human.
 \end{abstract}
 
@@ -101,7 +102,7 @@ the same outcome. Its contributions are:
   business rules, for LLM and non-LLM producers alike, with the rate broken down by prompt intent,
   field category and target, and sensitivity analyses for each design choice that affects it.
   \item \textbf{C2.} A controlled comparison of seven input-generation conditions on one outcome. The
-  comparison shows that the gap is a property of the unenforced boundary rather than of AI: random
+  comparison shows that the gap is not specific to AI-generated input: random
   structurally valid inputs exceed LLM inputs, and field context reduces LLM violations.
   \item \textbf{C3.} An evaluation of five semantic validation designs --- rules, embedding
   similarity, a small language model, a hybrid, and an LLM judge --- at a bounded false-positive rate
@@ -284,7 +285,7 @@ with no attempt at meaning; \textbf{C} rule-based adversarial values, one templa
 \textbf{D} LLM given the field name and structural constraints only; \textbf{E} LLM additionally given
 the field's purpose and rules; \textbf{F} boundary values at schema edges; \textbf{G} benign but
 unusual reference values. Conditions A and G were specified as human-written; in this execution
-their 272 values were drafted by an AI assistant at the researcher's request, before the main
+their \R{e1.refvalues} values were drafted by an AI assistant at the researcher's request, before the main
 generation, and checked against the schemas and objective rules. The researcher's review of them is
 outstanding (Section~\ref{sec:threats}).
 
@@ -317,8 +318,9 @@ the record, so seven judgement rules that depend on other fields (e.g.\ capacity
 location) were judged without that context; a sensitivity analysis excludes them. A planned human
 annotation of 200 inputs, which would validate the judge, has not been completed. An input is
 \emph{decided} when every applicable rule has a verdict. The judge was applied to a stratified sample
-for compute reasons: 1200 structurally valid inputs drawn round-robin across target $\times$ condition
-with a fixed seed, plus 136 for two booking targets re-measured after a defect
+for compute reasons: \R{judge.base} structurally valid inputs drawn round-robin across target
+$\times$ condition with a fixed seed, plus \R{judge.supplement} (up to 14 per stratum, as many as were
+available) for two booking targets re-measured after a defect
 (Section~\ref{sec:threats}).
 
 \subsection{Analysis population and statistics}
@@ -326,7 +328,7 @@ Of \R{e1.inputs} inputs, \R{e1.keymismatch} key-mismatch records, \R{e1.retried}
 by inadvertent retries of failed calls, and \R{e1.p5} injection-family inputs are excluded, leaving
 \R{e1.primary}. Of these, \R{e1.passes} passed structural validation and \R{e1.decided} are
 decided; the remainder were not in the judge sample (\R{e1.undecided.unjudged}) or received no usable
-verdict (\R{e1.undecided.unsure}). Rates carry Wilson 95\,\% intervals. H1 is evaluated on the lower
+verdict (\R{e1.undecided.unsure}). Rates carry Wilson 95\,\% confidence intervals (CIs); contrasts are reported as odds ratios (ORs). H1 is evaluated on the lower
 bound, H2 with a $\chi^2$ test and Cram\'er's $V$, and H3a--c with three one-sided Fisher tests,
 Holm-corrected. Because the judge sample gives conditions different target mixes, each contrast is
 also tested within target with the Cochran--Mantel--Haenszel (CMH) test, added after data collection.
@@ -352,7 +354,7 @@ fails open.
 Evaluation is leave-fields-out over five folds. In each fold the threshold is the smallest score at
 which at most 5\,\% of valid training-fold inputs are flagged, applied to held-out fields. Designs are
 compared on recall at that operating point, with FPR, precision and the threshold-free area under the
-ROC curve (AUROC). The model-based designs were scored on a stratified sample of \R{e3.n} decided
+receiver operating characteristic (ROC) curve (AUROC). The model-based designs were scored on a stratified sample of \R{e3.n} decided
 inputs (\R{e3.pos} SV-SI), on which all designs are compared; the fast designs were also scored on
 all \R{e3.fulln} decided inputs, a population that includes the injection family and retried records.
 
@@ -375,8 +377,8 @@ prompts never state the current date; without it the rate is \R{s.llm.nodates}\,
 was \R{run.D.1}, \R{run.D.2} and \R{run.D.3}\,\% without field context and \R{run.E.1},
 \R{run.E.2} and \R{run.E.3}\,\% with it; including the retried records gives \R{h1.withretried}\,\%.
 Reference conditions bound the labelling: valid inputs were labelled invalid in \R{c.A.rate}\,\% of
-cases and adversarial inputs in \R{c.C.rate}\,\%, so about a fifth of designed violations were missed
-and the rates may be underestimates.
+cases and adversarial inputs in \R{c.C.rate}\,\%: about a fifth of designed violations were missed,
+and a few valid inputs were flagged, so labelling error runs in both directions.
 
 \IfFileExists{tables/tab_sensitivity.tex}{\input{tables/tab_sensitivity}}{}
 
@@ -428,14 +430,13 @@ AI-drafted reference conditions for legitimate input.}
 \end{figure}}{}
 
 \subsection{Violation types (RQ4)}
-The most frequently violated rule is objective --- a workshop must start in the future
-(\R{rule.B-CO-2} violations) --- followed by duration plausibility (\R{rule.B-CO-3}); both are rules
-the application could enforce in code. Among judgement rules, the most frequent were a profile bio
-addressed to the assistant (\R{rule.B-PR-6}), a ticket priority inconsistent with its text
-(\R{rule.B-TK-4}) and implausible capacity for a location (\R{rule.B-CO-7}); the last two were judged
-without the text or location they depend on. On AI-facing fields, \R{ai.svsi} structurally valid
-inputs violated a rule; \R{ai.p5} came from the injection family and \R{ai.nonp5} from ordinary
-prompts.
+Judgement-rule violations outnumber objective ones (\R{viol.jud} against \R{viol.obj}, all
+conditions). The single most frequent violation is objective --- a workshop must start in the future
+(\R{rule.B-CO-2}) --- followed by a profile bio addressed to the assistant (\R{rule.B-PR-6}), a
+ticket priority inconsistent with its text (\R{rule.B-TK-4}) and duration plausibility
+(\R{rule.B-CO-3}); the ticket rule was judged without the text it depends on. On AI-facing fields,
+\R{ai.llm.svsi} structurally valid LLM inputs violated a rule; \R{ai.llm.p5} came from the injection
+family and \R{ai.llm.nonp5} from the other prompt families.
 
 \subsection{Ground-truth agreement}
 Judge--human agreement is not reported, because the human annotation was not completed
@@ -448,7 +449,7 @@ results, which cover every structurally valid input, do not.
 No design reached the target, so H5 is not supported (Table~\ref{tab:detection}). At the operating
 point fixed on training folds, the best non-judge design, HYB, detected \R{e3.HYB.recall}\,\% of SV-SI
 inputs (CI \R{e3.HYB.ci}) at a held-out FPR of \R{e3.HYB.fpr}\,\%, above the 5\,\% it was tuned for.
-Its detections come from R: HYB and R caught \R{e3.HYB.robj}\,\% of inputs violating only objective
+Most of its detections come from R: HYB and R caught \R{e3.HYB.robj}\,\% of inputs violating only objective
 rules and \R{e3.HYB.rjud}\,\% and \R{e3.R.rjud}\,\% of those violating a judgement rule. On all
 decided inputs the fast designs reach \R{e3.R.fullrecall}\,\% (R) and \R{e3.HYB.fullrecall}\,\% (HYB).
 EMB alone was no better than chance (AUROC \R{e3.EMB.auroc}).
@@ -473,7 +474,8 @@ failed and no layer call failed in any run (Table~\ref{tab:e4}). H6 is not suppo
 first part fails. R added at most \R{e4.R.c1.maxadd}\,ms to p97.5 latency with one client and
 \R{e4.R.c8.maxadd}\,ms with eight, within the 50\,ms bound; negative differences at eight clients
 reflect run-to-run variation. EMB added \R{e4.EMB.c1.minadd}--\R{e4.EMB.c1.maxadd}\,ms with one
-client, above the bound, and \R{e4.EMB.c8.minadd}--\R{e4.EMB.c8.maxadd}\,ms with eight, because every
+client, above the bound (on the p95 bracket used as a sensitivity check, the review endpoint fails
+and the other two are undetermined), and \R{e4.EMB.c8.minadd}--\R{e4.EMB.c8.maxadd}\,ms with eight, because every
 request embeds its text on the same CPU. The second part holds: SLM added
 \R{e4.SLM.c1.minp50add}--\R{e4.SLM.c1.maxp50add}\,ms at the median with one client, and JUDGE
 \R{e4.JUDGE.c1.minp50add}--\R{e4.JUDGE.c1.maxp50add}\,ms. Because the model server answers one
@@ -505,31 +507,35 @@ structurally valid LLM inputs broke an unenforced rule, a quarter when the model
 legitimate values, and under a tenth on objective rules alone. The rate extends output-side
 findings~\cite{li2026orderbench,singh2026sob,wrenn2026enterprise} to inputs that an application would
 persist, but its magnitude is sensitive to prompt intent, to one date-dependent target, and to an
-unvalidated judge, so the claim that survives every check is that the gap is clearly above the 5\,\% bound rather
+unvalidated judge, so the claim that survives every check is that the gap is above the 5\,\% bound rather
 than any single figure.
 
-\textbf{RQ2: where it occurs is uneven.} Category explained a moderate share of the variation, but
-individual targets drive it: a single target with a clock-dependent rule accounts for most of the
-cross-field rate, and the structured category is one target judged without its context.
+\textbf{RQ2: where it occurs is uneven.} Category is moderately associated with the outcome, but
+individual targets drive it: a single target with a clock-dependent rule accounts for over half of
+the cross-field violations, and the structured category is one target judged without its context.
 
 \textbf{RQ3: the gap is not specific to AI.} This is the central negative result. Random values that
 satisfy the schema broke rules more often than model values, with or without field context, pooled and
-within target. The phenomenon is a property of the validation boundary: a schema admits many values the
+within target. The results point to the validation boundary rather than to the producer: a schema admits many values the
 application should reject, and any producer that satisfies the schema without knowing the rules falls
 into it. What distinguishes the model is that context helps; the purpose and rules cut the odds of a
 violation by \R{cmh.EvD.reduction}\,\% relative to the schema alone. The random generator produces word
 sequences with no attempt at meaning, so ``random'' here is a weak producer, and the result bounds
 rather than characterises non-AI input.
 
-\textbf{RQ4: most violations are ordinary.} The two most frequent violations were of objective rules the
-application could enforce directly, and on AI-facing fields most came from ordinary prompts rather than
-injection attempts. The gap is mostly unenforced business logic.
+\textbf{RQ4: most violations are ordinary.} The single most frequent violation was of an objective rule
+the application could enforce directly, so enforcing objective rules would remove a share of the gap,
+but judgement-rule violations are the majority. On AI-facing fields most LLM violations came from
+ordinary prompts rather than injection attempts. The gap is mostly unenforced business logic rather
+than attack.
 
-\textbf{RQ5: no cheap layer closes it.} The designs that can be held to a low FPR find about a quarter
-to a third of violations, almost all of them objective ones that could simply be enforced. The prompted
+\textbf{RQ5: no cheap layer closes it.} The fast designs that can be held to a low FPR, R and HYB, find
+about a quarter to a third of violations, most of them objective ones that could simply be enforced;
+JUDGE at a similar FPR finds a quarter, split evenly between objective and judgement rules. The prompted
 models discriminate better but give coarse, field-dependent scores; used as they are, they catch more
 while rejecting between one valid input in fifteen and one in five in this sample. Detecting
 judgement-rule violations remains the open problem.
+
 \textbf{RQ6: cost rises faster than detection.} On commodity CPU hardware only the rule layer is
 effectively free, and it detects violations of rules the application could have enforced in the first
 place. Embedding costs tens of milliseconds per request and detected almost nothing here. The prompted
@@ -543,9 +549,9 @@ in code and treat judgement rules as an open problem, rather than add a model to
 producer that does not know the rules. \emph{Random inputs produce the same effect:} consistent, and
 random inputs exceed model inputs. \emph{Unusual human inputs behave the same:} not tested, because
 the reference inputs are AI-drafted. \emph{Confined to free text:} not supported; structured and
-cross-field targets are as high or higher, though driven by single targets. \emph{Prompt injection
+cross-field targets also show high rates, though driven by single targets. \emph{Prompt injection
 under another name:} not supported; injection prompts are excluded from all rates and account for
-\R{ai.p5} of \R{ai.svsi} violations on AI-facing fields. \emph{Too expensive to deploy:} supported for the model-based layers on CPU hardware, not for rules.
+\R{ai.llm.p5} of \R{ai.llm.svsi} LLM violations on AI-facing fields. \emph{Too expensive to deploy:} supported for the model-based layers on CPU hardware, not for rules.
 
 \section{Threats to Validity}
 \label{sec:threats}
@@ -595,11 +601,12 @@ Schema validation answers whether an input is well formed, not whether it belong
 boundary of one application with an explicit rule reference, about a third of structurally valid
 LLM inputs broke an unenforced business rule, but random structurally valid inputs broke rules more
 often, and telling the model the field's purpose and rules reduced violations. The gap is therefore
-a property of what the application leaves unenforced, not of AI; the most frequent violation was of
+a property of what the application leaves unenforced and not specific to AI-generated input; the most frequent violation was of
 an objective rule that a line of validation code could enforce. None of the five candidate layers
 detected the pre-registered share of violations at a tolerable false-positive rate.
-On a four-core CPU, rules added a few milliseconds, embeddings tens of milliseconds, a small language
-model about half a second and an LLM judge several seconds, the judge saturating under modest concurrency.
+On a four-core CPU, rules added at most \R{e4.R.c8.maxadd}\,ms at p97.5 and embeddings tens of
+milliseconds; at the median a small language model added about half a second and an LLM judge several
+seconds, and the judge saturated on two of three endpoints with eight concurrent clients.
 Future work should complete the human-written reference conditions and the human validation of the
 judge, re-judge context-dependent rules with the full record, state the current date to generators,
 and repeat the protocol on an existing open-source application.

@@ -77,3 +77,15 @@
 | I-R4-018 | R4 | LOW | Section structure | Sec | FIXED — framework section merged into Method; Limitations merged into Threats |
 | I-R4-019 | R4 | LOW | Grammar and style, various | "Authors of the largest such study concede" is missing its article | FIXED (partly) — article added; British spelling used throughout |
 | I-R4-020 | R4 | LOW | Index Terms | The keywords are free-form | NEEDS HUMAN — choose IEEE Thesaurus terms at submission |
+
+## Cycle 2 — final verification (14_REVIEWS/final_verification_cycle2.md), 2026-09-22
+
+All 18 issues (2 HIGH, 5 MEDIUM, 11 LOW) FIXED in paper.tex / generators; no new data needed:
+V2-01 RQ4 ranking corrected to the table4 order; V2-02 Discussion RQ4 now says judgement violations are the majority (514 vs 270) and objective enforcement removes a share;
+V2-03 AI-facing counts recomputed for LLM conditions only (keys ai.llm.*); V2-04 abstract/conclusion label medians vs p97.5 and use generated ranges;
+V2-05 "saturated on two of three endpoints"; V2-06 RQ5 claim restricted to R/HYB, JUDGE split stated; V2-07 "not specific to AI-generated input";
+V2-08 "above the 5 % bound"; V2-09 "moderately associated", "over half"; V2-10 "also show high rates"; V2-11 "most of its detections";
+V2-12 two-directional labelling error; V2-13 p95-bracket clause for EMB; V2-14 E2b p printed 0.001; V2-15 category column "Decided";
+V2-16 CI, OR, ROC defined; V2-17 paragraph break; V2-18 272/1200/136 now \R{} keys, supplement design explained.
+Also found while checking: E4 table H6 column was empty (CSV saved before verdicts) — FIXED.
+Open after cycle 2 (NEED HUMAN): DV-03 review of groups A/G; judge–human annotation; saleem2026layered author order; breck2019 author order; IEEE Thesaurus keywords; repository URL/licence; author details; venue.

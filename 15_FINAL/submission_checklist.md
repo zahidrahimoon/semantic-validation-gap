@@ -53,7 +53,7 @@ this paper is ready to submit; that decision is the author's.
 | Similarity check | Run before submission |
 | Author information, affiliation, ORCID, funding, conflicts | All `TODO-HUMAN` in `paper.tex` |
 | Venue requirements | Not yet researched — no venue chosen. Run `/rs-venue <name>` once decided. |
-| Page limit and format | Currently ~10 pages; check the chosen venue's limit |
+| Page limit and format | Currently 12 pages (IEEEtran conference); many IEEE conferences allow 6–10 — shorten or choose a venue with a higher limit |
 | Preprint policy | If posting to ResearchGate or arXiv, confirm the target venue permits preprints |
 | Final submission decision | The author's alone |
 

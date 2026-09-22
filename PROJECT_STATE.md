@@ -5,28 +5,27 @@
 ```text
 Project:            Semantic Validation Gaps in AI-Driven Web Applications
 Slug:               semantic-validation-gap
-Version:            v0.8 (in progress) — E1, E2, E2b, E3 analysed; E4 running
-Current stage:      12 results ingestion + 14 drafting. E4 v2 running as systemd unit svg-e4 (started 16:42 PKT 2026-09-22, ~2.2 h) → 16_RESULTS/raw/E4_20260922T1142, log 16_RESULTS/logs/e4_run.log
+Version:            v0.9 (reviewed & revised) — all experiments complete
+Current stage:      17 (final QA) — paper DRAFT, status at most READY FOR HUMAN VERIFICATION once human tasks are done
 Operating mode:     FULL (Ollama in Docker, CPU only)
-Last updated:       2026-09-22 17:15 PKT
-Completed stages:   0–11, Gate A (GO WITH CHANGES), Gate B (APPROVED); 12 for E1/E2/E2b/E3; 14 Results RQ1–RQ5 + Discussion (RQ6 pending)
+Last updated:       2026-09-22 20:00 PKT
+Completed stages:   0–16; Gates A and B; E1, E2, E2b, E3, E4; review cycle 1 (71 issues) + cycle-2 verification
 Open gates awaiting human decision: none
-Open CRITICAL/HIGH issues:
-  - DV-03 (HIGH): groups A/G AI-drafted, review outstanding → H3b exploratory, alt. explanation 3 not tested
-  - CL-023 (HIGH): judge–human κ missing (annotation_sample.csv not annotated) → judgement-rule results rest on the judge alone
-Testbed: main @ 62a7267 (v1.0-frozen) for E1–E3; E4 on branch e4-semantic-layer (v1.2-semantic, 33f2685); run_e4_service.sh restores main on exit
-Key results: H1 supported (28.0%); H2 supported (χ²=214.0, V=0.33); H3a–c NOT supported (random > LLM); H5 NOT supported (best non-judge HYB 26.9%); E2b: 1.7b worse than 4b
-Deviations this session: DV-11 (E3 threshold bug fixed; v1 H5 "supported" was wrong), DV-12 (H6 on p97.5), DV-13 (load timeout 120 s)
-Papers: included 70 / V4 15 / V3 5 / V2 50
+Open CRITICAL/HIGH issues (NEED HUMAN):
+  - DV-03: groups A/G AI-drafted → review/sign 10_DATASETS/human_inputs/PROVENANCE.md
+  - Judge–human κ missing → annotate 16_RESULTS/raw/E1_E1_20260920T0847/annotation_sample.csv, then `npx tsx cli.ts import-labels`
+Key results (all generated, see 13_DRAFT/tables/numbers.tex): H1 supported (31.6% [28.9,34.4]; P1-only 23.2%; objective-only 7.9%);
+  H2 association supported, structured prediction reversed; H3a–c NOT supported (random 54.6% > LLM); H5 NOT supported (best HYB 27.1%);
+  H6 NOT supported (EMB 65–96 ms > 50 ms; R ≤ 14 ms; JUDGE saturates at c=8)
+Testbed: main @ 62a7267 (v1.0-frozen), checked out; E4 branch e4-semantic-layer @ 33f2685 (v1.2-semantic)
+Repository: project root under git since 2026-09-22 (after data collection); testbed has its own repo
+Regenerate all results: see 16_RESULTS/analysis/README.md
 Next actions (ordered):
-  1. When svg-e4 finishes: check log for "E4 done" and no "!!"; confirm testbed back on main; run analysis/e4_analysis.py raw/E4_20260922T1142; make_latex_tables.py
-  2. Write RQ6 results + discussion; Conclusion; Abstract (last); recompile
-  3. Reviewer passes R1–R4 + critic on the full draft → 14_REVIEWS; fix loop
-  4. Update 15_FINAL (submission_checklist, ai_disclosure), claims ledger CL-025
-Blocked on human (TODO-HUMAN):
-  - TH-10: review/sign 10_DATASETS/human_inputs/PROVENANCE.md (272 values)
-  - Annotate 16_RESULTS/raw/E1_E1_20260920T0847/annotation_sample.csv (200 items + 20 repeats), then `npx tsx cli.ts import-labels`
-  - Author email/ORCID; similarity check; venue choice
+  1. HUMAN: TH-10 review of groups A/G; annotation of 200 items (then re-run import-labels, merge, analysis, make_numbers)
+  2. HUMAN: author email/ORCID, venue choice (then /rs-venue), IEEE Thesaurus keywords, repository URL + licences, similarity check
+  3. HUMAN: resolve saleem2026layered author order; confirm breck2019datavalidation author order
+  4. OPTIONAL (~1 h CPU): re-judge the 7 context-dependent rules with the full record (removes a stated limitation)
+Blocked on human: items 1–3 above
 ```
 
 ## Capability check (latest)

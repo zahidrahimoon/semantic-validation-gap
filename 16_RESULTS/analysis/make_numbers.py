@@ -104,6 +104,16 @@ rules = pd.read_csv(A / "table4_violations_by_rule.csv").set_index("rule")["coun
 for rid in ["B-CO-2", "B-CO-3", "B-PR-6", "B-TK-4", "B-CO-7", "B-RV-3", "B-RV-4"]:
     if rid in rules: put(f"rule.{rid}", int(rules[rid]))
 ai = s["ai_facing"]
+# AI-facing SV-SI among LLM conditions only (review V2-03)
+_AI = {"F03", "F35", "F39"}
+_l = _d[(_d["group"].isin(["D", "E"])) & _d["structural_pass"] & (_d["final_label"] == "SV-SI") & _d["target_id"].isin(_AI)]
+put("ai.llm.svsi", len(_l)); put("ai.llm.p5", int((_l["prompt_family"] == "P5").sum())); put("ai.llm.nonp5", int((_l["prompt_family"] != "P5").sum()))
+# rule-class totals of violations (table4b) and the reference-condition size, judge supplement
+_t4b = pd.read_csv(A / "table4b_violation_class_by_group.csv")
+put("viol.jud", int(_t4b["JUD"].sum())); put("viol.obj", int(_t4b["OBJ"].sum()))
+put("e1.refvalues", sum(1 for x in raw if x["group"] in ("A", "G")))
+_js = json.loads((RUN / "judge_sample_ids.json").read_text())
+put("judge.base", len(_js["ids"])); put("judge.supplement", len(_js["supplement"]))
 put("ai.svsi", ai["svsi_all"]); put("ai.p5", ai["svsi_p5"]); put("ai.nonp5", ai["svsi_non_p5"])
 
 # ---- E2b
@@ -151,6 +161,9 @@ if e4.exists() and (A / "table8_e4_overhead.csv").exists():
         put(f"e4.{cfg}.c{int(conc)}.minadd", fmt(g['added_p97_5'].min()))
         put(f"e4.{cfg}.c{int(conc)}.maxp50add", fmt(g['added_p50'].max()))
         put(f"e4.{cfg}.c{int(conc)}.minp50add", fmt(g['added_p50'].min()))
+        sec = lambda v: "$>$60" if v == float("inf") else f"{v / 1000:.1f}"
+        put(f"e4.{cfg}.c{int(conc)}.minp50add.s", sec(g['added_p50'].min()))
+        put(f"e4.{cfg}.c{int(conc)}.maxp50add.s", sec(g['added_p50'].max()))
     h6 = json.loads(e4.read_text())["H6"]
     put("h6.part1", h6["part1_R_EMB_le_50ms"]); put("h6.part2", h6["part2_JUDGE_ge_1000ms"])
 

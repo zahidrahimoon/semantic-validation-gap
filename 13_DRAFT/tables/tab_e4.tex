@@ -14,42 +14,42 @@ Config. & Endpoint & p50 (ms) & p97.5 (ms) & $\Delta$p50 (ms) & $\Delta$p97.5 (m
 \midrule
 \multicolumn{9}{l}{\emph{Concurrency 1}} \\
 structural & courses & 20 & 28 & 0 & 0 & 47.4 & -- &  \\
-R & courses & 20 & 29 & 0 & 1 & 46.0 & 100 &  \\
-EMB & courses & 47 & 93 & 27 & 65 & 19.2 & 100 &  \\
+R & courses & 20 & 29 & 0 & 1 & 46.0 & 100 & holds \\
+EMB & courses & 47 & 93 & 27 & 65 & 19.2 & 100 & fails \\
 HYB & courses & 46 & 93 & 26 & 65 & 19.2 & 100 &  \\
 SLM & courses & 547 & 789 & 527 & 761 & 1.8 & 100 &  \\
-JUDGE & courses & 7185 & 10214 & 7165 & 10186 & 0.1 & 100 &  \\
+JUDGE & courses & 7185 & 10214 & 7165 & 10186 & 0.1 & 100 & holds \\
 structural & profile & 21 & 32 & 0 & 0 & 42.9 & -- &  \\
-R & profile & 22 & 33 & 1 & 1 & 41.9 & 100 &  \\
-EMB & profile & 57 & 102 & 36 & 70 & 15.9 & 100 &  \\
+R & profile & 22 & 33 & 1 & 1 & 41.9 & 100 & holds \\
+EMB & profile & 57 & 102 & 36 & 70 & 15.9 & 100 & fails \\
 HYB & profile & 58 & 100 & 37 & 68 & 15.6 & 100 &  \\
 SLM & profile & 552 & 687 & 531 & 655 & 1.8 & 100 &  \\
-JUDGE & profile & 1632 & 7715 & 1611 & 7683 & 0.5 & 100 &  \\
+JUDGE & profile & 1632 & 7715 & 1611 & 7683 & 0.5 & 100 & holds \\
 structural & reviews & 20 & 31 & 0 & 0 & 45.6 & -- &  \\
-R & reviews & 22 & 31 & 2 & 0 & 43.1 & 100 &  \\
-EMB & reviews & 68 & 127 & 48 & 96 & 13.2 & 100 &  \\
+R & reviews & 22 & 31 & 2 & 0 & 43.1 & 100 & holds \\
+EMB & reviews & 68 & 127 & 48 & 96 & 13.2 & 100 & fails \\
 HYB & reviews & 65 & 113 & 45 & 82 & 13.6 & 100 &  \\
 SLM & reviews & 554 & 729 & 534 & 698 & 1.7 & 100 &  \\
-JUDGE & reviews & 7724 & 10855 & 7704 & 10824 & 0.1 & 100 &  \\
+JUDGE & reviews & 7724 & 10855 & 7704 & 10824 & 0.1 & 100 & holds \\
 \multicolumn{9}{l}{\emph{Concurrency 8}} \\
 structural & courses & 146 & 322 & 0 & 0 & 48.3 & -- &  \\
-R & courses & 149 & 317 & 3 & -5 & 47.6 & 100 &  \\
-EMB & courses & 272 & 444 & 126 & 122 & 27.9 & 100 &  \\
+R & courses & 149 & 317 & 3 & -5 & 47.6 & 100 & holds \\
+EMB & courses & 272 & 444 & 126 & 122 & 27.9 & 100 & fails \\
 HYB & courses & 249 & 453 & 103 & 131 & 29.0 & 100 &  \\
 SLM & courses & 4295 & 7178 & 4149 & 6856 & 1.7 & 100 &  \\
-JUDGE & courses & $>$60\,000 & $>$60\,000 & $>$60\,000 & $>$60\,000 & 0.0 & 100 &  \\
+JUDGE & courses & $>$60\,000 & $>$60\,000 & $>$60\,000 & $>$60\,000 & 0.0 & 100 & holds \\
 structural & profile & 156 & 477 & 0 & 0 & 41.7 & -- &  \\
-R & profile & 158 & 341 & 2 & -136 & 44.8 & 100 &  \\
-EMB & profile & 355 & 787 & 199 & 310 & 20.6 & 100 &  \\
+R & profile & 158 & 341 & 2 & -136 & 44.8 & 100 & holds \\
+EMB & profile & 355 & 787 & 199 & 310 & 20.6 & 100 & fails \\
 HYB & profile & 325 & 752 & 169 & 275 & 22.9 & 100 &  \\
 SLM & profile & 4354 & 7257 & 4198 & 6780 & 1.7 & 100 &  \\
-JUDGE & profile & 14438 & 23951 & 14282 & 23474 & 0.4 & 100 &  \\
+JUDGE & profile & 14438 & 23951 & 14282 & 23474 & 0.4 & 100 & holds \\
 structural & reviews & 155 & 333 & 0 & 0 & 45.6 & -- &  \\
-R & reviews & 161 & 347 & 6 & 14 & 43.9 & 100 &  \\
-EMB & reviews & 443 & 1084 & 288 & 751 & 16.0 & 100 &  \\
+R & reviews & 161 & 347 & 6 & 14 & 43.9 & 100 & holds \\
+EMB & reviews & 443 & 1084 & 288 & 751 & 16.0 & 100 & fails \\
 HYB & reviews & 425 & 729 & 270 & 396 & 17.7 & 100 &  \\
 SLM & reviews & 4365 & 7513 & 4210 & 7180 & 1.7 & 100 &  \\
-JUDGE & reviews & $>$60\,000 & $>$60\,000 & $>$60\,000 & $>$60\,000 & 0.0 & 100 &  \\
+JUDGE & reviews & $>$60\,000 & $>$60\,000 & $>$60\,000 & $>$60\,000 & 0.0 & 100 & holds \\
 \bottomrule
 \end{tabular}
 \end{table*}

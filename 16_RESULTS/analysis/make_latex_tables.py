@@ -65,13 +65,13 @@ if f.exists():
             f" A $\\chi^2$ test of independence gives $\\chi^2={s.get('chi2', float('nan')):.1f}$, "
             f"$p{'<0.001' if s.get('p', 1) < 0.001 else '=' + format(s.get('p', float('nan')), '.3f')}$, Cram\\'er's $V={s.get('cramers_v', float('nan')):.3f}$.")
     write("tab_categories.tex", r"""\begin{table}[t]
-\caption{Conditional SV-SI rate by input-field category, over structurally valid inputs from all
+\caption{Conditional SV-SI rate by input-field category, over decided structural passes from all
 conditions.""" + note + r"""}
 \label{tab:categories}
 \centering
 \begin{tabular}{lrrrr}
 \toprule
-Field category & Passes & SV-SI & Cond.\ SV-SI (\%) & 95\% CI \\
+Field category & Decided & SV-SI & Cond.\ SV-SI (\%) & 95\% CI \\
 \midrule
 """ + rows + r"""
 \bottomrule
@@ -193,7 +193,7 @@ if f.exists():
         m = tests[(tests["comparison"].str.startswith(cond + " vs")) & (tests["metric"] == metric)]
         if m.empty: return "ref."
         v = float(m['p_holm'].iloc[0])
-        return "$<$0.001" if v < 0.001 else f"{v:.2f}"
+        return "$<$0.001" if v < 0.001 else (f"{v:.3f}" if v < 0.01 else f"{v:.2f}")
     rows = "\n".join(
         f"{esc(SHORT.get(r['condition'], r['condition']))} & {int(r['runs'])} & {int(r['inputs'])} & {int(r['structural_pass'])} & "
         f"{int(r['svsi_obj'])} ({pct(r['svsi_obj_rate'])}) & {ptxt(r['condition'], 'objective')} & "

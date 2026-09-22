@@ -64,7 +64,6 @@ for r in res[res["config"] != "structural"].itertuples():
               f"failed={r.layer_calls_failed}; latency for this cell does not measure a working layer")
 ORDER = {"structural": 0, "R": 1, "EMB": 2, "HYB": 3, "SLM": 4, "JUDGE": 5}
 res = res.sort_values(["concurrency", "endpoint", "config"], key=lambda s: s.map(ORDER) if s.name == "config" else s)
-res.to_csv(OUT / "table8_e4_overhead.csv", index=False)
 
 
 def verdict(cfg, added):
@@ -81,6 +80,7 @@ def bracket(cfg, lo, hi):  # sensitivity only
 
 res["h6"] = [verdict(c, a) for c, a in zip(res["config"], res["added_p97_5"])]
 res["h6_p95_bracket"] = [bracket(c, lo, hi) for c, lo, hi in zip(res["config"], res["added_p95_lo"], res["added_p95_hi"])]
+res.to_csv(OUT / "table8_e4_overhead.csv", index=False)  # after the H6 verdicts, so the table shows them
 h6_cells = res[res["h6"].notna()]
 part1 = h6_cells[h6_cells["config"].isin(["R", "EMB"])]["h6"]
 part2 = h6_cells[h6_cells["config"] == "JUDGE"]["h6"]
