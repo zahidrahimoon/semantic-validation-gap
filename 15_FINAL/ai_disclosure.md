@@ -35,13 +35,15 @@ vague statement would be inadequate.
   found and corrected three transcription or reproducibility errors in an earlier draft (see
   `16_RESULTS/RESULTS_LOG.md`), and an analysis defect that had produced a wrong detector result was
   fixed before that result was reported (deviation DV-11).
-- **Human-written input conditions.** `TODO-HUMAN`: conditions A and G were drafted by the assistant
-  at the author's request rather than written by the author. Their provenance, the consequence for one
+- **Human-written input conditions.** Conditions A and G were drafted by the assistant at the author's
+  request and then reviewed value by value by the author (262 kept, 7 deleted, 3 replaced, sign-off
+  recorded); the paper calls them human-curated, not human-written. Their provenance, the consequence for one
   hypothesis, and the options for resolving it are recorded in
-  `10_DATASETS/human_inputs/PROVENANCE.md` and in the paper's limitations section. **This must be
-  resolved or disclosed in the submitted version.**
-- **Human annotation.** `TODO-HUMAN`: the 200-item annotation that validates the ground-truth judge
-  against a person has not been done; the paper states that judgement-rule results rest on the judge.
+  `10_DATASETS/human_inputs/PROVENANCE.md` and in the paper's limitations section. **Disclosed in the paper's method and threats sections.**
+- **Human annotation.** DONE 2026-09-23: the researcher annotated 200 inputs (+20 repeats) blind to
+  condition in the review app; human verdicts take precedence over the judge. Agreement with the judge
+  was Cohen's kappa 0.238, below the pre-registered 0.4, so judgement-rule results are reported as
+  exploratory. Raw answers with timestamps: `16_RESULTS/human_review/annotation_answers.jsonl`.
 
 ## What AI assistance did not do
 

@@ -10,6 +10,12 @@ import json, pathlib
 import pandas as pd
 
 OUT = pathlib.Path(__file__).parent
+_rs = OUT / "../human_review/review_status.json"
+REVIEWED = json.loads(_rs.read_text())["reviewed"] if _rs.exists() else False
+REF_NOTE = ("$^{*}$Specified as human-written; values AI-drafted and then reviewed value by value by the researcher "
+            "(human-curated)." if REVIEWED else
+            "$^{*}$Specified as human-written; values AI-drafted, researcher review outstanding.")
+G_NOTE = "human-curated" if REVIEWED else "AI-drafted"
 TEX = (OUT / "../../13_DRAFT/tables").resolve(); TEX.mkdir(parents=True, exist_ok=True)
 
 def pct(x, nd=1):
@@ -37,7 +43,7 @@ the share of structurally valid inputs that violate at least one business rule; 
 outcome, computed over \emph{decided} passes: those whose every applicable rule received a verdict
 (passes outside the judge sample are undecided and excluded). Prompt family P5 (injection) and retried
 records are excluded. Intervals are Wilson 95\% confidence intervals.
-$^{*}$Specified as human-written; values AI-drafted, researcher review outstanding.}
+""" + REF_NOTE + r"""}
 \label{tab:conditions}
 \centering
 \begin{tabular}{lrrrrrrr}
@@ -108,7 +114,7 @@ if f.exists():
 \caption{Pre-declared one-sided contrasts on the conditional SV-SI rate (Fisher exact, Holm-corrected
 across the three tests). Each test is one-sided in the pre-registered direction (Rate 1 $>$ Rate 2), so
 an odds ratio below 1 yields $p$ close to 1. Conditions: B random, E LLM with field context,
-G benign-unusual (AI-drafted), D LLM without field context. Within-target results are in the text.}
+G benign-unusual (""" + G_NOTE + r"""), D LLM without field context. Within-target results are in the text.}
 \label{tab:contrasts}
 \centering
 \footnotesize
@@ -305,7 +311,7 @@ if f.exists():
                      f"{cell('B', v)} & {cell('G', v)} \\\\" for v in NAMES)
     write("tab_sensitivity.tex", r"""\begin{table}[t]
 \caption{Sensitivity of the conditional SV-SI rate to design choices. LLM: conditions D and E pooled;
-B: random; G: benign-unusual (AI-drafted). ``Without context rules'' drops seven judgement rules the
+B: random; G: benign-unusual (""" + G_NOTE + r"""). ``Without context rules'' drops seven judgement rules the
 judge had to decide without the rest of the record. ``Objective rules only'' uses no judge. Target-weighted averages
 per-target rates by each target's share of structural passes. P1 and P3 apply to model conditions only.}
 \label{tab:sensitivity}

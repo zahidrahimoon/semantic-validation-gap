@@ -175,6 +175,23 @@ if st.exists():
     rs = json.loads(st.read_text())
     FLAGS["reviewed"] = bool(rs["reviewed"])
     for k in ("keep", "change", "delete"): put(f"review.{k}", rs[k])
+    # how many of the researcher's replacement values the application itself accepted
+    nref = json.loads((A / "../human_review/new_reference_ids.json").read_text())
+    _v = {json.loads(l)["input_id"]: json.loads(l) for l in open(RUN / "validation_results.jsonl") if l.strip()}
+    put("newref.passes", sum(1 for i in nref if _v.get(i, {}).get("structural_pass")))
+    put("e1.refdrafted", sum(1 for x in raw if x["group"] in ("A", "G")) - len(nref))  # AI-drafted, before the review
+    # effort actually spent on each task, from the answer logs (timestamps of the latest answer per item)
+    import statistics, datetime
+    for task, fn, kk in (("review", "provenance_answers.jsonl", "review"), ("annotation", "annotation_answers.jsonl", "ann")):
+        f = A / "../human_review" / fn
+        if not f.exists(): continue
+        latest = {}
+        for line in f.read_text().splitlines():
+            if line.strip(): r2 = json.loads(line); latest[r2["key"]] = r2["at"]
+        ts = sorted(datetime.datetime.fromisoformat(x) for x in latest.values())
+        put(f"{kk}.minutes", f"{(ts[-1] - ts[0]).total_seconds() / 60:.0f}")
+        gaps = [(b_ - a_).total_seconds() for a_, b_ in zip(ts, ts[1:])]
+        put(f"{kk}.median_s", f"{statistics.median(gaps):.0f}")
 ag = A / "agreement_summary.json"
 if ag.exists():
     sm = json.loads(ag.read_text())
@@ -183,6 +200,8 @@ if ag.exists():
     for r in sm["rows"]:
         k = {"judge vs human": "judge", "rule functions vs human": "rules", "annotator vs self (repeats)": "self"}[r["comparison"]]
         put(f"kappa.{k}", f2(r["kappa"])); put(f"agree.{k}", pct(r["agreement"])); put(f"n.{k}", r["compared"])
+        if r.get("human_fail") is not None: put(f"fail.human.{k}", int(r["human_fail"])); put(f"fail.other.{k}", int(r["other_fail"]))
+        if r.get("other_no_verdict") is not None: put(f"noverdict.{k}", int(r["other_no_verdict"]))
         if r.get("human_unsure") is not None and r["rule_verdicts"]:
             put(f"unsure.{k}", pct(r["human_unsure"] / r["rule_verdicts"]))
 

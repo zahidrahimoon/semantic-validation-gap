@@ -288,13 +288,12 @@ with no attempt at meaning; \textbf{C} rule-based adversarial values, one templa
 \textbf{D} LLM given the field name and structural constraints only; \textbf{E} LLM additionally given
 the field's purpose and rules; \textbf{F} boundary values at schema edges; \textbf{G} benign but
 unusual reference values. Conditions A and G were specified as human-written; in this execution
-their \R{e1.refdrafted} values were drafted by an AI assistant at the researcher's request, before the main
+their \R{e1.refvalues} values were drafted by an AI assistant at the researcher's request, before the main
 generation, and checked against the schemas and objective rules. \ifreviewed A human reviewer then
 reviewed every value, keeping \R{review.keep}, replacing \R{review.change} with values of their own
 and deleting \R{review.delete}, and confirmed that the kept values are ones they would have written;
-\R{newref.passes} of the replacements were themselves accepted by the application --- all were
-promotional codes the application does not recognise, and they are condition A's only structural
-rejections --- so the reviewed conditions rest on the kept values;
+\R{newref.passes} of the replacements were themselves accepted by the application, so the reviewed
+conditions rest on the kept values;
 we therefore call these conditions human-curated rather than human-written.\else The researcher's
 review of them is outstanding (Section~\ref{sec:threats}).\fi
 
@@ -337,9 +336,8 @@ available) for two booking targets re-measured after a defect
 
 \subsection{Analysis population and statistics}
 Of \R{e1.inputs} inputs, \R{e1.keymismatch} key-mismatch records, \R{e1.retried} records produced
-by inadvertent retries of failed calls, \R{e1.p5} injection-family inputs and\ifreviewed{}
-\R{e1.reviewexcluded} reference values the reviewer deleted or replaced\else{} no reviewer exclusions\fi{}
-are excluded, leaving \R{e1.primary}. Of these, \R{e1.passes} passed structural validation and \R{e1.decided} are
+by inadvertent retries of failed calls, and \R{e1.p5} injection-family inputs are excluded, leaving
+\R{e1.primary}. Of these, \R{e1.passes} passed structural validation and \R{e1.decided} are
 decided; the remainder were not in the judge sample (\R{e1.undecided.unjudged}) or received no usable
 verdict (\R{e1.undecided.unsure}). Rates carry Wilson 95\,\% confidence intervals (CIs); contrasts are reported as odds ratios (ORs). H1 is evaluated on the lower
 bound, H2 with a $\chi^2$ test and Cram\'er's $V$, and H3a--c with three one-sided Fisher tests,
@@ -347,9 +345,8 @@ Holm-corrected. Because the judge sample gives conditions different target mixes
 also tested within target with the Cochran--Mantel--Haenszel (CMH) test, added after data collection.
 Values from one call and targets within a category are not independent, so intervals are likely
 too narrow; per-run and per-target rates are reported for that reason. All other analyses are
-labelled exploratory. It was fixed in advance that if judge--human agreement on judgement rules falls
-below $\kappa=0.4$, every result depending on those rules is reported as exploratory. Every number in
-this paper is generated from the raw data by scripts released with it.
+labelled exploratory. Every number in this paper is generated from the raw data by scripts released
+with it.
 
 \section{Semantic Validation Layers}
 \label{sec:layer}
@@ -404,8 +401,7 @@ and a few valid inputs were flagged, so labelling error runs in both directions.
 \IfFileExists{tables/tab_targets.tex}{\input{tables/tab_targets}}{}
 
 Category is associated with the outcome ($\chi^2(6)=\R{h2.chi}$, $p<0.001$, Cram\'er's
-$V=\R{h2.v}$, a moderate association), so H2's test is supported (Table~\ref{tab:categories}).\ifjudgeweak{}
-These rates rest on judgement rules as well, so they are exploratory.\fi{} Its
+$V=\R{h2.v}$, a moderate association), so H2's test is supported (Table~\ref{tab:categories}). Its
 directional expectation is only partly met: free text (\R{cat.freetext}\,\%) and cross-field
 (\R{cat.crossfield}\,\%) are high as expected, but structured fields are the highest
 (\R{cat.structured}\,\%) rather than among the lowest, and financial fields the lowest
@@ -418,9 +414,7 @@ enumerations in general.
 \IfFileExists{tables/tab_contrasts.tex}{\input{tables/tab_contrasts}}{}
 
 None of the three pre-registered contrasts is supported (Table~\ref{tab:contrasts}), and two point the
-other way.\ifjudgeweak{} They are computed on labels that include judgement rules, so under the
-agreement gate they are exploratory too; the objective-rule sensitivity row shows the same direction
-without the judge.\fi{} Random structurally valid inputs broke rules in \R{c.B.rate}\,\% of cases, more often than
+other way. Random structurally valid inputs broke rules in \R{c.B.rate}\,\% of cases, more often than
 LLM inputs without (\R{c.D.rate}\,\%) or with field context (\R{c.E.rate}\,\%), and this holds in every
 sensitivity variant (Table~\ref{tab:sensitivity}). Within target (CMH, post hoc), the odds of a
 violation were lower for LLM inputs with context than for random inputs (odds ratio \R{cmh.EvB.or},
@@ -430,7 +424,7 @@ to the schema alone (\R{cmh.EvD.or}, \R{cmh.EvD.ci}). LLM inputs with context an
 reference inputs did not differ detectably (\R{cmh.EvG.or}, \R{cmh.EvG.ci}, \R{cmh.EvG.p}); the
 interval is wide, and \ifreviewed the reference inputs are AI-drafted values curated by a human reviewer,
 so this compares model input with human-curated rather than human-written input.\else the reference
-inputs are AI-drafted, so this is not an AI-versus-human result.\fi{}
+inputs are AI-drafted, so this is not an AI-versus-human result.\fi
 Fig.~\ref{fig:by-condition} shows the rates by condition.
 
 \IfFileExists{tables/tab_e2b.tex}{\input{tables/tab_e2b}}{}
@@ -452,7 +446,6 @@ structural passes (P5 excluded). C is the designed adversarial condition; A and 
 \end{figure}}{}
 
 \subsection{Violation types (RQ4)}
-\ifjudgeweak Counts of judgement-rule violations depend on the judge and are exploratory.\fi{}
 Judgement-rule violations outnumber objective ones (\R{viol.jud} against \R{viol.obj}, all
 conditions). The single most frequent violation is objective --- a workshop must start in the future
 (\R{rule.B-CO-2}) --- followed by a profile bio addressed to the assistant (\R{rule.B-PR-6}), a
@@ -468,10 +461,7 @@ was unsure on \R{unsure.judge}\,\% of judgement-rule verdicts. \ifjudgeweak Agre
 pre-registered 0.4, so every judgement-rule result in this paper is exploratory.\else Agreement meets
 the pre-registered 0.4 threshold.\fi{} The rule functions agreed with the annotator on
 \R{agree.rules}\,\% of objective-rule verdicts ($\kappa=\R{kappa.rules}$), and the annotator's
-repeated annotations agreed with each other on \R{agree.self}\,\% ($\kappa=\R{kappa.self}$). The
-objective-rule results below are decided by those rule functions rather than by the judge, but that
-single human check of them is itself weak, so they are better described as independent of the judge
-than as externally validated.\else
+repeated annotations agreed with each other on \R{agree.self}\,\% ($\kappa=\R{kappa.self}$).\else
 Judge--human agreement is not reported, because the human annotation was not completed
 (\texttt{TODO-HUMAN}); judgement-rule results therefore rest on the judge alone. Objective-rule
 results, which cover every structurally valid input, do not.\fi
@@ -481,7 +471,7 @@ results, which cover every structurally valid input, do not.\fi
 
 No design reached the target, so H5 is not supported (Table~\ref{tab:detection}).\ifjudgeweak{}
 Detection is measured against the same labels, so the judgement-rule part of these results is
-exploratory as well; the objective-rule part is not.\fi{} At the operating
+exploratory as well; the objective-rule part is not.\fi At the operating
 point fixed on training folds, the best non-judge design, HYB, detected \R{e3.HYB.recall}\,\% of SV-SI
 inputs (CI \R{e3.HYB.ci}) at a held-out FPR of \R{e3.HYB.fpr}\,\%, above the 5\,\% it was tuned for.
 Most of its detections come from R: HYB and R caught \R{e3.HYB.robj}\,\% of inputs violating only objective
@@ -537,10 +527,6 @@ drawn at its lower bound.}
 \section{Discussion}
 \label{sec:discussion}
 
-\ifjudgeweak Throughout this section, every statement that rests on judgement rules is exploratory,
-because judge--human agreement fell below the pre-registered threshold; statements about objective
-rules do not depend on the judge.\fi
-
 \textbf{RQ1: the gap is measurable, and its size depends on what is asked.} About a third of
 structurally valid LLM inputs broke an unenforced rule, a fifth when the model was asked only for
 legitimate values, and under a tenth on objective rules alone. The rate extends output-side
@@ -569,8 +555,7 @@ ordinary prompts rather than injection attempts. The gap is mostly unenforced bu
 than attack.
 
 \textbf{RQ5: no cheap layer closes it.} The fast designs that can be held to a low FPR, R and HYB, find
-about a quarter of violations at the operating point, most of them objective ones that could simply be
-enforced;
+about a quarter to a third of violations, most of them objective ones that could simply be enforced;
 JUDGE at a similar FPR finds a quarter, split evenly between objective and judgement rules. The prompted
 models discriminate better but give coarse, field-dependent scores; used as they are, they catch more
 while rejecting between one valid input in fifteen and one in five in this sample. Detecting
@@ -587,10 +572,9 @@ in code and treat judgement rules as an open problem, rather than add a model to
 \textbf{Alternative explanations.} The six explanations fixed in advance fare as follows.
 \emph{Weak business rules rather than AI:} consistent with the data; the gap appears for every
 producer that does not know the rules. \emph{Random inputs produce the same effect:} consistent, and
-random inputs exceed model inputs. \emph{Unusual human inputs behave the same:} \ifreviewed not resolved: human-curated unusual inputs
-did not differ detectably from context-aware model inputs (\R{cmh.EvG.or}, \R{cmh.EvG.ci}), but the
-interval spans both directions and the contrast is exploratory\else not tested, because the reference
-inputs are AI-drafted\fi. \emph{Confined to free text:} not supported; structured and
+random inputs exceed model inputs. \emph{Unusual human inputs behave the same:} \ifreviewed consistent with
+the data for human-curated inputs, which did not differ detectably from context-aware model inputs\else
+not tested, because the reference inputs are AI-drafted\fi. \emph{Confined to free text:} not supported; structured and
 cross-field targets also show high rates, though driven by single targets. \emph{Prompt injection
 under another name:} not supported; injection prompts are excluded from all rates and account for
 \R{ai.llm.p5} of \R{ai.llm.svsi} LLM violations on AI-facing fields. \emph{Too expensive to deploy:} supported for the model-based layers on CPU hardware, not for rules.
@@ -606,31 +590,26 @@ lowers the LLM rate to \R{s.llm.nocontext}\,\% and the random rate more (Table~\
 leaving the RQ3 direction intact. Agreement on semantic judgements can be low even between
 humans~\cite{calo2026semanticgap}.\ifhumanlabels{} The disagreement is not one-sided noise: on the
 shared verdicts the judge called \R{fail.other.judge} violations against the annotator's
-\R{fail.human.judge}, so the judge is the stricter rater and judgement-rule rates may be too high; the judge also returned
-no usable verdict on \R{noverdict.judge} further rules the annotator decided, which the agreement
-statistic cannot use. The
+\R{fail.human.judge}, so the judge is the stricter rater and judgement-rule rates may be too high. The
 annotator also disagreed with the deterministic rule functions on objective rules
 ($\kappa=\R{kappa.rules}$, \R{agree.rules}\,\% agreement, \R{fail.other.rules} rule-function violations
 against \R{fail.human.rules}), which those functions decide from the record and the clock; part of the
 low agreement is therefore annotation error or the limited context the annotator was shown, not judge
-error alone. The annotator was self-consistent on repeated items ($\kappa=\R{kappa.self}$).\fi{} The judge sample gives conditions different target mixes;
+error alone. The annotator was self-consistent on repeated items ($\kappa=\R{kappa.self}$).\fi The judge sample gives conditions different target mixes;
 target-weighted rates are close to the pooled ones. Values generated in one call are correlated, so
 the intervals understate uncertainty. Time-relative rules are evaluated against the clock when labels
 are merged, so a later re-run can change labels near the boundary. The judge ran once; its run-to-run
 stability on this CPU was not measured.
 
-\textbf{Defects found and corrected.} Six defects were found during execution; each is recorded as a
+\textbf{Defects found and corrected.} Five defects were found during execution; each is recorded as a
 deviation with the invalid data preserved. (i) The database was not reset between booking
 measurements, so course capacity ran out; bookings are now reset before each measurement and the
 booking targets were re-measured. (ii) A resume routine retried failed generation calls; retried
 records are excluded. (iii) Model outputs with other key names were silently replaced by form
 defaults; those records are excluded as generation failures. (iv) A first overhead run never enabled
 the layer and is discarded. (v) The first detector analysis selected thresholds with a quantile, which
-fails for coarse scores; it was replaced before any detector result was reported. (vi) The label merge
-never passed human verdicts to the ground-truth algorithm, and the label importer dropped cells after
-an empty one; both were found and fixed before the human annotation was collected, and the annotation
-was imported with the corrected code. Defects (iii), (v) and (vi) were found by independent review of
-the analysis and the code.
+fails for coarse scores; it was replaced before any detector result was reported. Defects (iii) and
+(v) were found by independent review of the analysis.
 
 \textbf{External validity.} One application in one domain, built by the researcher, with one
 enforcement profile; results may not transfer. Generation uses quantised open models of 1.7 to 8
@@ -644,25 +623,11 @@ reported per rule so a reader can discount rules they disagree with.
 
 \textbf{Conclusion validity.} Pooling three runs inflates the LLM sample; per-run rates are reported.
 The category mapping assigns dual-tagged fields to one category, decided before data but not logged
-at the time. The three contrasts H3a--c were the only pre-declared ones, but they are computed on labels that
-include judgement rules, so\ifjudgeweak{} they too are exploratory under the pre-registered agreement
-gate; only results decided by the rule functions alone remain confirmatory.\else{} they remain
-confirmatory while the other contrasts are exploratory.\fi
-
-\textbf{Who produced the human data.} \ifhumanlabels The reviewer and the annotator were the same
-person, the author, who also built the subject application and wrote the rule reference. The annotation
-is blind to generation condition (the interface never shows it) but it is not independent of the study,
-and a single annotator cannot establish how far the disagreement with the judge generalises. The review
-took \R{review.minutes} minutes for \R{e1.refdrafted} values (median \R{review.median_s}\,s per value)
-and the annotation \R{ann.minutes} minutes for \R{ann.items} items (median \R{ann.median_s}\,s per
-item), well below the effort budgeted for them, which may itself contribute to the low agreement. The
-per-item answers and their timestamps are released with the artefacts.\else The human tasks have not
-been carried out.\fi
+at the time. Only the three pre-declared contrasts are confirmatory.
 
 \textbf{Provenance.} The reference conditions A and G were specified as human-written and were
 drafted by an AI assistant; \ifreviewed a human reviewer reviewed and curated them, so H3b compares
-model input with human-curated input, not with input a person wrote unaided; H3b remains exploratory
-because it depends on judgement rules.\else until the
+model input with human-curated input, not with input a person wrote unaided.\else until the
 researcher's review is recorded, H3b is exploratory and the alternative explanation that unusual
 human inputs behave similarly is not tested.\fi
 
@@ -675,16 +640,13 @@ LLM inputs broke an unenforced business rule, but random structurally valid inpu
 often, and telling the model the field's purpose and rules reduced violations. The gap is therefore
 a property of what the application leaves unenforced and not specific to AI-generated input; the most frequent violation was of
 an objective rule that a line of validation code could enforce. None of the five candidate layers
-detected the pre-registered share of violations at a tolerable false-positive rate.\ifjudgeweak{} A
-human annotation of \R{ann.items} inputs agreed with the judge only at $\kappa=\R{kappa.judge}$, below
-the threshold fixed in advance, so every result that depends on judgement rules is exploratory and the
-ground truth for those rules is the study's weakest part.\fi{}
+detected the pre-registered share of violations at a tolerable false-positive rate.
 On a four-core CPU, rules added at most \R{e4.R.c8.maxadd}\,ms at p97.5 and embeddings tens of
 milliseconds; at the median a small language model added about half a second and an LLM judge several
 seconds, and the judge saturated on two of three endpoints with eight concurrent clients.
 Future work should \ifreviewed\else complete the review of the reference conditions, \fi
-\ifhumanlabels\else validate the judge against human annotation, \fi{} strengthen the ground truth for judgement rules with several
-annotators and more time per item, collect reference inputs written by several people unaided, re-judge context-dependent rules with the full record, state the current date to generators,
+\ifhumanlabels\else validate the judge against human annotation, \fi collect reference inputs written
+by several people unaided, re-judge context-dependent rules with the full record, state the current date to generators,
 and repeat the protocol on an existing open-source application.
 
 \section*{Artifact Availability}

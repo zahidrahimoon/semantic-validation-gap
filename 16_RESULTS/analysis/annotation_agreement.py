@@ -46,7 +46,7 @@ for line in open(RUN / "rule_verdicts.jsonl"):
 
 rows = []
 def compare(name, cls, other):
-    pairs, unsure, total = [], 0, 0
+    pairs, unsure, total, no_verdict = [], 0, 0, 0
     for iid, hv in human.items():
         for rid, h in hv.items():
             if CLS.get(rid) != cls: continue
@@ -55,10 +55,11 @@ def compare(name, cls, other):
             o = other.get(iid, {}).get(rid)
             o = o.get("verdict") if isinstance(o, dict) else o
             if o in ("PASS", "FAIL"): pairs.append((h, o))
+            else: no_verdict += 1   # the other rater gave no usable verdict on this rule
     a, b = [p[0] for p in pairs], [p[1] for p in pairs]
     rows.append(dict(comparison=name, rule_class=cls, rule_verdicts=total, human_unsure=unsure, compared=len(pairs),
                      agreement=sum(x == y for x, y in pairs) / len(pairs) if pairs else float("nan"),
-                     kappa=kappa(a, b), human_fail=a.count("FAIL"), other_fail=b.count("FAIL")))
+                     kappa=kappa(a, b), human_fail=a.count("FAIL"), other_fail=b.count("FAIL"), other_no_verdict=no_verdict))
 
 compare("judge vs human", "JUD", judge)
 compare("rule functions vs human", "OBJ", rules)

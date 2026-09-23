@@ -234,3 +234,23 @@ Source: `raw/E4_20260922T1142/` (108 runs: 6 configurations × 3 endpoints × 2 
 Command: `.venv/bin/python analysis/e4_analysis.py raw/E4_20260922T1142` → `table8_e4_overhead.csv`, `table8b_e4_pareto.csv`, `e4_summary.json`; figure `09_DIAGRAMS/rendered/fig_tradeoff.pdf`.
 Key values (median of 3 reps, added vs structural-only): R p97.5 ≤ 1 ms (c=1), ≤ 14 ms (c=8); EMB p97.5 65–96 ms (c=1), 122–751 ms (c=8); SLM p50 527–534 ms (c=1), 4149–4210 ms (c=8); JUDGE p50 1611–7704 ms (c=1), c=8 saturated on courses (3/3) and reviews (2/3).
 H6 (on p97.5, DV-12): part 1 FAILS (EMB > 50 ms in every cell), part 2 HOLDS → **H6 NOT SUPPORTED**. Pareto frontier: R, HYB.
+
+## 2026-09-23 — researcher review (TH-10) and blind annotation (R3) applied
+
+Reviewer/annotator: Muhammad Zahid (sign-off `16_RESULTS/human_review/provenance_signoff.json`, confirmation YES).
+Raw answers: `16_RESULTS/human_review/provenance_answers.jsonl` (272 items, 295 clicks, 12:17–12:36 PKT) and `annotation_answers.jsonl` (220 items, 225 clicks, 12:53–13:26 PKT); both logs keep every click with its timestamp.
+Command: `bash 17_CODE/review_app/finish_review.sh` (log `16_RESULTS/logs/finish_review.log`).
+
+Reference conditions A/G: 262 kept, 7 deleted, 3 replaced. The 10 deleted/replaced ids are excluded via `10_DATASETS/human_inputs/review_exclusions.json`; the 3 replacement values (promo codes) were all rejected by the application's own promo-code check, so they add no valid input. Groups A/G are now labelled **human-curated (AI-drafted, researcher-reviewed)**.
+
+Ground-truth agreement (`analysis/table9_agreement.csv`, `agreement_summary.json`):
+| Comparison | rule class | compared | agreement | kappa |
+|---|---|---|---|---|
+| judge vs human | JUD | 126 | 70.6% | **0.238** |
+| rule functions vs human | OBJ | 143 | 89.5% | 0.316 |
+| annotator vs self (repeats) | all | 32 | 93.8% | 0.714 |
+Judge called 37 violations against the annotator's 28 on the shared verdicts; rule functions 19 against 4 on objective rules.
+**Pre-registered consequence: kappa < 0.4 → all judgement-rule results are EXPLORATORY.** Objective-rule results (rule functions, every structural pass) are unaffected.
+
+Results after human verdicts take precedence (Algorithm 1 R3) and the review exclusions:
+population 2917 structural passes, 1876 decided. H1 338/1094 = 30.9% [28.2, 33.7] (P1-only 20.3%, objective-only 7.9%) — supported. H2 χ²(6)=184.5, V=0.31. Conditions: A 3.8%, B 53.3%, C 69.1%, D 37.7%, E 24.5%, F 32.1%, G 17.2%. CMH within target: E vs B 0.156, D vs B 0.474, E vs G 1.323 (p=0.29), E vs D 0.232, C vs B 2.178. H3a–c not supported. E3: HYB 27.1%, JUDGE 23.7%, R 22.5% — H5 not supported. E4 unchanged (H6 not supported).

@@ -13,7 +13,8 @@
       "agreement": 0.7063492063492064,
       "kappa": 0.23798627002288353,
       "human_fail": 28,
-      "other_fail": 37
+      "other_fail": 37,
+      "other_no_verdict": 36
     },
     {
       "comparison": "rule functions vs human",
@@ -24,7 +25,8 @@
       "agreement": 0.8951048951048951,
       "kappa": 0.31622569333758416,
       "human_fail": 4,
-      "other_fail": 19
+      "other_fail": 19,
+      "other_no_verdict": 12
     },
     {
       "comparison": "annotator vs self (repeats)",

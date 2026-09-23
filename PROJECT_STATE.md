@@ -11,12 +11,9 @@ Operating mode:     FULL (Ollama in Docker, CPU only)
 Last updated:       2026-09-22 20:00 PKT
 Completed stages:   0–16; Gates A and B; E1, E2, E2b, E3, E4; review cycle 1 (71 issues) + cycle-2 verification
 Open gates awaiting human decision: none
-Open CRITICAL/HIGH issues (NEED HUMAN):
-  - DV-03: groups A/G AI-drafted → review/sign 10_DATASETS/human_inputs/PROVENANCE.md
-  - Judge–human κ missing → annotate 16_RESULTS/raw/E1_E1_20260920T0847/annotation_sample.csv, then `npx tsx cli.ts import-labels`
-Key results (all generated, see 13_DRAFT/tables/numbers.tex): H1 supported (31.6% [28.9,34.4]; P1-only 23.2%; objective-only 7.9%);
-  H2 association supported, structured prediction reversed; H3a–c NOT supported (random 54.6% > LLM); H5 NOT supported (best HYB 27.1%);
-  H6 NOT supported (EMB 65–96 ms > 50 ms; R ≤ 14 ms; JUDGE saturates at c=8)
+Open CRITICAL/HIGH issues: none blocking. Judge-human kappa 0.238 (< 0.4) -> all judgement-rule results
+  are EXPLORATORY (pre-registered); the ground truth for judgement rules is the study's weakest part.
+Human tasks: DONE 2026-09-23 (TH-10 review signed; 200-item annotation imported) - see DV-19
 Testbed: main @ 62a7267 (v1.0-frozen), checked out; E4 branch e4-semantic-layer @ 33f2685 (v1.2-semantic)
 Repository: project root under git since 2026-09-22 (after data collection); testbed has its own repo
 Regenerate all results: see 16_RESULTS/analysis/README.md
