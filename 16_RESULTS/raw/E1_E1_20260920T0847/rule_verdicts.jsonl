@@ -3876,3 +3876,6 @@
 {"input_id":"F29|E|P3|r1|2","verdicts":{"B-BK-1":"PASS"}}
 {"input_id":"F29|E|P3|r1|3","verdicts":{"B-BK-1":"PASS"}}
 {"input_id":"F29|E|P3|r1|4","verdicts":{"B-BK-1":"PASS"}}
+{"input_id":"F28|A|r1|136","verdicts":{"B-BK-1":"PASS","B-BK-2":"FAIL","B-BK-3":"NA"}}
+{"input_id":"F28|A|r1|137","verdicts":{"B-BK-1":"PASS","B-BK-2":"FAIL","B-BK-3":"NA"}}
+{"input_id":"F28|A|r1|138","verdicts":{"B-BK-1":"PASS","B-BK-2":"FAIL","B-BK-3":"NA"}}

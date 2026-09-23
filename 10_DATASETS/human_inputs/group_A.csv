@@ -1,5 +1,5 @@
 target_id,value_json
-# PROVENANCE: AI-DRAFTED 2026-09-20, NOT human-written. Awaiting researcher review (TH-10). See PROVENANCE.md.
+# PROVENANCE: AI-DRAFTED 2026-09-20; reviewed by Muhammad Zahid on 2026-09-23 (confirmed). See PROVENANCE.md.
 F01,"{""displayName"": ""Ada Lovelace""}"
 F01,"{""displayName"": ""Zahid R.""}"
 F01,"{""displayName"": ""Maryam Iqbal""}"
@@ -136,3 +136,6 @@ F39,"{""message"": ""Is the guitar workshop suitable for a complete beginner?""}
 F39,"{""message"": ""What does the promo code WELCOME10 apply to?""}"
 F39,"{""message"": ""Can I book two seats and pay for both at once?""}"
 F39,"{""message"": ""Where can I see the reviews for a workshop?""}"
+F28,"{""promoCode"": ""Rahi""}"
+F28,"{""promoCode"": ""Zahid0078""}"
+F28,"{""promoCode"": ""Mosa78""}"

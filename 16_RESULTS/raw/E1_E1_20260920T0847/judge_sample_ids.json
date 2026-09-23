@@ -1350,5 +1350,10 @@
   "per_stratum": 14,
   "seed": 90211,
   "strata": 14
- }
+ },
+ "replacements": [
+  "F28|A|r1|136",
+  "F28|A|r1|137",
+  "F28|A|r1|138"
+ ]
 }

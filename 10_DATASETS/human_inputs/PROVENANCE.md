@@ -41,13 +41,15 @@ short values) and preserves the study's strongest contribution (C3).
 ## Review record (to be completed by the researcher)
 
 ```text
-Reviewed by:
-Date:
-Values edited:            (count)
-Values replaced:          (count)
-Values deleted:           (count)
-Confirmation: "these values are ones I would have written myself"  YES / NO
-Resulting label for the paper:  human-written / human-curated (AI-drafted) / AI-drafted
+Reviewed by:              Muhammad Zahid
+Date:                     2026-09-23
+Values edited:            3
+Values replaced:          3 (each edited value is a replacement: new value appended, old id excluded)
+Values deleted:           7
+Values kept unchanged:    262 of 272 reviewed (272 in total)
+Confirmation: "these values are ones I would have written myself"  YES
+Resulting label for the paper:  human-curated (AI-drafted, researcher-reviewed)
+Recorded by the review app (17_CODE/review_app); answers in 16_RESULTS/human_review/.
 ```
 
 ## Construction notes (so a reviewer can judge the values)

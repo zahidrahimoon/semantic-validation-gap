@@ -1,0 +1,4 @@
+comparison,rule_class,rule_verdicts,human_unsure,compared,agreement,kappa,human_fail,other_fail
+judge vs human,JUD,168,6.0,126,0.7063492063492064,0.23798627002288353,28.0,37.0
+rule functions vs human,OBJ,162,7.0,143,0.8951048951048951,0.31622569333758416,4.0,19.0
+annotator vs self (repeats),all,32,,32,0.9375,0.7142857142857143,,

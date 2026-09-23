@@ -1,0 +1,41 @@
+{
+  "items": 200,
+  "repeats": 20,
+  "judge_kappa": 0.23798627002288353,
+  "judgement_results_exploratory": true,
+  "rows": [
+    {
+      "comparison": "judge vs human",
+      "rule_class": "JUD",
+      "rule_verdicts": 168,
+      "human_unsure": 6,
+      "compared": 126,
+      "agreement": 0.7063492063492064,
+      "kappa": 0.23798627002288353,
+      "human_fail": 28,
+      "other_fail": 37
+    },
+    {
+      "comparison": "rule functions vs human",
+      "rule_class": "OBJ",
+      "rule_verdicts": 162,
+      "human_unsure": 7,
+      "compared": 143,
+      "agreement": 0.8951048951048951,
+      "kappa": 0.31622569333758416,
+      "human_fail": 4,
+      "other_fail": 19
+    },
+    {
+      "comparison": "annotator vs self (repeats)",
+      "rule_class": "all",
+      "rule_verdicts": 32,
+      "human_unsure": null,
+      "compared": 32,
+      "agreement": 0.9375,
+      "kappa": 0.7142857142857143,
+      "human_fail": null,
+      "other_fail": null
+    }
+  ]
+}

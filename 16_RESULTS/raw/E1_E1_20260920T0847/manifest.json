@@ -3,10 +3,10 @@
   "run_id": "E1_20260920T0847",
   "step": "generate",
   "groups": [
-    "D",
-    "E"
+    "A",
+    "G"
   ],
-  "runs": 3,
+  "runs": 1,
   "model": "qwen3:4b",
   "temperature": 0.8,
   "families": [
@@ -40,7 +40,7 @@
     "F39"
   ],
   "testbed_commit": "62a726720bc81ee498acee8f1b1fc0924b8ca598",
-  "generated": 0,
+  "generated": 3,
   "failures": 0,
-  "at": "2026-09-22T05:14:16.442Z"
+  "at": "2026-09-23T08:39:18.453Z"
 }
