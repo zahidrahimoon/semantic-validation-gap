@@ -15,7 +15,9 @@ Open CRITICAL/HIGH issues: none blocking. Judge-human kappa 0.238 (< 0.4) -> all
   are EXPLORATORY (pre-registered); the ground truth for judgement rules is the study's weakest part.
 Human tasks: DONE 2026-09-23 (TH-10 review signed; 200-item annotation imported) - see DV-19
 Testbed: main @ 62a7267 (v1.0-frozen), checked out; E4 branch e4-semantic-layer @ 33f2685 (v1.2-semantic)
-Repository: project root under git since 2026-09-22 (after data collection); testbed has its own repo
+Repository: https://github.com/zahidrahimoon/semantic-validation-gap (public, pushed 2026-09-24).
+  Branches: main (study) + testbed-main (v1.0-frozen) + testbed-e4-semantic-layer (v1.2-semantic).
+  TODO-HUMAN: set default branch to main in GitHub settings. Licences: MIT (code), CC BY 4.0 (data/manuscript)
 Regenerate all results: see 16_RESULTS/analysis/README.md
 Next actions (ordered):
   1. HUMAN: open http://127.0.0.1:8765 (service svg-review) — task 1 review 272 values + sign-off, task 2 annotate 220 items;

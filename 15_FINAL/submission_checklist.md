@@ -51,11 +51,20 @@ this paper is ready to submit; that decision is the author's.
 | Ethics | No human subjects; confirm no institutional requirement applies |
 | Figures | Original, generated from our data only |
 | Similarity check | Run before submission |
-| Author information | Email set (zahidrahimoon22@gmail.com); no ORCID (optional for most venues); affiliation, funding and conflicts still to confirm |
+| Author information | Email set (zahidrahimoon22@gmail.com); no ORCID; affiliation, funding and conflicts still to confirm |
 | Venue requirements | Not yet researched — no venue chosen. Run `/rs-venue <name>` once decided. |
 | Page limit and format | Currently 13 pages (IEEEtran conference). Many IEEE conferences allow 6–10 pages, so shorten or choose a venue with a higher limit |
 | Preprint policy | If posting to ResearchGate or arXiv, confirm the target venue permits preprints |
 | Final submission decision | The author's alone |
+
+## Repository
+
+Public artefacts: https://github.com/zahidrahimoon/semantic-validation-gap
+  main                          the study (stages, data, analysis, manuscript, testbed source)
+  testbed-main                  the testbed's own history, tag v1.0-frozen (commit 62a7267) as used for E1-E3
+  testbed-e4-semantic-layer     the overhead branch, tag v1.2-semantic (commit 33f2685) as used for E4
+Licences: MIT for software (LICENSE), CC BY 4.0 for data and manuscript (LICENSE-DATA).
+TODO-HUMAN: set the default branch to `main` in the GitHub repository settings.
 
 ## Artefacts to release with the paper
 

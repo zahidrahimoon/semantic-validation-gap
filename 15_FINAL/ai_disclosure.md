@@ -1,7 +1,10 @@
 # AI-USE DISCLOSURE
 
 Paper: *Structurally Valid, Semantically Wrong: Measuring the Validation Gap for AI-Generated Web
-Inputs* · Author: Zahid Rahimoon · Date: 2026-09-22
+Inputs* · Author: Zahid Rahimoon · Date: 2026-09-24
+
+The manuscript itself carries a one-sentence disclosure in the acknowledgment. This file is the full
+version kept with the artefacts, for venues that ask for detail.
 
 This statement is written to satisfy the disclosure policies of IEEE and ACM venues and of preprint
 servers. It is deliberately specific, because the paper is itself about AI-generated content and a
