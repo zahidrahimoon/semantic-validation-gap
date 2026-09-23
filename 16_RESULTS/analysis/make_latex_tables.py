@@ -226,68 +226,41 @@ qwen3 & Runs & $n$ & Pass & Obj.\ (\%) & $p_{\mathrm{H}}$ & All (\%) & $p_{\math
 \end{table}
 """)
 
-# ---- Table: E4 overhead ----
+# ---- Table: E4 overhead (condensed: endpoints summarised as a range) ----
 f = OUT / "table8_e4_overhead.csv"
 if f.exists():
     t = pd.read_csv(f)
     def ms0(x):
         if pd.isna(x): return "--"
         return "$>$60\\,000" if x == float("inf") else f"{float(x):.0f}"
+    def rng(g, col):
+        lo, hi = g[col].min(), g[col].max()
+        return ms0(lo) if lo == hi else f"{ms0(lo)}--{ms0(hi)}"
+    ORDER = {"structural": 0, "R": 1, "EMB": 2, "HYB": 3, "SLM": 4, "JUDGE": 5}
     rows = []
     for conc in sorted(t["concurrency"].unique()):
-        rows.append(f"\\multicolumn{{9}}{{l}}{{\\emph{{Concurrency {int(conc)}}}}} \\\\")
-        for _, r in t[t["concurrency"] == conc].iterrows():
-            rows.append(f"{esc(r['config'])} & {esc(r['endpoint'])} & {ms0(r['p50'])} & {ms0(r['p97_5'])} & "
-                        f"{ms0(r['added_p50'])} & {ms0(r['added_p97_5'])} & {float(r['rps']):.1f} & "
-                        f"{'--' if r['config'] == 'structural' else pct(r['layer_success'], 0)} & "
-                        f"{'' if pd.isna(r.get('h6')) else esc(r['h6'])} \\\\")
-    write("tab_e4.tex", r"""\begin{table*}[t]
-\caption{Request-path overhead of each configuration (production build, 4-core CPU, no GPU). Each
-cell is the median over 3 repetitions of a 60\,s autocannon run after a 10\,s warm-up, with a unique
-payload per request. Added latency is relative to structural-only validation on the same endpoint and
-concurrency. H6 is evaluated on the added p97.5, the nearest tail percentile autocannon reports
-($\geq$ p95). Layer success is the share of layer calls that returned a verdict rather than failing open.
-``$>$60\,000'': the configuration saturated, completing no request within at least two of the three
-60\,s runs.}
+        rows.append(f"\\multicolumn{{6}}{{l}}{{\\emph{{Concurrency {int(conc)}}}}} \\\\")
+        d = t[t["concurrency"] == conc].copy()
+        for cfg in sorted(d["config"].unique(), key=lambda c: ORDER.get(c, 9)):
+            g = d[d["config"] == cfg]
+            h6 = "" if g["h6"].isna().all() else str(g["h6"].iloc[0])
+            ok = "--" if cfg == "structural" else pct(g["layer_success"].min(), 0)
+            rows.append(f"{esc(cfg)} & {rng(g, 'added_p50')} & {rng(g, 'added_p97_5')} & "
+                        f"{g['rps'].min():.1f}--{g['rps'].max():.1f} & {ok} & {h6} \\\\")
+    write("tab_e4.tex", r"""\begin{table}[t]
+\caption{Request-path overhead of each configuration (production build, four-core CPU, no GPU). Each
+value is the median over three 60\,s runs, given as the range across the three endpoints (profile,
+review, course). Added latency is relative to structural-only validation on the same endpoint and
+concurrency. H6 is evaluated on the added p97.5, the nearest tail percentile the load generator reports.
+``Ok'' is the share of layer calls that returned a verdict rather than failing open. ``$>$60\,000'': the configuration saturated, completing no request within at least two of
+the three runs. Per-endpoint values are in the repository.}
 \label{tab:e4}
-\centering
-\begin{tabular}{llrrrrrrl}
-\toprule
-Config. & Endpoint & p50 (ms) & p97.5 (ms) & $\Delta$p50 (ms) & $\Delta$p97.5 (ms) & req/s & Layer ok (\%) & H6 \\
-\midrule
-""" + "\n".join(rows) + r"""
-\bottomrule
-\end{tabular}
-\end{table*}
-""")
-
-# ---- Table: LLM rate by prompt family ----
-f = OUT / "table1b_llm_by_family.csv"
-if f.exists():
-    t = pd.read_csv(f)
-    rows = []
-    for fam in ["P1", "P2", "P3", "P4", "P6", "P7"]:
-        x = t[t["family"] == fam].set_index("group")
-        if x.empty: continue
-        rows.append(f"{fam} & {esc(x.loc['D+E', 'meaning']).replace('asked to violate rules', 'rule violations')} & {pct(x.loc['D', 'rate'])} & {pct(x.loc['E', 'rate'])} & "
-                    f"{int(x.loc['D+E', 'svsi'])}/{int(x.loc['D+E', 'decided'])} & {pct(x.loc['D+E', 'rate'])} & "
-                    f"{ci(x.loc['D+E', 'ci_lo'], x.loc['D+E', 'ci_hi'])} \\\\")
-    for lbl in ["pooled", "pooled excl. P3"]:
-        x = t[t["family"] == lbl].iloc[0]
-        rows.append(f"\\multicolumn{{2}}{{l}}{{{'All (H1)' if lbl == 'pooled' else 'All except P3'}}} & & & "
-                    f"{int(x['svsi'])}/{int(x['decided'])} & {pct(x['rate'])} & {ci(x['ci_lo'], x['ci_hi'])} \\\\")
-    rows.insert(len(rows) - 2, "\\midrule")
-    write("tab_family.tex", r"""\begin{table}[t]
-\caption{Conditional SV-SI rate of model-generated inputs by prompt family (decided structural passes;
-P5 excluded). P3 explicitly asks the model for values the application should reject; P1 asks for
-legitimate values. D: without field context; E: with purpose and rules.}
-\label{tab:family}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{2pt}
-\begin{tabular}{llrrrrr}
+\begin{tabular}{lrrrrl}
 \toprule
- & Prompt asks for & D (\%) & E (\%) & SV-SI & D+E (\%) & 95\% CI \\
+Config. & $\Delta$p50 (ms) & $\Delta$p97.5 (ms) & req/s & Ok (\%) & H6 \\
 \midrule
 """ + "\n".join(rows) + r"""
 \bottomrule
@@ -295,62 +268,4 @@ legitimate values. D: without field context; E: with purpose and rules.}
 \end{table}
 """)
 
-# ---- Table: sensitivity of the H1 rate ----
-f = OUT / "table1c_sensitivity.csv"
-if f.exists():
-    t = pd.read_csv(f)
-    NAMES = {"primary": "Pre-registered (all rules)", "P1 only": "P1 (legitimate) prompts only",
-             "excluding P3": "Without P3 (asks for violations)", "excluding F15+F16": "Without dates (F15+F16)",
-             "objective rules only": "Objective rules only", "excluding context rules": "Without context rules",
-             "target-weighted": "Target-weighted"}
-    def cell(c, v):
-        x = t[(t["condition"] == c) & (t["variant"] == v)]
-        return "--" if x.empty or pd.isna(x["rate"].iloc[0]) else pct(x["rate"].iloc[0])
-    rows = "\n".join(f"{NAMES[v]} & {cell('LLM (D+E)', v)} & "
-                     f"{'--' if t[(t['condition'] == 'LLM (D+E)') & (t['variant'] == v)]['ci_lo'].isna().all() else ci(*t[(t['condition'] == 'LLM (D+E)') & (t['variant'] == v)][['ci_lo', 'ci_hi']].iloc[0])} & "
-                     f"{cell('B', v)} & {cell('G', v)} \\\\" for v in NAMES)
-    write("tab_sensitivity.tex", r"""\begin{table}[t]
-\caption{Sensitivity of the conditional SV-SI rate to design choices. LLM: conditions D and E pooled;
-B: random; G: benign-unusual (""" + G_NOTE + r"""). ``Without context rules'' drops seven judgement rules the
-judge had to decide without the rest of the record. ``Objective rules only'' uses no judge. Target-weighted averages
-per-target rates by each target's share of structural passes. P1 and P3 apply to model conditions only.}
-\label{tab:sensitivity}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{lrrrr}
-\toprule
-Variant & LLM (\%) & 95\% CI & B (\%) & G (\%) \\
-\midrule
-""" + rows + r"""
-\bottomrule
-\end{tabular}
-\end{table}
-""")
-
-# ---- Table: per target ----
-f = OUT / "table2b_by_target.csv"
-if f.exists():
-    t = pd.read_csv(f)
-    CAT = {"structured": "Structured", "freetext": "Free text", "crossfield": "Cross-field",
-           "aifacing": "AI-facing", "search": "Search", "simple": "Simple scalar", "financial": "Financial"}
-    rows = "\n".join(f"{esc(r['target'])} & {CAT[r['category']]} & {int(r['decided'])} & {pct(r['rate'])} & "
-                     f"{int(r['llm_decided'])} & {pct(r['llm_rate'])} \\\\" for _, r in t.iterrows())
-    write("tab_targets.tex", r"""\begin{table}[t]
-\caption{Conditional SV-SI rate per target, all conditions and model conditions (D+E) only, over
-decided structural passes. Categories hold one to four targets, so a category rate can be driven by
-a single target.}
-\label{tab:targets}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{llrrrr}
-\toprule
-Target & Category & Decided & All (\%) & LLM dec. & LLM (\%) \\
-\midrule
-""" + rows + r"""
-\bottomrule
-\end{tabular}
-\end{table}
-""")
 print("\nInclude in paper.tex with e.g. \\input{tables/tab_conditions}")

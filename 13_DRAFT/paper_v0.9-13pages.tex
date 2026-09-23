@@ -78,24 +78,26 @@ payloads~\cite{corradini2023massassignment}. What has changed since then is who 
 language models (LLMs) now fill forms, operate web applications on a user's behalf, and generate test
 data~\cite{li2026webformtest,alian2024formnexus,li2025formfactory}.
 
-Recent work shows that LLM output which satisfies a schema is often wrong in meaning. Schema-constrained
-ordering agents reach full schema validity while semantic success falls as low as a few per
-cent~\cite{li2026orderbench}; hard schema decoding raised validity while executable accuracy
-fell~\cite{ray2026constrainttax}; across 21 models, schema compliance exceeds value accuracy by 15 to 25
-percentage points~\cite{singh2026sob}; schema-first tool interfaces increase schema-valid semantic
-misuse~\cite{sigdel2026schemafirst}; and in one enterprise platform the most structurally successful
-model had among the lowest semantic satisfaction~\cite{wrenn2026enterprise}. All of this concerns model
-outputs that a tool, an API or a renderer consumes, and there a wrong value is discarded. At the input
-boundary of a web application the accepted value is stored and later shown to other users or to an
-assistant, and two questions remain open there. How often do LLM-written inputs that pass validation
-break the application's business rules? And is that rate different from the rate for other producers of
-structurally valid input? Web testing studies cannot answer either, because they treat acceptance by the
-application as validity~\cite{li2026webformtest,alian2024formnexus}; one of them notes that incomplete
-e-mail addresses may be submitted successfully because the application lacks the
-check~\cite{li2026webformtest}, and a robustness study using status codes as its oracle cannot see
-failures that return success~\cite{tigulla2026robustness}. Where semantic validity is measured, a base
-eight-billion-parameter model produces domain-coherent values under a quarter of the
-time~\cite{kim2025llamaresttest}, with no non-LLM comparison.
+Recent work shows that LLM output which satisfies a schema is often wrong in meaning.
+Schema-constrained ordering agents reach full schema validity while semantic success falls as low as a
+few per cent~\cite{li2026orderbench}. Forcing a small model into a schema raised validity while
+executable accuracy fell in a calendar tool-call task~\cite{ray2026constrainttax}. Across 21 models,
+schema compliance exceeds value accuracy by 15 to 25 percentage points~\cite{singh2026sob}. Schema-first
+tool interfaces reduce interface misuse and increase schema-valid semantic
+misuse~\cite{sigdel2026schemafirst}. In one enterprise platform the most structurally successful model
+had among the lowest semantic satisfaction~\cite{wrenn2026enterprise}. All of this concerns model
+outputs that a tool, an API or a renderer consumes. Two questions about the input boundary of a web
+application remain open, and there the accepted value is stored and later shown to other users or to an
+assistant. How often do LLM-written inputs that pass validation break the application's business rules?
+And is that rate different from the rate for other producers of structurally valid input?
+
+Web testing studies cannot answer either question, because they treat acceptance by the application as
+validity~\cite{li2026webformtest,alian2024formnexus}. One such study notes that some invalid data, such
+as incomplete e-mail addresses, may be submitted successfully because the application lacks the
+corresponding check~\cite{li2026webformtest}. A robustness study that uses status codes as its oracle
+cannot see failures that return success~\cite{tigulla2026robustness}. Where the semantic validity of
+generated API values is measured, a base eight-billion-parameter model produces domain-coherent values
+under a quarter of the time~\cite{kim2025llamaresttest}, but that study has no non-LLM comparison.
 
 This paper measures the gap at the input boundary of one purpose-built application that has an explicit
 rule reference. It compares LLM inputs with random, rule-based, boundary and reference inputs on the
@@ -103,31 +105,39 @@ same outcome. The contributions are:
 
 \begin{itemize}
   \item \textbf{C1.} A measurement of how often structurally valid inputs break unenforced business
-  rules, for LLM and non-LLM producers alike, broken down by prompt intent, field category and target,
-  with a sensitivity analysis for every design choice that affects the rate.
-  \item \textbf{C2.} A controlled comparison of seven generation conditions on one outcome, showing
-  that the gap is not specific to AI-generated input: random structurally valid inputs exceed LLM
-  inputs, and field context reduces LLM violations.
+  rules, for LLM and non-LLM producers alike. The rate is broken down by prompt intent, field category
+  and target, and a sensitivity analysis is reported for every design choice that affects it.
+  \item \textbf{C2.} A controlled comparison of seven input-generation conditions on one outcome. The
+  comparison shows that the gap is not specific to AI-generated input. Random structurally valid inputs
+  exceed LLM inputs, and field context reduces LLM violations.
   \item \textbf{C3.} An evaluation of five validation layers (rules, embedding similarity, a small
-  language model, a hybrid and an LLM judge) at a bounded false-positive rate on held-out fields, none
-  of which reaches the pre-registered target.
-  \item \textbf{C4.} Their request-path cost on commodity CPU hardware, a regime for which the
-  guardrail literature I reviewed reports no comparable
+  language model, a hybrid, and an LLM judge) at a bounded false-positive rate on held-out fields. None
+  of them reaches the pre-registered target.
+  \item \textbf{C4.} The request-path cost of those layers on commodity CPU hardware. The guardrail
+  literature I reviewed reports no comparable
   figures~\cite{jacob2025promptshield,ahmed2026reflexguard,saleem2026layered,wang2026sokguardrails}.
-  \item \textbf{C5.} The testbed, harness, rule reference, raw data and analysis scripts, with the
-  defects found during execution and how each was handled.
+  \item \textbf{C5.} The testbed, harness, rule reference, raw data and analysis scripts, together with
+  the defects found during execution and the way each one was handled.
 \end{itemize}
+
+Section~\ref{sec:background} fixes the terminology and Section~\ref{sec:related} positions the work.
+Section~\ref{sec:rq} states the research questions and hypotheses, which were frozen before data
+collection. Section~\ref{sec:method} describes the method and Section~\ref{sec:layer} the validation
+layers. Section~\ref{sec:results} reports the results and Section~\ref{sec:discussion} interprets them.
+Sections~\ref{sec:threats} and \ref{sec:conclusion} give the threats to validity and the conclusions.
 
 \section{Background and Terminology}
 \label{sec:background}
 
 \textbf{Structural validation} is every check the application performs before business logic: the
-runtime schema (type, presence, length, pattern, range, enumeration, format and any refinements written
-into it), service-level checks and database constraints. An input \emph{passes} when the application
-accepts it. \textbf{Semantic validity} is whether a structurally valid value is appropriate for the
-application's purpose, covering consistency across fields, domain plausibility, compliance with business
-rules and safety for downstream consumers such as an LLM component. It is operationalised as satisfying
-every rule in a frozen, enumerated reference.
+runtime schema (type, presence, length, pattern, range, enumeration, format, and any refinements
+written into it) together with service-level checks and database constraints. An input
+\emph{passes} structural validation when the application accepts it.
+
+\textbf{Semantic validity} is whether a structurally valid value is appropriate for the application's
+purpose: consistency across fields, domain plausibility, compliance with business rules, and safety
+for downstream consumers such as an LLM component. It is operationalised as satisfying every rule in a
+frozen, enumerated reference.
 
 An input that passes structural validation and violates at least one rule is \textbf{SV-SI}
 (structurally valid, semantically invalid). The \emph{conditional} SV-SI rate is the share of SV-SI
@@ -136,91 +146,123 @@ generator that produces more well-formed values would otherwise look worse merel
 often.
 
 Terminology differs across communities. The OWASP Input Validation Cheat Sheet separates syntactic from
-semantic validation~\cite{owasp2026inputvalidation}; I count a range the developer wrote into the schema
-as structural, because the application enforces it. Security research speaks of logic or business logic
-vulnerabilities~\cite{felmetsger2010waler,pellegrino2014logicflaws,metin2025blv}, API testing research of
-inter-parameter dependencies~\cite{martinlopez2022idl,martinlopez2019catalogue}. In LLM
-security the adjective usually means adversarial intent~\cite{singh2026injectioninteraction}, whereas my
+semantic validation~\cite{owasp2026inputvalidation}. I count a range that the developer wrote into the
+schema as structural, because the application enforces it. Security research speaks of logic
+vulnerabilities~\cite{felmetsger2010waler,pellegrino2014logicflaws} or of business logic
+vulnerabilities~\cite{metin2025blv}. API testing research speaks of inter-parameter
+dependencies~\cite{martinlopez2022idl,martinlopez2019catalogue}, and one older paper uses
+``semantic-based user input validation'' in the sense used here~\cite{hanna2018semanticvalidation}. In LLM
+security the same adjective usually means adversarial intent~\cite{singh2026injectioninteraction}. My
 usage concerns whether the data is appropriate, which includes that case.
 
 \section{Related Work}
 \label{sec:related}
 
-\subsection{Limits of structural validation, and logic flaws}
-JSON Schema has a formal semantics and a known
-complexity~\cite{pezoa2016foundations,attouche2023jsonschema}, and empirical studies describe which
-constraints practitioners encode~\cite{baazizi2021usagenot}. Inter-parameter dependencies such as
-\emph{requires}, \emph{only-one} and arithmetic relations cannot be stated in an OpenAPI
-document~\cite{martinlopez2022idl,martinlopez2019catalogue}, and schema-derived fuzzers inherit the
-same boundary~\cite{hatfielddodds2021schemathesis}, and surveys of input-validation vulnerabilities
-remain organised around injection classes~\cite{fadlalla2023inputvalidation}. The rules beyond that
-boundary are the classical subject of logic-flaw research. Waler inferred likely invariants over
-session state and database query parameters and model-checked them~\cite{felmetsger2010waler}, and
-related classes are detected by behavioural patterns~\cite{pellegrino2014logicflaws}, parameter
-tampering~\cite{bisht2010notamper}, mass-assignment testing~\cite{corradini2023massassignment} and
-excessive-data-exposure fuzzing~\cite{pan2024edefuzz}. Recent work applies LLMs to find such flaws in code~\cite{metin2025blv}. In the studies I reviewed the
-inputs are crafted by an attacker or a tester, and they are not compared across producers.
+\subsection{Limits of structural validation}
+JSON Schema has a formal semantics and a known complexity~\cite{pezoa2016foundations,attouche2023jsonschema},
+and empirical studies describe which constraints practitioners encode~\cite{baazizi2021usagenot}.
+Inter-parameter dependencies of the form \emph{requires}, \emph{or}, \emph{only-one},
+\emph{all-or-none}, \emph{zero-or-one} and arithmetic relations cannot be stated in an OpenAPI
+document~\cite{martinlopez2022idl,martinlopez2019catalogue}. That gap has motivated generating
+server-side validation code from a separate dependency language~\cite{barakat2023idlgen}.
+Schema-derived fuzzers inherit the same boundary~\cite{hatfielddodds2021schemathesis}, and surveys of
+input-validation vulnerabilities remain organised around injection
+classes~\cite{fadlalla2023inputvalidation}.
 
-\subsection{LLM-generated inputs, and schema-valid but wrong outputs}
+\subsection{Logic flaws}
+Waler inferred likely invariants over session state and database query parameters and model-checked
+them, which uncovered previously unknown logic vulnerabilities~\cite{felmetsger2010waler}. Related
+classes are detected by black-box behavioural patterns~\cite{pellegrino2014logicflaws}, by
+parameter-tampering analysis~\cite{bisht2010notamper}, by mass-assignment
+testing~\cite{corradini2023massassignment} and by excessive-data-exposure
+fuzzing~\cite{pan2024edefuzz}. Semantic anomaly detection in this invariant sense predates the web
+literature~\cite{raz2002semanticanomaly}. Recent work applies LLMs to find business-logic
+vulnerabilities in code~\cite{metin2025blv,armillotta2026antaeus}, surveyed among other security
+uses~\cite{sheng2025llmsecsurvey}. In the studies I reviewed the inputs are crafted by an attacker or
+a tester, and they are not compared across producers.
+
+\subsection{LLM-generated inputs for forms and APIs}
 LLMs are better than random and type-based generators at producing inputs that applications accept. On
 thirty real forms an LLM-driven approach reaches a form passing rate of 83\,\%, against 23\,\% for a
-static type-based generator and 3\,\% for random crawling~\cite{alian2024formnexus}, and across 146
-forms the best of eleven models submits over 98\,\% of its inputs~\cite{li2026webformtest}. The oracle
-in both cases is acceptance by the application. Where semantic validity is measured separately, a base
-model reaches 22.9\,\% domain-coherent values against 72.4\,\% after
-fine-tuning~\cite{kim2025llamaresttest}. Related work also mines input constraints from specifications and benchmarks form-filling
-agents~\cite{li2025formfactory}. For model \emph{outputs},
-several 2026 studies document the same pattern: OrderBench separates syntactic validity, schema
-validity and semantic success~\cite{li2026orderbench}; hard schema decoding costs
-accuracy~\cite{ray2026constrainttax}; JSON pass rate stays ahead of value
-accuracy~\cite{singh2026sob}; schemas shift failures from interface misuse to semantic
-misuse~\cite{sigdel2026schemafirst}; and workflows pass validation and then fail to
-execute~\cite{wrenn2026enterprise}. Tool-use benchmarks evaluate emitted calls against a task's expected
-answer~\cite{yu2026wildtoolbench,yu2026parambench}. In all of them the semantic check is the oracle
-rather than a layer that is itself evaluated.
+static type-based generator and 3\,\% for random crawling~\cite{alian2024formnexus}. Across 146 forms
+and eleven models, the best model submits over 98\,\% of its generated inputs~\cite{li2026webformtest}.
+The oracle in both cases is acceptance by the application. Where semantic validity is measured
+separately, a base model reaches 22.9\,\% domain-coherent values, against 72.4\,\% after
+fine-tuning~\cite{kim2025llamaresttest}. Related work mines input constraints from
+specifications~\cite{kim2024restgpt,huynh2024constraints}, studies text input for mobile
+interfaces~\cite{cui2024guitextinput}, benchmarks form-filling agents~\cite{li2025formfactory}, and
+measures the schema validity of synthetic records~\cite{mishra2026structuredsynthetic}. I found no
+study that compares LLM inputs with random, rule-based and reference inputs on a semantic outcome.
 
-\subsection{Data validation beyond schemas, and inappropriate input as a security problem}
-Data-management research validates data beyond structural schemas with anomaly detection for
-machine-learning pipelines~\cite{breck2019datavalidation}, declarative constraint checks that act as
-unit tests for data~\cite{schelter2018deequ} and learned detection of column semantic
-types~\cite{hulsebos2019sherlock}; these work on datasets in batch rather than on one request.
-Classifying a single field entry from a context embedding and statistics of recent entries has been
-described in a patent~\cite{banerjee2025contextembedding}, of which my EMB design is a simpler,
-untrained relative. On the security side, indirect prompt injection established that models do not
-separate data from instructions~\cite{greshake2023indirect}, and that attacks on deployed applications
-succeed~\cite{kaya2026chatbotplugins}. Prompt fragments inserted through an ordinary form field
-can later drive a database write~\cite{pedro2025p2sql}, the pattern occurs in the
-wild~\cite{khodayari2026ipiwild}, and benchmarks extend the
-coverage~\cite{yi2025bipia,evtimov2025wasp}.
-Those inputs are attacker-crafted and mostly free text.
+\subsection{Schema-valid but semantically wrong outputs}
+For model outputs the pattern is documented by several 2026 studies. OrderBench separates syntactic
+validity, schema validity and semantic success~\cite{li2026orderbench}, while the constraint-tax study
+measures how much accuracy is lost when hard schema decoding replaces
+prompting~\cite{ray2026constrainttax}. On a multi-source benchmark the JSON pass rate stays ahead of
+value accuracy~\cite{singh2026sob}, and in a controlled tool-API comparison schemas shift failures from
+interface misuse to semantic misuse~\cite{sigdel2026schemafirst}. The pattern also reaches production:
+in one enterprise platform, workflows passed validation and then could not
+execute~\cite{wrenn2026enterprise}. Taxonomies of
+structured-output error~\cite{song2026structuredoutput}, cross-column constraint
+repair~\cite{zhao2026constraintaware} and neuro-symbolic
+verification~\cite{sigloch2026neurosymbolic} develop the theme. Tool-use benchmarks evaluate the calls
+an LLM emits against a task's expected answer, either under realistic multi-turn
+use~\cite{yu2026wildtoolbench} or with a focus on filling parameter values
+correctly~\cite{yu2026parambench}. In all of these the semantic check is the oracle rather than a layer
+that is itself evaluated, and the setting is model output rather than application input.
+
+\subsection{Data validation beyond schemas}
+Data-management research validates data beyond structural schemas. Examples are anomaly detection on
+data fed to machine-learning pipelines~\cite{breck2019datavalidation}, declarative constraint checks
+that act as unit tests for data~\cite{schelter2018deequ}, and learned detection of the semantic types
+of columns~\cite{hulsebos2019sherlock}. These systems work on datasets or columns in batch. I study
+per-request validation of one input against an application's business rules. Classifying a single field
+entry as valid or invalid from a context embedding and statistics of recent entries has been described
+in a patent~\cite{banerjee2025contextembedding}. My EMB design is a simpler, untrained relative of that
+idea, and I evaluate it empirically.
+
+\subsection{Semantically inappropriate input as a security problem}
+Indirect prompt injection established that models do not separate data from
+instructions~\cite{greshake2023indirect}, that attacks on deployed applications
+succeed~\cite{liu2023houyi,kaya2026chatbotplugins}, and that surface quality checks do not distinguish
+compromised text from clean text~\cite{liu2024formalizing}. An attacker can insert prompt fragments
+through an ordinary form field and later drive a database write with them~\cite{pedro2025p2sql}. The
+pattern extends to classic web sinks~\cite{tsigkopoulos2026webexploitation} and occurs in the
+wild~\cite{khodayari2026ipiwild}. Benchmarks~\cite{yi2025bipia,evtimov2025wasp,liu2025wainjectbench}
+and a journal study~\cite{milani2026ipi} extend the coverage. Inputs in this line of work are
+attacker-crafted and mostly free text.
 
 \subsection{Detection layers and their cost}
-Input-side detectors include fine-tuned classifiers~\cite{jacob2025promptshield}, embedding
-classifiers~\cite{ayub2024embedding,ahmed2026reflexguard}, small
-transformers~\cite{datta2025javelinguard} and LLM judges~\cite{rebedea2023nemo}. What constrains deployment is the false-positive rate on
-benign traffic~\cite{li2024injecguard}. Cost evidence is thin and tied to GPUs. A detector presented as
-deployable gives no timing at all~\cite{jacob2025promptshield}, an embedding guardrail puts its
-embedding floor at 35\,ms on a datacentre GPU~\cite{ahmed2026reflexguard}, and a layered framework
-reports a 61\,ms median on an A100 with model inference excluded~\cite{saleem2026layered}. A systematisation notes
-that cost and utility are routinely overlooked~\cite{wang2026sokguardrails}, the one study that
-compares regex, classifier and LLM tiers head to head does not state its
-hardware~\cite{maiorano2026tradeoffs}, and LLM judges can themselves be redirected by the content they
-assess~\cite{shi2024judgeattack}. I found no measurement of a validator for data appropriateness on
-structured request payloads on CPU.
+Input-side detectors include fine-tuned classifiers~\cite{jacob2025promptshield,liu2025datasentinel},
+embedding classifiers~\cite{ayub2024embedding,ahmed2026reflexguard}, small
+transformers~\cite{datta2025javelinguard,lakara2026fence}, intrinsic-feature
+probes~\cite{shi2025promptarmor,akinrele2026regime} and LLM
+judges~\cite{le2026llmjudge,rebedea2023nemo}. What constrains deployment is the false-positive rate on benign
+traffic~\cite{li2024injecguard}. Cost evidence, by contrast, is thin and tied to GPUs. A detector
+presented as deployable gives no timing at all~\cite{jacob2025promptshield}, whereas an embedding
+guardrail puts its embedding floor at 35\,ms on a datacentre GPU~\cite{ahmed2026reflexguard} and a
+layered framework reports a 61\,ms median on an A100 with model inference
+excluded~\cite{saleem2026layered}. Surveys of the area note that cost and utility are routinely
+overlooked~\cite{wang2026sokguardrails,zizzo2025guardrails,kumar2025nofreelunch}. Only one study
+compares regex, classifier and LLM tiers head to head, and it does not state its
+hardware~\cite{maiorano2026tradeoffs}. LLM judges, meanwhile, can themselves be
+redirected by the content they assess~\cite{shi2024judgeattack}. I found no measurement of a validator for data appropriateness
+on structured request payloads on CPU.
 
 \subsection{Position of this work}
-Three lines of work come closest among the studies I reviewed, and the design of this study responds to
-a specific difference in each. The output-side studies measure schema-valid but wrong values that a
+Three lines of work come closest among the studies I reviewed, and the design of this study responds
+to a specific difference in each. The output-side studies measure schema-valid but wrong values that a
 model emits~\cite{li2026orderbench,ray2026constrainttax,singh2026sob,wrenn2026enterprise}, where the
-oracle is the task's expected answer; I measure values that an application accepts and stores, where it
-raises no error and the value is later read by people or by an assistant. The form and API testing
-studies count acceptance by the application~\cite{alian2024formnexus,li2026webformtest}, so an accepted
-but inappropriate value counts as a success, and the one study that measures domain coherence
-separately has no non-LLM comparison~\cite{kim2025llamaresttest}; I separate the two outcomes and label
-semantic validity against a frozen rule reference, independently of the application. The guardrail
-studies evaluate detectors for adversarial intent and, where they report cost at all, do so on
-datacentre GPUs~\cite{ahmed2026reflexguard,saleem2026layered}; I evaluate detectors for ordinary data
-appropriateness, on structured payloads, on a four-core CPU, and report detection quality and cost
+oracle is the task's expected answer. I measure values that an application accepts and stores, where
+the application raises no error and the value is later read by people or by an assistant. The form and
+API testing studies generate inputs with an LLM and count acceptance by the
+application~\cite{alian2024formnexus,li2026webformtest}, so an accepted but inappropriate value counts
+as a success; one study measures domain coherence separately but has no non-LLM
+comparison~\cite{kim2025llamaresttest}. I separate the two outcomes and label semantic validity
+against a frozen rule reference, independently of the application. The guardrail studies evaluate
+detectors for adversarial intent, and where they report cost at all it is on datacentre
+GPUs~\cite{ahmed2026reflexguard,saleem2026layered}. I evaluate detectors for ordinary data
+appropriateness, on structured payloads, on a four-core CPU, and I report detection quality and cost
 together. The comparison across seven producers, including non-LLM ones, is what lets me ask whether
 the gap belongs to AI writers or to the validation boundary itself.
 
@@ -255,25 +297,25 @@ primary rates and analysed separately.
 The subject is a purpose-built Next.js~16 application written in TypeScript. It uses Zod~4 for
 validation on the client and the server, Prisma with SQLite for persistence, and a local Ollama runtime
 for two AI-facing features, support-ticket triage and a booking assistant. It has seven input surfaces
-and 39 fields. A reference file enumerates 43 business rules, of which five are enforced in code, two of
-those as Zod refinements (a birth date not in the future, a workshop end after its start). The remaining
-38 are unenforced, a profile chosen to resemble small production applications. Each rule is classified in
-advance as objective, meaning decidable from the input, the database and the clock (19 rules), or as
-judgement (24 rules). The application and the rule reference were tagged before any input was generated
-(commit \texttt{62a7267}), and the commit is recorded with every run. A purpose-built subject is a
-deliberate trade: real applications do not enumerate their business rules, and without a complete
-reference the semantic outcome has no ground truth.
+and 39 fields. A reference file enumerates 43 business rules. Five of them are enforced in code, two of
+those as Zod refinements (a birth date not in the future, and a workshop end after its start), and 38
+are not enforced. That profile was chosen to resemble small production applications. Each rule is
+classified in advance as objective, meaning decidable from the input, the database and the clock (19
+rules), or as judgement (24 rules). The application and the rule reference were tagged before any input
+was generated (commit \texttt{62a7267}), and the commit is recorded with every run. Using a
+purpose-built subject is a deliberate trade. Real applications do not enumerate their business rules,
+and without a complete reference the semantic outcome has no ground truth.
 
 \subsection{Targets and generation conditions}
 Seventeen targets covering 22 fields were selected to represent every field category, every directly
 AI-facing field, and five cross-field pairs whose rule relates the two members. Each target carries a
 purpose description, its rule identifiers and its structural constraints. Seven conditions produce
-values for each target: \textbf{A} valid reference values; \textbf{B} random values that satisfy the
-schema, from a seeded generator of word sequences, numbers and dates within the schema's limits, with no
-attempt at meaning; \textbf{C} rule-based adversarial values, one template per unenforced rule;
-\textbf{D} an LLM given the field name and the structural constraints only; \textbf{E} the same LLM
-given the field's purpose and rules as well; \textbf{F} boundary values at the schema edges; and
-\textbf{G} benign but unusual reference values. Conditions A and G were
+values for each target. \textbf{A} is valid reference values. \textbf{B} is random values that satisfy
+the schema, drawn from a seeded generator of word sequences, numbers and dates within the schema's
+limits, with no attempt at meaning. \textbf{C} is rule-based adversarial values, one template per
+unenforced rule. \textbf{D} is an LLM given the field name and the structural constraints only.
+\textbf{E} is the same LLM given the field's purpose and rules as well. \textbf{F} is boundary values
+at the schema edges. \textbf{G} is benign but unusual reference values. Conditions A and G were
 specified as human-written. In this execution their \R{e1.refdrafted} values were first drafted with the
 help of a language model, before the main generation, and checked against the schemas and the
 objective rules. \ifreviewed I then went through every value myself, kept \R{review.keep}, replaced
@@ -343,15 +385,15 @@ paper is generated from the raw data by scripts that are released with it.
 \label{sec:layer}
 
 Five designs run as a drop-in check after structural validation. \textbf{R} packages the objective
-rule functions; because those functions also define the ground truth for objective rules, R cannot
-produce a false positive on them and serves as a floor rather than a competitor. \textbf{EMB} scores a
-value by its cosine distance from an embedding (nomic-embed-text) of the field's purpose and rules,
-using no labelled examples, unlike the trained classifier the plan anticipated. \textbf{SLM} prompts a
-small language model (SLM; qwen3:1.7b) with the field purpose and rules for a verdict and a confidence.
-\textbf{HYB} runs R first and then EMB on what R passes. \textbf{JUDGE} sends the same prompt to
-qwen3:4b, the generator's model, and serves as a reference point, so SLM and JUDGE receive a rubric
-similar to the ground-truth judge's. The prompted designs run at temperature 0, and a reply without a
-verdict counts as a pass, because the deployed layer fails open.
+rule functions. Those functions also define the ground truth for objective rules, so R cannot produce a
+false positive on them, and it serves as a floor rather than a competitor. \textbf{EMB} scores a value
+by its cosine distance from an embedding (nomic-embed-text) of the field's purpose and rules. It uses
+no labelled examples, unlike the trained classifier the plan anticipated. \textbf{SLM} prompts a small
+language model (SLM; qwen3:1.7b) with the field purpose and the rules, and asks for a verdict and a
+confidence. \textbf{HYB} runs R first and then EMB on what R passes. \textbf{JUDGE} sends the same
+prompt to qwen3:4b, the generator's model, and serves as a reference point. SLM and JUDGE therefore
+receive a rubric similar to the ground-truth judge's. The prompted designs run at temperature 0, and a
+reply without a verdict counts as a pass, because the deployed layer fails open.
 
 Evaluation is leave-fields-out over five folds. In each fold the threshold is the smallest score at
 which at most 5\,\% of the valid training-fold inputs are flagged, and that threshold is applied to the
@@ -379,18 +421,20 @@ pooled rate includes prompt family P3, which asks for rule violations. Per famil
 included. The objective-rule rate below depends only on the rule functions and is not affected.\fi{}
 H1 holds under every sensitivity variant in Table~\ref{tab:sensitivity}, including objective rules
 alone (\R{s.llm.objective}\,\%, CI \R{s.llm.objective.ci}), which do not depend on the judge. One
-target dominates: on workshop dates (F15+F16) nearly every model value was in the past, because the
-prompts never state the current date, and without that target the rate is \R{s.llm.nodates}\,\%. Per
-run the rate was \R{run.D.1}, \R{run.D.2} and \R{run.D.3}\,\% without field context and \R{run.E.1},
-\R{run.E.2} and \R{run.E.3}\,\% with it; including the retried records gives
-\R{h1.withretried}\,\%. The reference conditions bound the labelling from both sides: valid inputs
-were labelled invalid in \R{c.A.rate}\,\% of cases and adversarial inputs in \R{c.C.rate}\,\%, so
-about a third of the designed violations were missed and a few valid inputs were flagged.
+target dominates. On workshop dates (F15+F16) nearly every model value was in the past, because the
+prompts never state the current date. Without that target the rate is \R{s.llm.nodates}\,\%. Per run,
+the rate was \R{run.D.1}, \R{run.D.2} and \R{run.D.3}\,\% without field context, and \R{run.E.1},
+\R{run.E.2} and \R{run.E.3}\,\% with it. Including the retried records gives \R{h1.withretried}\,\%.
+The reference conditions bound the labelling from both sides. Valid inputs were labelled invalid in
+\R{c.A.rate}\,\% of cases, and adversarial inputs in \R{c.C.rate}\,\%. About a third of the designed
+violations were therefore missed and a few valid inputs were flagged, so labelling error runs in both
+directions.
 
 \IfFileExists{tables/tab_sensitivity.tex}{\input{tables/tab_sensitivity}}{}
 
 \subsection{Field categories (RQ2)}
 \IfFileExists{tables/tab_categories.tex}{\input{tables/tab_categories}}{}
+\IfFileExists{tables/tab_targets.tex}{\input{tables/tab_targets}}{}
 
 Category is associated with the outcome ($\chi^2(6)=\R{h2.chi}$, $p<0.001$, Cram\'er's
 $V=\R{h2.v}$, a moderate association), so H2's test is supported
@@ -398,9 +442,10 @@ $V=\R{h2.v}$, a moderate association), so H2's test is supported
 exploratory.\fi{} The directional expectation is only partly met. Free text (\R{cat.freetext}\,\%) and
 cross-field (\R{cat.crossfield}\,\%) are high, as expected. Structured fields are the highest
 (\R{cat.structured}\,\%) rather than among the lowest, and financial fields are the lowest
-(\R{cat.financial}\,\%). Categories contain between one and four targets, and per-target rates are in the repository. The
-structured category is a single target, a ticket's priority and category, whose rules the judge decided
-without seeing the ticket text, so the reversal is not a property of enumerated fields in general.
+(\R{cat.financial}\,\%). Categories contain between one and four targets (Table~\ref{tab:targets}). The
+structured category is a single target, a ticket's priority and category, and the judge decided its
+rules without seeing the ticket text. The reversal should therefore not be read as a property of
+enumerated fields in general.
 
 \subsection{Comparison of producers (RQ3)}
 \IfFileExists{tables/tab_contrasts.tex}{\input{tables/tab_contrasts}}{}
@@ -409,26 +454,36 @@ None of the three pre-registered contrasts is supported (Table~\ref{tab:contrast
 other way.\ifjudgeweak{} They are computed on labels that include judgement rules, so under the
 agreement gate they are exploratory as well. The objective-rule sensitivity row shows the same
 direction without the judge.\fi{} Random structurally valid inputs broke rules in \R{c.B.rate}\,\% of
-cases, more often than LLM inputs without field context (\R{c.D.rate}\,\%) or with it
-(\R{c.E.rate}\,\%), and that holds in every sensitivity variant (Table~\ref{tab:sensitivity}). Within
-target (CMH, post hoc) the odds of a violation were lower for LLM inputs with context than for random
-inputs (odds ratio \R{cmh.EvB.or}, 95\,\% CI \R{cmh.EvB.ci}) and lower without context
-(\R{cmh.DvB.or}, \R{cmh.DvB.ci}); adversarial inputs exceeded random ones (\R{cmh.CvB.or},
-\R{cmh.CvB.ci}), and field context lowered the odds relative to the schema alone (\R{cmh.EvD.or},
+cases. That is more often than LLM inputs without field context (\R{c.D.rate}\,\%) or with it
+(\R{c.E.rate}\,\%), and it holds in every sensitivity variant (Table~\ref{tab:sensitivity}). Within
+target (CMH, post hoc), the odds of a violation were lower for LLM inputs with context than for random
+inputs (odds ratio \R{cmh.EvB.or}, 95\,\% CI \R{cmh.EvB.ci}), and lower without context
+(\R{cmh.DvB.or}, \R{cmh.DvB.ci}). Adversarial inputs exceeded random ones (\R{cmh.CvB.or},
+\R{cmh.CvB.ci}). Field context lowered the odds relative to the schema alone (\R{cmh.EvD.or},
 \R{cmh.EvD.ci}). LLM inputs with context and benign-unusual reference inputs did not differ detectably
-(\R{cmh.EvG.or}, \R{cmh.EvG.ci}, \R{cmh.EvG.p}); the interval is wide, and \ifreviewed the reference
+(\R{cmh.EvG.or}, \R{cmh.EvG.ci}, \R{cmh.EvG.p}). The interval is wide, and \ifreviewed the reference
 inputs are AI-drafted values curated by a human reviewer, so this compares model input with
 human-curated input rather than with input a person wrote unaided.\else the reference inputs are
-AI-drafted, so this is not an AI-versus-human result.\fi{}
+AI-drafted, so this is not an AI-versus-human result.\fi{} Fig.~\ref{fig:by-condition} shows the rates
+by condition.
 
+\IfFileExists{tables/tab_e2b.tex}{\input{tables/tab_e2b}}{}
 An exploratory variation repeated conditions D and E on ten targets with families P1 to P4, changing
-only the generator. The 1.7-billion-parameter model produced more violations than
+only the generator (Table~\ref{tab:e2b}). The 1.7-billion-parameter model produced more violations than
 the 4-billion model, both on objective rules (\R{e2b.small.obj}\,\% against \R{e2b.ref.obj}\,\%, odds
 ratio \R{e2b.small.obj.or}, \R{e2b.small.obj.p}) and on all rules (\R{e2b.small.all}\,\% against
 \R{e2b.ref.all}\,\%, \R{e2b.small.all.p}). Neither the 8-billion model (\R{e2b.large.all}\,\%) nor
 temperature 0 (\R{e2b.tzero.all}\,\%) differed detectably. With one run per generator and a smaller
 judge sample, this only indicates that a smaller model may widen the gap.
 
+\IfFileExists{../09_DIAGRAMS/rendered/fig_svsi_by_condition.pdf}{%
+\begin{figure}[t]\centering
+\includegraphics[width=\columnwidth]{../09_DIAGRAMS/rendered/fig_svsi_by_condition.pdf}
+\caption{Conditional SV-SI rate by generation condition with Wilson 95\,\% intervals, over decided
+structural passes (P5 excluded). C is the designed adversarial condition. A and G are the
+\ifreviewed human-curated\else AI-drafted\fi{} reference conditions for legitimate input.}
+\label{fig:by-condition}
+\end{figure}}{}
 
 \subsection{Violation types (RQ4)}
 \ifjudgeweak Counts of judgement-rule violations depend on the judge and are exploratory.\fi{}
@@ -469,17 +524,18 @@ rule. On all decided inputs the fast designs reach \R{e3.R.fullrecall}\,\% for R
 \R{e3.HYB.fullrecall}\,\% for HYB. EMB on its own was no better than chance (AUROC
 \R{e3.EMB.auroc}).
 
-The prompted designs rank inputs better (AUROC \R{e3.SLM.auroc} for SLM and \R{e3.JUDGE.auroc} for
-JUDGE against \R{e3.HYB.auroc} for HYB), but their scores take only a handful of values, so holding FPR
-to 5\,\% on the training fields forces the threshold to the top confidence level, where SLM detects
+The prompted designs rank inputs better, with AUROC \R{e3.SLM.auroc} for SLM and \R{e3.JUDGE.auroc} for
+JUDGE against \R{e3.HYB.auroc} for HYB. Their scores take only a handful of values, so holding FPR to
+5\,\% on the training fields forces the threshold to the top confidence level. There SLM detects
 \R{e3.SLM.recall}\,\% and JUDGE \R{e3.JUDGE.recall}\,\%. Taking each model's own verdict without
 tuning, which is exploratory, SLM detects \R{e3.SLM.nrecall}\,\% while flagging \R{e3.SLM.nfpr}\,\% of
-valid inputs, and JUDGE detects \R{e3.JUDGE.nrecall}\,\% while flagging \R{e3.JUDGE.nfpr}\,\% and
-gives no usable verdict for \R{e3.JUDGE.noverdict}\,\% of inputs. Both receive a rubric similar to the
-ground-truth judge's, so their agreement with it partly measures agreement between two LLMs. Thresholds
-did not transfer across fields: the held-out FPR per fold reached \R{e3.emb.foldfprmax}\,\% for the
-embedding-based designs. On benign-unusual inputs the FPR was \R{e3.HYB.fprG}\,\% for HYB,
-\R{e3.SLM.fprG}\,\% for SLM and \R{e3.JUDGE.fprG}\,\% for JUDGE.
+valid inputs, and JUDGE detects \R{e3.JUDGE.nrecall}\,\% while flagging \R{e3.JUDGE.nfpr}\,\%. JUDGE
+gave no usable verdict for \R{e3.JUDGE.noverdict}\,\% of inputs. These designs receive a rubric similar
+to the ground-truth judge's, so their agreement with it partly measures agreement between two LLMs.
+Thresholds did not transfer across fields, and the held-out FPR per fold reached
+\R{e3.emb.foldfprmax}\,\% for the embedding-based designs. On benign-unusual inputs the FPR at the
+operating point was \R{e3.HYB.fprG}\,\% for HYB, \R{e3.SLM.fprG}\,\% for SLM and \R{e3.JUDGE.fprG}\,\%
+for JUDGE.
 
 \subsection{Overhead (RQ6)}
 \IfFileExists{tables/tab_e4.tex}{\input{tables/tab_e4}}{}
@@ -561,9 +617,10 @@ problem.
 
 \textbf{RQ6: cost rises faster than detection.} On commodity CPU hardware only the rule layer is
 effectively free, and it detects violations of rules the application could have enforced in the first
-place. The embedding layer costs tens of milliseconds per request and detected almost nothing here. The prompted models cost half a second to several seconds per request with one client, a local model
-server handles one request at a time, so they cannot keep up with eight, and their better ranking of
-inputs does not survive the false-positive constraint. On this hardware the practical recommendation is to
+place. The embedding layer costs tens of milliseconds per request and detected almost nothing here. The
+prompted models cost half a second to several seconds per request with one client, and a local model
+server handles one request at a time, so they cannot keep up with eight. Their better ranking of inputs
+does not survive the false-positive constraint. On this hardware the practical recommendation is to
 enforce objective rules in code and to treat judgement rules as an open problem, rather than to add a
 model to the request path.
 
@@ -605,16 +662,18 @@ rules are evaluated against the clock at the moment the labels are merged, so a 
 labels near the boundary. The judge ran once, and its run-to-run stability on this CPU was not
 measured.
 
-\textbf{Defects found and corrected.} Six defects were found during execution, each recorded as a
-deviation with the invalid data preserved: the database was not reset between booking measurements, so
-capacity ran out and those targets were re-measured; a resume routine retried failed generation calls,
-whose records are excluded; model outputs with other key names were silently replaced by form defaults,
-and those records are excluded as generation failures; a first overhead run never enabled the layer and
-is discarded; the first detector analysis chose thresholds with a quantile, which fails for coarse
-scores, and was replaced before any detector result was reported; and the label merge never passed
-human verdicts to the ground-truth algorithm while the importer dropped cells after an empty one, both
-fixed before the annotation was collected. Three of the six were found by independent review of the
-analysis and the code.
+\textbf{Defects found and corrected.} Six defects were found during execution, and each is recorded as
+a deviation with the invalid data preserved. (i) The database was not reset between booking
+measurements, so course capacity ran out. Bookings are now reset before each measurement and the
+booking targets were re-measured. (ii) A resume routine retried failed generation calls, and the
+retried records are excluded. (iii) Model outputs with other key names were silently replaced by form
+defaults, and those records are excluded as generation failures. (iv) A first overhead run never
+enabled the layer, and it is discarded. (v) The first detector analysis selected thresholds with a
+quantile, which fails for coarse scores, and it was replaced before any detector result was reported.
+(vi) The label merge never passed human verdicts to the ground-truth algorithm, and the label importer
+dropped cells after an empty one. Both were found and fixed before the human annotation was collected,
+and the annotation was imported with the corrected code. Defects (iii), (v) and (vi) were found by
+independent review of the analysis and the code.
 
 \textbf{External validity.} The study covers one application in one domain, built by the researcher,
 with one enforcement profile, so the results may not transfer. Generation uses quantised open models of
@@ -669,17 +728,18 @@ of milliseconds. At the median a small language model added about half a second 
 several seconds, and the judge saturated on two of three endpoints with eight concurrent clients.
 
 Future work should \ifreviewed\else complete the review of the reference conditions, \fi
-\ifhumanlabels\else validate the judge against human annotation, \fi strengthen the ground truth with
-several annotators and more time per item, collect reference inputs written unaided by several people,
-re-judge the context-dependent rules with the full record, and repeat the protocol on an existing
-open-source application.
+\ifhumanlabels\else validate the judge against human annotation, \fi strengthen the ground truth for
+judgement rules with several annotators and more time per item, collect reference inputs written by
+several people unaided, re-judge the context-dependent rules with the full record, state the current
+date to the generators, and repeat the protocol on an existing open-source application.
 
 \section*{Acknowledgment}
 
 The testbed, the harness, the rule reference, every generated input, measurement and label, and the
 scripts that produce every table, figure and number in this paper are available at
-\url{https://github.com/zahidrahimoon/semantic-validation-gap}. Generative AI tools assisted with
-drafting and code; all content was verified by the author, who is responsible for it.
+\url{https://github.com/zahidrahimoon/semantic-validation-gap}. Language models were used as
+instruments of the study and as writing and coding assistants during its preparation; the design, the
+analysis and the claims are mine, and I take responsibility for them.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}

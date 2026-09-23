@@ -21,7 +21,7 @@ this paper is ready to submit; that decision is the author's.
 | Diagrams | DONE — generated from data by `16_RESULTS/analysis/make_figures.py` |
 | Paper draft | DONE — every prose number generated (`make_numbers.py`), every table generated (`make_latex_tables.py`) |
 | Reviewer simulation and fix loop | DONE, cycle 1 — R1–R4 (71 issues) in `14_REVIEWS/`; status of each in `issue_tracker.md` |
-| IEEE formatting | DONE — IEEEtran conference, compiles with no errors or overfull boxes |
+| IEEE formatting | DONE — IEEEtran conference, 10 pages, no errors or overfull boxes, clickable citations and DOIs |
 | AI-use disclosure | DONE — `15_FINAL/ai_disclosure.md` |
 
 ## BLOCKING — must be true before submission
@@ -53,7 +53,7 @@ this paper is ready to submit; that decision is the author's.
 | Similarity check | Run before submission |
 | Author information | Email set (zahidrahimoon22@gmail.com); no ORCID; affiliation, funding and conflicts still to confirm |
 | Venue requirements | Not yet researched — no venue chosen. Run `/rs-venue <name>` once decided. |
-| Page limit and format | Currently 13 pages (IEEEtran conference). Many IEEE conferences allow 6–10 pages, so shorten or choose a venue with a higher limit |
+| Page limit and format | 10 pages (IEEEtran conference), references included. Check the chosen venue's limit; if it is 8+2, the text already fits in 8 |
 | Preprint policy | If posting to ResearchGate or arXiv, confirm the target venue permits preprints |
 | Final submission decision | The author's alone |
 

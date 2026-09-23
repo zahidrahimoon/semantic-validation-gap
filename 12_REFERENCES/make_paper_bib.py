@@ -64,6 +64,10 @@ def fix_entry(block: str) -> str:
             t = re.sub(rf"(?<![{{\w]){w}(?![}}\w])", "{" + w + "}", t)
         return t
     block = re.sub(r"(\btitle\s*=\s*\{)(.*?)(\}\s*,)", lambda x: x.group(1) + title_fix(x.group(2)) + x.group(3), block, flags=re.S)
+    # A DOI already resolves, so a separate url field only lengthens the printed reference.
+    if re.search(r"\n\s*doi\s*=\s*\{", block):
+        block = re.sub(r"\n\s*url\s*=\s*\{[^}]*\},?", "", block)
+        block = re.sub(r",(\s*\n\})\s*$", r"\1", block.rstrip()) + "\n"
     return block.replace(r"Cristov\~ao", r"Cristov{\~a}o")
 
 
