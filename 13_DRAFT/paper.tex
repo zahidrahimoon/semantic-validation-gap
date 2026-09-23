@@ -26,9 +26,9 @@ Email: \texttt{zahidrahimoon22@gmail.com}}}
 \maketitle
 
 \begin{abstract}
-A web application's schema validation checks that an input is well formed. It does not check the many
-business rules that decide whether the input is appropriate, and most of those rules are never
-enforced in code. This paper measures how often inputs that pass validation still break such rules,
+A web application's schema validation checks that an input is well formed. It does not check the
+business rules that decide whether the input is appropriate, and in the application studied here most
+of those rules are not enforced in code. This paper measures how often inputs that pass validation still break such rules,
 and whether inputs written by large language models (LLMs) differ from inputs produced in other ways.
 A Next.js testbed with an enumerated reference of 43 business rules received \R{e1.inputs} inputs
 through its real HTTP validation path. The inputs came from seven generation conditions: two LLM
@@ -64,15 +64,15 @@ ecosystem that validation is usually a schema. The schema is a declarative objec
 presence, length, pattern, numeric range, enumeration and format of every field. It is checked on the
 client, again on the server, and finally by database constraints. Schemas of this kind are well
 understood~\cite{pezoa2016foundations,attouche2023jsonschema} and have been studied empirically at
-scale~\cite{baazizi2021usagenot}. Other rules depend on what the application is for. A promotional code
-must apply to the item being bought. A workshop must start in the future. A review must be about the
-workshop it is attached to. Some of these can be written as custom refinements, but in practice most
-are never written down. The distinction that matters is therefore between the business rules an
+scale~\cite{baazizi2021usagenot}. Other rules depend on what the application is for: a promotional code has to apply to the item being
+bought, a workshop cannot start in the past, and a review is supposed to be about the workshop it is
+attached to. Some of these can be written as custom refinements, although in practice most are never
+written down anywhere. The distinction that matters is therefore between the business rules an
 application enforces and the many it leaves unenforced.
 
 That limitation is not new. Felmetsger et al.\ separated input-validation flaws, which admit a general
 specification, from logic vulnerabilities, which do not~\cite{felmetsger2010waler}. Later work detected
-such flaws from behavioural traces~\cite{pellegrino2014logicflaws}, from client-server validation
+such flaws from behavioural traces~\cite{pellegrino2014logicflaws}, from client--server validation
 mismatches~\cite{bisht2010notamper} and from over-permissive API
 payloads~\cite{corradini2023massassignment}. What has changed since then is who writes the input. Large
 language models (LLMs) now fill forms, operate web applications on a user's behalf, and generate test
@@ -195,12 +195,14 @@ measures the schema validity of synthetic records~\cite{mishra2026structuredsynt
 study that compares LLM inputs with random, rule-based and reference inputs on a semantic outcome.
 
 \subsection{Schema-valid but semantically wrong outputs}
-Several 2026 studies report the pattern for model outputs. OrderBench separates syntactic validity,
-schema validity and semantic success~\cite{li2026orderbench}. The constraint-tax study measures the
-accuracy lost under hard schema decoding~\cite{ray2026constrainttax}. A multi-source benchmark finds a
-gap between JSON pass rate and value accuracy~\cite{singh2026sob}. A tool-API study finds that schemas
-shift failures from interface misuse to semantic misuse~\cite{sigdel2026schemafirst}. A production study
-finds workflows that pass validation and cannot execute~\cite{wrenn2026enterprise}. Taxonomies of
+For model outputs the pattern is documented by several 2026 studies. OrderBench separates syntactic
+validity, schema validity and semantic success~\cite{li2026orderbench}, while the constraint-tax study
+measures how much accuracy is lost when hard schema decoding replaces
+prompting~\cite{ray2026constrainttax}. On a multi-source benchmark the JSON pass rate stays ahead of
+value accuracy~\cite{singh2026sob}, and in a controlled tool-API comparison schemas shift failures from
+interface misuse to semantic misuse~\cite{sigdel2026schemafirst}. The pattern also reaches production:
+in one enterprise platform, workflows passed validation and then could not
+execute~\cite{wrenn2026enterprise}. Taxonomies of
 structured-output error~\cite{song2026structuredoutput}, cross-column constraint
 repair~\cite{zhao2026constraintaware} and neuro-symbolic
 verification~\cite{sigloch2026neurosymbolic} develop the theme. Tool-use benchmarks evaluate the calls
@@ -235,33 +237,34 @@ Input-side detectors include fine-tuned classifiers~\cite{jacob2025promptshield,
 embedding classifiers~\cite{ayub2024embedding,ahmed2026reflexguard}, small
 transformers~\cite{datta2025javelinguard,lakara2026fence}, intrinsic-feature
 probes~\cite{shi2025promptarmor,akinrele2026regime} and LLM
-judges~\cite{le2026llmjudge,rebedea2023nemo}. The deployment constraint is the false-positive rate on
-benign traffic~\cite{li2024injecguard}. Reported cost evidence is thin and tied to GPUs. One detector
-reports no timing at all~\cite{jacob2025promptshield}. An embedding guardrail reports a 35\,ms
-embedding floor on a datacentre GPU~\cite{ahmed2026reflexguard}. A layered framework reports a 61\,ms
-median on an A100 with model inference excluded~\cite{saleem2026layered}. A systematisation notes that
-cost and utility are routinely overlooked~\cite{wang2026sokguardrails,zizzo2025guardrails,kumar2025nofreelunch}.
-One study compares regex, classifier and LLM tiers without stating its
-hardware~\cite{maiorano2026tradeoffs}, and LLM judges are themselves
-injectable~\cite{shi2024judgeattack}. We found no measurement of a validator for data appropriateness
+judges~\cite{le2026llmjudge,rebedea2023nemo}. What constrains deployment is the false-positive rate on benign
+traffic~\cite{li2024injecguard}. Cost evidence, by contrast, is thin and tied to GPUs. A detector
+presented as deployable gives no timing at all~\cite{jacob2025promptshield}, whereas an embedding
+guardrail puts its embedding floor at 35\,ms on a datacentre GPU~\cite{ahmed2026reflexguard} and a
+layered framework reports a 61\,ms median on an A100 with model inference
+excluded~\cite{saleem2026layered}. Surveys of the area note that cost and utility are routinely
+overlooked~\cite{wang2026sokguardrails,zizzo2025guardrails,kumar2025nofreelunch}. Only one study
+compares regex, classifier and LLM tiers head to head, and it does not state its
+hardware~\cite{maiorano2026tradeoffs}. LLM judges, meanwhile, can themselves be
+redirected by the content they assess~\cite{shi2024judgeattack}. We found no measurement of a validator for data appropriateness
 on structured request payloads on CPU.
 
 \subsection{Position of this work}
-Three lines of work come closest, and each differs from this study in a way that the design addresses.
-The output-side studies measure schema-valid but wrong values that a model
-emits~\cite{li2026orderbench,ray2026constrainttax,singh2026sob,wrenn2026enterprise}, where a wrong
-value fails at once in the consuming tool. We measure values that an application accepts and stores,
-where nothing fails and the value is later read by people or by an assistant. The form and API testing
-studies generate inputs with an LLM and count acceptance by the
-application~\cite{alian2024formnexus,li2026webformtest,kim2025llamaresttest}, so an accepted but
-inappropriate value counts as a success. We separate the two outcomes and label semantic validity
+Three lines of work come closest among the studies we reviewed, and the design of this study responds
+to a specific difference in each. The output-side studies measure schema-valid but wrong values that a
+model emits~\cite{li2026orderbench,ray2026constrainttax,singh2026sob,wrenn2026enterprise}, where the
+oracle is the task's expected answer. We measure values that an application accepts and stores, where
+the application raises no error and the value is later read by people or by an assistant. The form and
+API testing studies generate inputs with an LLM and count acceptance by the
+application~\cite{alian2024formnexus,li2026webformtest}, so an accepted but inappropriate value counts
+as a success; one study measures domain coherence separately but has no non-LLM
+comparison~\cite{kim2025llamaresttest}. We separate the two outcomes and label semantic validity
 against a frozen rule reference, independently of the application. The guardrail studies evaluate
-detectors for adversarial intent and report cost on datacentre
-GPUs~\cite{jacob2025promptshield,ahmed2026reflexguard,saleem2026layered,maiorano2026tradeoffs}. We
-evaluate detectors for ordinary data appropriateness, on structured payloads, on a four-core CPU, and
-we report detection and cost together. The comparison across seven producers, including non-LLM ones,
-is what allows the central question to be answered at all: whether this gap is a property of AI
-writers or of the validation boundary itself.
+detectors for adversarial intent, and where they report cost at all it is on datacentre
+GPUs~\cite{ahmed2026reflexguard,saleem2026layered}. We evaluate detectors for ordinary data
+appropriateness, on structured payloads, on a four-core CPU, and we report detection quality and cost
+together. The comparison across seven producers, including non-LLM ones, is what lets us ask whether
+the gap belongs to AI writers or to the validation boundary itself.
 
 \section{Research Questions and Hypotheses}
 \label{sec:rq}
@@ -318,8 +321,8 @@ assistant at the researcher's request, before the main generation, and checked a
 the objective rules. \ifreviewed A human reviewer then went through every value, kept \R{review.keep},
 replaced \R{review.change} with values of their own, deleted \R{review.delete}, and confirmed that the
 kept values are ones they would have written. The application accepted \R{newref.passes} of the
-replacements. All three were promotional codes it does not recognise, and they are condition A's only
-structural rejections, so the reviewed conditions rest on the kept values. We therefore call these
+replacements, because all \R{review.change} were promotional codes it does not recognise. They are
+condition A's only structural rejections, so the reviewed conditions rest on the kept values. We therefore call these
 conditions human-curated rather than human-written.\else The researcher's review of them is outstanding
 (Section~\ref{sec:threats}).\fi
 
@@ -349,10 +352,9 @@ before each booking request.
 Objective rules are decided by rule functions. The 11 objective rules that apply to the 17 targets all
 have one. Judgement rules are decided by a judge model from a different family than the generator
 (gemma3:4b, temperature 0). The judge sees the field purpose, the rule text and the submitted value of
-the target's fields. It never sees the condition, the prompt family or the intent. The judge does not
-see the rest of the record, so seven judgement rules that depend on other fields, such as capacity
-being plausible for the location, were judged without that context, and a sensitivity analysis excludes
-them. \ifhumanlabels A human annotator labelled \R{ann.items} structurally valid inputs blind to
+the target's fields. It never sees the condition, the prompt family or the intent. The judge does not see the rest of the record. Seven judgement rules depend on other fields, such as
+capacity being plausible for the location, and those were judged without that context. A sensitivity
+analysis excludes them. \ifhumanlabels A human annotator labelled \R{ann.items} structurally valid inputs blind to
 condition, with \R{ann.repeats} items repeated to estimate the annotator's consistency. Where a human
 verdict exists it takes precedence over the judge.\else A planned human annotation of 200 inputs, which
 would validate the judge, has not been completed.\fi{} An input is \emph{decided} when every applicable
@@ -362,7 +364,7 @@ structurally valid inputs drawn round-robin across target and condition with a f
 (Section~\ref{sec:threats}), up to 14 per stratum and as many as were available.
 
 \subsection{Analysis population and statistics}
-Of the \R{e1.inputs} inputs, four groups are excluded: \R{e1.keymismatch} key-mismatch records,
+Of the \R{e1.inputs} inputs, the following are excluded: \R{e1.keymismatch} key-mismatch records,
 \R{e1.retried} records produced by inadvertent retries of failed calls, \R{e1.p5} injection-family
 inputs, and\ifreviewed{} \R{e1.reviewexcluded} reference values that the reviewer deleted or
 replaced\else{} no reviewer exclusions\fi. That leaves \R{e1.primary} inputs. Of these, \R{e1.passes}
@@ -545,8 +547,8 @@ fails. R added at most \R{e4.R.c1.maxadd}\,ms to p97.5 latency with one client a
 clients reflect run-to-run variation. EMB added
 \R{e4.EMB.c1.minadd}--\R{e4.EMB.c1.maxadd}\,ms with one client, above the bound, and
 \R{e4.EMB.c8.minadd}--\R{e4.EMB.c8.maxadd}\,ms with eight, because every request embeds its text on the
-same CPU. On the p95 bracket used as a sensitivity check, the review endpoint fails and the other two
-are undetermined. The second part of H6 holds. SLM added
+same CPU. On the p95 bracket used as a sensitivity check, EMB fails on the review endpoint and is undetermined
+on the other two. The second part of H6 holds. SLM added
 \R{e4.SLM.c1.minp50add}--\R{e4.SLM.c1.maxp50add}\,ms at the median with one client and JUDGE added
 \R{e4.JUDGE.c1.minp50add}--\R{e4.JUDGE.c1.maxp50add}\,ms. The model server answers one request at a
 time, so requests queue under concurrency. With eight clients SLM added
