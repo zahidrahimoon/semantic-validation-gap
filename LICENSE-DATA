@@ -1,0 +1,19 @@
+Data, rule reference and manuscript: Creative Commons Attribution 4.0 International (CC BY 4.0)
+Copyright (c) 2026 Zahid Rahimoon
+
+This licence covers everything in this repository that is not software, in particular:
+  10_DATASETS/            the reference input values and their provenance record
+  16_RESULTS/             every generated input, measurement, label and analysis output
+  13_DRAFT/, 15_FINAL/    the manuscript and its figures and tables
+  17_CODE/testbed/BUSINESS_RULES.md   the business-rule reference
+
+You are free to share and adapt this material for any purpose, including commercially,
+provided you give appropriate credit, link to the licence, and indicate if changes were made.
+
+Licence text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+The software in this repository (17_CODE/, 16_RESULTS/analysis/, tools) is licensed separately
+under the MIT License; see LICENSE.
+
+Note on third-party material: papers cited by this work are not redistributed here.
+Model weights used as instruments (Qwen3, Gemma 3, nomic-embed-text) keep their own licences.

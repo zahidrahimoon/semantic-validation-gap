@@ -1,7 +1,12 @@
 # third-party papers: legal copies for reading, not ours to redistribute
 11_PAPERS/pdfs/
-# the testbed is its own git repository (tags v1.0-frozen, v1.2-semantic)
-17_CODE/testbed/
+# the testbed's own git history is pushed to the branches testbed-main and
+# testbed-e4-semantic-layer (tags v1.0-frozen, v1.1-semantic, v1.2-semantic);
+# its working tree is included here, minus dependencies, build output and local state
+17_CODE/testbed/.git/
+17_CODE/testbed/dev.db
+17_CODE/testbed/.env
+17_CODE/testbed/generated/
 # dependencies, builds, caches
 node_modules/
 .next/

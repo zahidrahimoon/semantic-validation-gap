@@ -114,7 +114,7 @@ same outcome. The contributions are:
   language model, a hybrid, and an LLM judge) at a bounded false-positive rate on held-out fields. None
   of them reaches the pre-registered target.
   \item \textbf{C4.} The request-path cost of those layers on commodity CPU hardware. The guardrail
-  literature I reviewed reports no comparable
+  literature we reviewed reports no comparable
   figures~\cite{jacob2025promptshield,ahmed2026reflexguard,saleem2026layered,wang2026sokguardrails}.
   \item \textbf{C5.} The testbed, harness, rule reference, raw data and analysis scripts, together with
   the defects found during execution and the way each one was handled.
@@ -146,13 +146,13 @@ generator that produces more well-formed values would otherwise look worse merel
 often.
 
 Terminology differs across communities. The OWASP Input Validation Cheat Sheet separates syntactic from
-semantic validation~\cite{owasp2026inputvalidation}. I count a range that the developer wrote into the
+semantic validation~\cite{owasp2026inputvalidation}. We count a range that the developer wrote into the
 schema as structural, because the application enforces it. Security research speaks of logic
 vulnerabilities~\cite{felmetsger2010waler,pellegrino2014logicflaws} or of business logic
 vulnerabilities~\cite{metin2025blv}. API testing research speaks of inter-parameter
 dependencies~\cite{martinlopez2022idl,martinlopez2019catalogue}, and one older paper uses
-``semantic-based user input validation'' in the sense used here~\cite{hanna2018semanticvalidation}. In LLM
-security the same adjective usually means adversarial intent~\cite{singh2026injectioninteraction}. My
+``semantic-based user input validation'' in our sense~\cite{hanna2018semanticvalidation}. In LLM
+security the same adjective usually means adversarial intent~\cite{singh2026injectioninteraction}. Our
 usage concerns whether the data is appropriate, which includes that case.
 
 \section{Related Work}
@@ -178,7 +178,7 @@ testing~\cite{corradini2023massassignment} and by excessive-data-exposure
 fuzzing~\cite{pan2024edefuzz}. Semantic anomaly detection in this invariant sense predates the web
 literature~\cite{raz2002semanticanomaly}. Recent work applies LLMs to find business-logic
 vulnerabilities in code~\cite{metin2025blv,armillotta2026antaeus}, surveyed among other security
-uses~\cite{sheng2025llmsecsurvey}. In the studies I reviewed the inputs are crafted by an attacker or
+uses~\cite{sheng2025llmsecsurvey}. In the studies we reviewed the inputs are crafted by an attacker or
 a tester, and they are not compared across producers.
 
 \subsection{LLM-generated inputs for forms and APIs}
@@ -191,7 +191,7 @@ separately, a base model reaches 22.9\,\% domain-coherent values, against 72.4\,
 fine-tuning~\cite{kim2025llamaresttest}. Related work mines input constraints from
 specifications~\cite{kim2024restgpt,huynh2024constraints}, studies text input for mobile
 interfaces~\cite{cui2024guitextinput}, benchmarks form-filling agents~\cite{li2025formfactory}, and
-measures the schema validity of synthetic records~\cite{mishra2026structuredsynthetic}. I found no
+measures the schema validity of synthetic records~\cite{mishra2026structuredsynthetic}. We found no
 study that compares LLM inputs with random, rule-based and reference inputs on a semantic outcome.
 
 \subsection{Schema-valid but semantically wrong outputs}
@@ -215,11 +215,11 @@ that is itself evaluated, and the setting is model output rather than applicatio
 Data-management research validates data beyond structural schemas. Examples are anomaly detection on
 data fed to machine-learning pipelines~\cite{breck2019datavalidation}, declarative constraint checks
 that act as unit tests for data~\cite{schelter2018deequ}, and learned detection of the semantic types
-of columns~\cite{hulsebos2019sherlock}. These systems work on datasets or columns in batch. I study
+of columns~\cite{hulsebos2019sherlock}. These systems work on datasets or columns in batch. We study
 per-request validation of one input against an application's business rules. Classifying a single field
 entry as valid or invalid from a context embedding and statistics of recent entries has been described
-in a patent~\cite{banerjee2025contextembedding}. My EMB design is a simpler, untrained relative of that
-idea, and I evaluate it empirically.
+in a patent~\cite{banerjee2025contextembedding}. Our EMB design is a simpler, untrained relative of that
+idea, and we evaluate it empirically.
 
 \subsection{Semantically inappropriate input as a security problem}
 Indirect prompt injection established that models do not separate data from
@@ -246,24 +246,24 @@ excluded~\cite{saleem2026layered}. Surveys of the area note that cost and utilit
 overlooked~\cite{wang2026sokguardrails,zizzo2025guardrails,kumar2025nofreelunch}. Only one study
 compares regex, classifier and LLM tiers head to head, and it does not state its
 hardware~\cite{maiorano2026tradeoffs}. LLM judges, meanwhile, can themselves be
-redirected by the content they assess~\cite{shi2024judgeattack}. I found no measurement of a validator for data appropriateness
+redirected by the content they assess~\cite{shi2024judgeattack}. We found no measurement of a validator for data appropriateness
 on structured request payloads on CPU.
 
 \subsection{Position of this work}
-Three lines of work come closest among the studies I reviewed, and the design of this study responds
+Three lines of work come closest among the studies we reviewed, and the design of this study responds
 to a specific difference in each. The output-side studies measure schema-valid but wrong values that a
 model emits~\cite{li2026orderbench,ray2026constrainttax,singh2026sob,wrenn2026enterprise}, where the
-oracle is the task's expected answer. I measure values that an application accepts and stores, where
+oracle is the task's expected answer. We measure values that an application accepts and stores, where
 the application raises no error and the value is later read by people or by an assistant. The form and
 API testing studies generate inputs with an LLM and count acceptance by the
 application~\cite{alian2024formnexus,li2026webformtest}, so an accepted but inappropriate value counts
 as a success; one study measures domain coherence separately but has no non-LLM
-comparison~\cite{kim2025llamaresttest}. I separate the two outcomes and label semantic validity
+comparison~\cite{kim2025llamaresttest}. We separate the two outcomes and label semantic validity
 against a frozen rule reference, independently of the application. The guardrail studies evaluate
 detectors for adversarial intent, and where they report cost at all it is on datacentre
-GPUs~\cite{ahmed2026reflexguard,saleem2026layered}. I evaluate detectors for ordinary data
-appropriateness, on structured payloads, on a four-core CPU, and I report detection quality and cost
-together. The comparison across seven producers, including non-LLM ones, is what lets me ask whether
+GPUs~\cite{ahmed2026reflexguard,saleem2026layered}. We evaluate detectors for ordinary data
+appropriateness, on structured payloads, on a four-core CPU, and we report detection quality and cost
+together. The comparison across seven producers, including non-LLM ones, is what lets us ask whether
 the gap belongs to AI writers or to the validation boundary itself.
 
 \section{Research Questions and Hypotheses}
@@ -316,13 +316,13 @@ limits, with no attempt at meaning. \textbf{C} is rule-based adversarial values,
 unenforced rule. \textbf{D} is an LLM given the field name and the structural constraints only.
 \textbf{E} is the same LLM given the field's purpose and rules as well. \textbf{F} is boundary values
 at the schema edges. \textbf{G} is benign but unusual reference values. Conditions A and G were
-specified as human-written. In this execution their \R{e1.refdrafted} values were first drafted with the
-help of a language model, before the main generation, and checked against the schemas and the
-objective rules. \ifreviewed I then went through every value myself, kept \R{review.keep}, replaced
-\R{review.change} with values of my own, deleted \R{review.delete}, and confirmed that the kept values
-are ones I would have written. The application accepted \R{newref.passes} of the
+specified as human-written. In this execution their \R{e1.refdrafted} values were drafted by an AI
+assistant at the researcher's request, before the main generation, and checked against the schemas and
+the objective rules. \ifreviewed A human reviewer then went through every value, kept \R{review.keep},
+replaced \R{review.change} with values of their own, deleted \R{review.delete}, and confirmed that the
+kept values are ones they would have written. The application accepted \R{newref.passes} of the
 replacements, because all \R{review.change} were promotional codes it does not recognise. They are
-condition A's only structural rejections, so the reviewed conditions rest on the kept values. I therefore call these
+condition A's only structural rejections, so the reviewed conditions rest on the kept values. We therefore call these
 conditions human-curated rather than human-written.\else The researcher's review of them is outstanding
 (Section~\ref{sec:threats}).\fi
 
@@ -693,8 +693,8 @@ so\ifjudgeweak{} they too are exploratory under the pre-registered agreement gat
 decided by the rule functions alone remain confirmatory.\else{} they remain confirmatory while the
 other contrasts are exploratory.\fi
 
-\textbf{Who produced the human data.} \ifhumanlabels I carried out both the review and the annotation,
-and I also built the subject application and wrote the rule reference. The annotation
+\textbf{Who produced the human data.} \ifhumanlabels The reviewer and the annotator were the same
+person, the author, who also built the subject application and wrote the rule reference. The annotation
 is blind to the generation condition, because the interface never shows it, but it is not independent
 of the study, and a single annotator cannot establish how far the disagreement with the judge
 generalises. The review took \R{review.minutes} minutes for \R{e1.refdrafted} values, a median of
@@ -703,10 +703,10 @@ items, a median of \R{ann.median_s}\,s per item. Both are well below the effort 
 which may itself contribute to the low agreement. The per-item answers and their timestamps are
 released with the artefacts.\else The human tasks have not been carried out.\fi
 
-\textbf{Provenance.} The reference conditions A and G were specified as human-written and their
-first drafts came from a language model. \ifreviewed I then reviewed and curated every value, so H3b
-compares model input with human-curated input rather than with input written unaided. H3b remains
-exploratory because it depends on judgement rules.\else Until the researcher's review is recorded, H3b is
+\textbf{Provenance.} The reference conditions A and G were specified as human-written and were drafted
+by an AI assistant. \ifreviewed A human reviewer then reviewed and curated them, so H3b compares model
+input with human-curated input rather than with input a person wrote unaided. H3b remains exploratory
+because it depends on judgement rules.\else Until the researcher's review is recorded, H3b is
 exploratory and the alternative explanation that unusual human inputs behave similarly is not
 tested.\fi
 
@@ -733,13 +733,18 @@ judgement rules with several annotators and more time per item, collect referenc
 several people unaided, re-judge the context-dependent rules with the full record, state the current
 date to the generators, and repeat the protocol on an existing open-source application.
 
+\section*{Artifact Availability}
+
+The testbed (tag \texttt{v1.0-frozen}), the harness, the prompts, the rule reference, every generated
+input, measurement and label, and the scripts that produce every table, figure and number in this paper
+are released with it (\texttt{TODO-HUMAN}: repository URL and licence).
+
 \section*{Acknowledgment}
 
-The testbed, the harness, the rule reference, every generated input, measurement and label, and the
-scripts that produce every table, figure and number in this paper are available at
-\url{https://github.com/zahidrahimoon/semantic-validation-gap}. Language models were used as
-instruments of the study and as writing and coding assistants during its preparation; the design, the
-analysis and the claims are mine, and I take responsibility for them.
+The literature search, verification, drafting, harness implementation and analysis scripting were
+performed with the assistance of an AI system under the author's direction; the research claims and
+the manuscript are the author's responsibility. A full disclosure of AI use and all artefacts are
+released with the paper.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
