@@ -18,7 +18,7 @@ import { programmaticRecords } from "./generate/programmatic.js";
 import { appendJsonl, mulberry32, nowRunId, readJsonl, runDir, writeManifest } from "./lib/io.js";
 import { courseIdFor, measure, type StructRecord } from "./measure/structural.js";
 import { evaluateRules, type Verdict } from "./groundtruth/rules.js";
-import { judge, type JudgeRecord } from "./groundtruth/judge.js";
+import { judge, CONTEXT_RULES, type JudgeRecord } from "./groundtruth/judge.js";
 import { cohenKappa, mergeLabel } from "./groundtruth/merge.js";
 import { modelDigest } from "./lib/ollama.js";
 
@@ -220,6 +220,32 @@ async function cmdJudge() {
   console.log(`judge done: ${i} judged with ${model} (${digest.slice(0, 12)}) → ${out}`);
 }
 
+/**
+ * DV-20: re-judge the context-dependent rules with the whole submitted record, for the inputs that
+ * were already judged. Writes judge_context_verdicts.jsonl; merge prefers these for those rules.
+ *   tsx cli.ts judge-context --exp E1 --run <id> [--model gemma3:4b] [--limit N]
+ */
+async function cmdJudgeContext() {
+  const exp = flag("exp", "E1")!, runId = flag("run")!, model = flag("model", "gemma3:4b")!;
+  const limit = Number(flag("limit", "0"));
+  const dir = runDir(exp, runId);
+  const struct = readJsonl<StructRecord>(join(dir, "validation_results.jsonl")).filter((x) => x.structural_pass);
+  const judged = new Set(readJsonl<JudgeRecord>(join(dir, "judge_verdicts.jsonl")).map((r) => r.input_id));
+  const out = join(dir, "judge_context_verdicts.jsonl");
+  const done = new Set(readJsonl<JudgeRecord>(out).map((r) => r.input_id));
+  const todo = struct.filter((x) => judged.has(x.input_id) && !done.has(x.input_id)
+    && byId(x.target_id).rules.some((r) => CONTEXT_RULES.includes(r)));
+  console.log(`judge-context: ${todo.length} inputs to re-judge with the full record (${done.size} already done)`);
+  const digest = await modelDigest(model);
+  let i = 0;
+  for (const x of (limit > 0 ? todo.slice(0, limit) : todo)) {
+    try { appendJsonl(out, [await judge(x, model, digest, { onlyRules: CONTEXT_RULES, fullRecord: true })]); }
+    catch (e) { appendJsonl(join(dir, "judge_failures.jsonl"), [{ input_id: x.input_id, context: true, error: String(e).slice(0, 200) }]); }
+    if (++i % 25 === 0) console.log(`  re-judged ${i}/${todo.length}`);
+  }
+  console.log(`judge-context done: ${i} inputs → ${out}`);
+}
+
 function cmdMerge() {
   const exp = flag("exp", "E0")!, runId = flag("run")!;
   const dir = runDir(exp, runId);
@@ -228,6 +254,17 @@ function cmdMerge() {
   const r2 = new Map(readJsonl<JudgeRecord>(join(dir, "judge_verdicts.jsonl")).map((r) => [r.input_id, r.verdicts]));
   // R3: the researcher's annotation takes precedence over the judge for judgement rules (Algorithm 1).
   // First annotations only (the "#repeat" copies measure intra-annotator agreement); latest import wins.
+  // DV-20: context-rule verdicts made with the whole record replace the first-pass ones
+  const cf = join(dir, "judge_context_verdicts.jsonl");
+  if (existsSync(cf)) {
+    let n = 0;
+    for (const r of readJsonl<JudgeRecord>(cf)) {
+      const base = r2.get(r.input_id);
+      if (!base) continue;
+      for (const [rule, v] of Object.entries(r.verdicts)) { base[rule] = v; n++; }
+    }
+    console.log(`  using ${n} context-rule verdicts re-judged with the full record (DV-20)`);
+  }
   const hf = join(dir, "human_verdicts.jsonl");
   type HumanRow = { input_id: string; verdicts: Record<string, "PASS" | "FAIL" | "AMBIGUOUS">; repeat: boolean };
   const r3 = new Map((existsSync(hf) ? readJsonl<HumanRow>(hf) : []).filter((r) => !r.repeat).map((r) => [r.input_id, r.verdicts]));
@@ -353,6 +390,7 @@ const run = async () => {
     case "structural": return cmdStructural();
     case "rules": return cmdRules();
     case "judge": return cmdJudge();
+    case "judge-context": return cmdJudgeContext();
     case "sample": return cmdSample();
     case "import-labels": return cmdImportLabels();
     case "merge": return cmdMerge();

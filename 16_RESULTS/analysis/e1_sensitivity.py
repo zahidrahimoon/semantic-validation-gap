@@ -61,6 +61,9 @@ for cond in ["LLM (D+E)", "B", "G"]:
     }
     a = df[df["cond"] == cond]   # all structural passes: objective rules decide every one
     variants["objective rules only"] = (a, a["violated_obj"].apply(len) > 0)
+    # the only fully judge-independent variant that also removes the date artefact (reviewer point 3)
+    ad = a[a["target_id"] != "F15+F16"]
+    variants["objective only, without dates"] = (ad, ad["violated_obj"].apply(len) > 0)
     ctx = d[~d["ambiguous_rules"].apply(lambda r: bool(set(r) - CONTEXT_RULES))]
     variants["excluding context rules"] = (ctx, ctx["violated_rules"].apply(lambda r: bool(set(r) - CONTEXT_RULES)))
     for name, (dd, y) in variants.items():

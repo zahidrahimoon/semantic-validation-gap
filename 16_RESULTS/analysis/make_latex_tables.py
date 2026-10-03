@@ -226,6 +226,108 @@ qwen3 & Runs & $n$ & Pass & Obj.\ (\%) & $p_{\mathrm{H}}$ & All (\%) & $p_{\math
 \end{table}
 """)
 
+# ---- Table: LLM rate by prompt family ----
+f = OUT / "table1b_llm_by_family.csv"
+if f.exists():
+    t = pd.read_csv(f)
+    rows = []
+    for fam in ["P1", "P2", "P3", "P4", "P6", "P7"]:
+        x = t[t["family"] == fam].set_index("group")
+        if x.empty: continue
+        meaning = str(x.loc["D+E", "meaning"]).replace("asked to violate rules", "rule violations")
+        rows.append(f"{fam} & {esc(meaning)} & {pct(x.loc['D', 'rate'])} & {pct(x.loc['E', 'rate'])} & "
+                    f"{int(x.loc['D+E', 'svsi'])}/{int(x.loc['D+E', 'decided'])} & {pct(x.loc['D+E', 'rate'])} & "
+                    f"{ci(x.loc['D+E', 'ci_lo'], x.loc['D+E', 'ci_hi'])} \\\\")
+    for lbl in ["pooled", "pooled excl. P3"]:
+        x = t[t["family"] == lbl]
+        if x.empty: continue
+        x = x.iloc[0]
+        rows.append(f"\\multicolumn{{2}}{{l}}{{{'All (H1)' if lbl == 'pooled' else 'All except P3'}}} & & & "
+                    f"{int(x['svsi'])}/{int(x['decided'])} & {pct(x['rate'])} & {ci(x['ci_lo'], x['ci_hi'])} \\\\")
+    rows.insert(len(rows) - 2, "\\midrule")
+    write("tab_family.tex", r"""\begin{table}[t]
+\caption{Conditional SV-SI rate of model-generated inputs by prompt family (decided structural passes;
+P5 excluded). P3 explicitly asks the model for values the application should reject; P1 asks for
+legitimate values. D: without field context; E: with purpose and rules.}
+\label{tab:family}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2pt}
+\begin{tabular}{llrrrrr}
+\toprule
+ & Prompt asks for & D (\%) & E (\%) & SV-SI & D+E (\%) & 95\% CI \\
+\midrule
+""" + "\n".join(rows) + r"""
+\bottomrule
+\end{tabular}
+\end{table}
+""")
+
+# ---- Table: sensitivity of the H1 rate ----
+f = OUT / "table1c_sensitivity.csv"
+if f.exists():
+    t = pd.read_csv(f)
+    NAMES = {"primary": "Pre-registered (all rules)", "P1 only": "P1 (legitimate) prompts only",
+             "excluding P3": "Without P3 (asks for violations)", "excluding F15+F16": "Without dates (F15+F16)",
+             "objective rules only": "Objective rules only (no judge)",
+             "objective only, without dates": "Objective only, without dates",
+             "excluding context rules": "Without context rules", "target-weighted": "Target-weighted"}
+    def cell(c, v):
+        x = t[(t["condition"] == c) & (t["variant"] == v)]
+        return "--" if x.empty or pd.isna(x["rate"].iloc[0]) else pct(x["rate"].iloc[0])
+    def cell_ci(v):
+        x = t[(t["condition"] == "LLM (D+E)") & (t["variant"] == v)]
+        return "--" if x.empty or pd.isna(x["ci_lo"].iloc[0]) else ci(x["ci_lo"].iloc[0], x["ci_hi"].iloc[0])
+    rows = "\n".join(f"{NAMES[v]} & {cell('LLM (D+E)', v)} & {cell_ci(v)} & {cell('B', v)} & {cell('G', v)} \\\\"
+                     for v in NAMES)
+    write("tab_sensitivity.tex", r"""\begin{table}[t]
+\caption{Sensitivity of the conditional SV-SI rate to design choices. LLM: conditions D and E pooled;
+B: random; G: benign-unusual (""" + G_NOTE + r"""). ``Without context rules'' drops seven judgement rules
+the judge had to decide without the rest of the record. The two objective rows use the rule functions
+alone and so do not depend on the judge. Target-weighted averages per-target rates by each target's
+share of structural passes. P1 and P3 apply to model conditions only.}
+\label{tab:sensitivity}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrr}
+\toprule
+Variant & LLM (\%) & 95\% CI & B (\%) & G (\%) \\
+\midrule
+""" + rows + r"""
+\bottomrule
+\end{tabular}
+\end{table}
+""")
+
+# ---- Table: judge calibration against the designed conditions ----
+f = OUT / "table10_judge_calibration.csv"
+if f.exists():
+    t = pd.read_csv(f)
+    t = t[(t["designed_violations"] >= 2) | (t["judge_false_positives"] > 0)].sort_values(
+        ["designed_violations", "judge_false_positives"], ascending=False).head(10)
+    rows = "\n".join(
+        f"{esc(r['rule'])} & {int(r['judge_caught'])}/{int(r['designed_violations'])} & "
+        f"{pct(r['recall'])} & {int(r['judge_false_positives'])}/{int(r['valid_inputs'])} & {pct(r['fpr'])} \\\\"
+        for _, r in t.iterrows())
+    write("tab_calibration.tex", r"""\begin{table}[t]
+\caption{Judge calibration on the two designed conditions, by judgement rule (rules with at least two
+designed violations or at least one false positive, ordered by the number of designed violations).
+Recall is measured on condition C, whose templates each break one named rule; the false-positive rate
+is measured on condition A, which is written to be valid. Full table in the repository.}
+\label{tab:calibration}
+\centering
+\footnotesize
+\begin{tabular}{lrrrr}
+\toprule
+Rule & Caught & Recall (\%) & False pos. & FPR (\%) \\
+\midrule
+""" + rows + r"""
+\bottomrule
+\end{tabular}
+\end{table}
+""")
+
 # ---- Table: E4 overhead (condensed: endpoints summarised as a range) ----
 f = OUT / "table8_e4_overhead.csv"
 if f.exists():

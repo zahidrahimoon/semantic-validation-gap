@@ -1,0 +1,22 @@
+{
+  "rules": 17,
+  "designed_violations": 56,
+  "caught": 44,
+  "recall": 0.7857142857142857,
+  "recall_ci": [
+    0.6618028634399505,
+    0.8729421968525549
+  ],
+  "valid_inputs": 135,
+  "false_positives": 19,
+  "fpr": 0.14074074074074075,
+  "fpr_ci": [
+    0.09198786092943734,
+    0.20937426684782834
+  ],
+  "observed_judgement_rate": 0.15722120658135283,
+  "observed_k": 172,
+  "observed_n": 1094,
+  "corrected_judgement_rate": 0.025552157866084356,
+  "note": "C is deliberately blatant, so its recall is optimistic and the correction is a lower bound on the true rate"
+}

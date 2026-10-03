@@ -22,16 +22,32 @@ For each rule, answer PASS (the value respects the rule), FAIL (the value breaks
 
 Return ONLY JSON: {"<RULE-ID>": {"verdict": "PASS|FAIL|UNSURE", "why": "<one short clause>"}, ...} with one entry per rule you were given. No other keys.`;
 
-export async function judge(s: StructRecord, model: string, digest?: string): Promise<JudgeRecord> {
+/**
+ * Rules whose text refers to other fields of the same record (ticket text, course location, the
+ * workshop a review is attached to). The first judging pass showed the judge only the target's own
+ * fields, so these were decided without the context they name (DV-20). `judgeContext` re-judges just
+ * these rules with the whole submitted record.
+ */
+export const CONTEXT_RULES = ["B-TK-3", "B-TK-4", "B-CO-4", "B-CO-5", "B-CO-7", "B-RV-3", "B-BK-8"];
+
+export async function judge(
+  s: StructRecord, model: string, digest?: string,
+  opts: { onlyRules?: string[]; fullRecord?: boolean } = {},
+): Promise<JudgeRecord> {
   const t = byId(s.target_id);
-  const rules = t.rules.filter((r) => RULES[r]);
-  const submitted = Object.fromEntries(t.keys.map((k) => [k, s.payload[k]]));
+  let rules = t.rules.filter((r) => RULES[r]);
+  if (opts.onlyRules) rules = rules.filter((r) => opts.onlyRules!.includes(r));
+  const submitted = opts.fullRecord
+    ? Object.fromEntries(Object.entries(s.payload).filter(([k, v]) => v !== undefined && k !== "courseId"))
+    : Object.fromEntries(t.keys.map((k) => [k, s.payload[k]]));
   const user = [
     `Field: ${t.keys.join(", ")} (on the ${t.surface} form of a workshop-booking website)`,
     `What the field is for: ${t.purpose}`,
     `Rules to check:`,
     ...rules.map((r) => `${r}: ${RULES[r].text}`),
-    `Submitted value: ${JSON.stringify(submitted)}`,
+    opts.fullRecord
+      ? `Judge the field(s) ${t.keys.join(", ")}. The whole submitted record is given so that you can see the other fields the rules refer to: ${JSON.stringify(submitted)}`
+      : `Submitted value: ${JSON.stringify(submitted)}`,
   ].join("\n");
   const r = await chat(SYSTEM, user, { model, temperature: 0, seed: 7, maxTokens: 400 });
   const out: JudgeRecord = { input_id: s.input_id, judge_model: r.model, judge_digest: digest ?? (await modelDigest(model)), ms: r.ms, verdicts: {}, rationale: {} };

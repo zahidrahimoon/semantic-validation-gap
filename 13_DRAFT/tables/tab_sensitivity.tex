@@ -1,8 +1,9 @@
 \begin{table}[t]
 \caption{Sensitivity of the conditional SV-SI rate to design choices. LLM: conditions D and E pooled;
-B: random; G: benign-unusual (human-curated). ``Without context rules'' drops seven judgement rules the
-judge had to decide without the rest of the record. ``Objective rules only'' uses no judge. Target-weighted averages
-per-target rates by each target's share of structural passes. P1 and P3 apply to model conditions only.}
+B: random; G: benign-unusual (human-curated). ``Without context rules'' drops seven judgement rules
+the judge had to decide without the rest of the record. The two objective rows use the rule functions
+alone and so do not depend on the judge. Target-weighted averages per-target rates by each target's
+share of structural passes. P1 and P3 apply to model conditions only.}
 \label{tab:sensitivity}
 \centering
 \footnotesize
@@ -15,7 +16,8 @@ Pre-registered (all rules) & 30.9 & [28.2, 33.7] & 53.3 & 17.2 \\
 P1 (legitimate) prompts only & 20.3 & [15.4, 26.2] & -- & -- \\
 Without P3 (asks for violations) & 28.7 & [25.9, 31.7] & 53.3 & 17.2 \\
 Without dates (F15+F16) & 21.5 & [19.0, 24.2] & 50.4 & 17.5 \\
-Objective rules only & 7.9 & [6.8, 9.2] & 10.3 & 0.8 \\
+Objective rules only (no judge) & 7.9 & [6.8, 9.2] & 10.3 & 0.8 \\
+Objective only, without dates & 1.8 & [1.3, 2.5] & 5.1 & 0.0 \\
 Without context rules & 24.5 & [22.1, 27.2] & 36.5 & 9.4 \\
 Target-weighted & 30.2 & -- & 53.3 & 17.2 \\
 \bottomrule
