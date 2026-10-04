@@ -1,0 +1,29 @@
+\begin{table*}[t]
+\caption{Detection quality of the candidate semantic validation layers on the shared stratified sample
+of 573 decided inputs (261 SV-SI, 312 valid), leave-fields-out (5 folds). Recall, 95\% bootstrap
+interval, FPR and precision are at the pre-registered operating point: the threshold is the smallest
+score whose false-positive rate on valid training-fold inputs is at most 5\%, applied to held-out fields.
+AUROC is threshold-free. The native column (exploratory) applies each design's own decision rule
+without tuning; JUDGE returned no usable verdict for 25\% of inputs, counted as not flagged. R's zero
+FPR is partly by construction, because its rule functions also decide the ground truth for objective
+rules, and JUDGE shares a model family with the generator. Latency is the layer's own median decision
+time on the study CPU; HYB reuses embeddings cached by EMB, so its request-path cost is the one in
+Table~\ref{tab:e4}. $^{\dagger}$EMB-TRAINED needs training folds, so it is scored on all decided
+inputs rather than on the shared sample.}
+\label{tab:detection}
+\centering
+\footnotesize
+\begin{tabular}{lrrrrrrr}
+\toprule
+Design & Recall (\%) & 95\% CI & FPR (\%) & Precision (\%) & AUROC & Native recall / FPR (\%) & Median (ms) \\
+\midrule
+HYB & 25.3 & [20.2, 30.5] & 5.4 & 79.5 & 0.59 & 22.6 / 1.6 & 0.01 \\
+R & 20.3 & [15.6, 25.2] & 0.0 & 100.0 & 0.60 & 20.3 / 0.0 & 0.01 \\
+JUDGE & 6.5 & [3.7, 9.5] & 1.0 & 85.0 & 0.73 & 45.2 / 8.7 & 2709 \\
+EMB & 5.0 & [2.5, 7.8] & 5.4 & 43.3 & 0.45 & 2.3 / 1.6 & 31 \\
+SLM & 1.9 & [0.4, 3.7] & 0.6 & 71.4 & 0.72 & 62.8 / 21.5 & 1075 \\
+\midrule
+EMB-TRAINED$^{\dagger}$ & 1.9 & [1.1, 2.9] & 3.5 & 27.3 & 0.43 & n/a & n/a \\
+\bottomrule
+\end{tabular}
+\end{table*}
