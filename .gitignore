@@ -24,3 +24,5 @@ __pycache__/
 # local secrets
 .env
 .env.*
+# regenerable embedding cache for e3_trained_classifier.py (4.5 MB; rebuild with --embed)
+16_RESULTS/analysis/embeddings.npz

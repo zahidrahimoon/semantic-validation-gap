@@ -1,0 +1,2 @@
+design,n,tp,fp,fn,tn,recall_at_fpr05,recall_ci_lo,recall_ci_hi,precision,fpr,auroc,population
+EMB-TRAINED,1933,15,40,761,1117,0.019329896907216496,0.010663157894736841,0.029412706183625816,0.2727272727272727,0.03457216940363008,0.43324307888335456,"all decided inputs, leave-fields-out"

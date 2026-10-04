@@ -28,7 +28,13 @@ targets = {t["id"]: t for t in json.loads((pathlib.Path(__file__).resolve().pare
 
 rows = [json.loads(l) for l in open(RUN / "e3_decisions.jsonl") if l.strip()]
 d = pd.DataFrame([r for r in rows if r["design"] == "R"])          # one row per decided input
-d = d[~d["input_id"].isin(excluded_ids(RUN))].reset_index(drop=True)
+d = d[~d["input_id"].isin(excluded_ids(RUN))].copy()
+lab = {}
+for l in open(RUN / "semantic_labels.jsonl"):
+    if l.strip():
+        r = json.loads(l); lab[r["input_id"]] = r["final_label"]
+d["label"] = d["input_id"].map(lab)                      # DV-22, as in e3_analysis.py
+d = d[d["label"].isin(["VALID", "SV-SI"])].reset_index(drop=True)
 d["y"] = (d["label"] == "SV-SI").astype(int)
 struct = {json.loads(l)["input_id"]: json.loads(l) for l in open(RUN / "validation_results.jsonl") if l.strip()}
 
@@ -51,16 +57,26 @@ def purpose_text(tid):
     return t["purpose"] + " " + " ".join(r["text"] for r in t["rules"])
 
 
-if "--embed" in sys.argv or not CACHE.exists():
-    print(f"embedding {len(d)} values and {len(targets)} field purposes through {MODEL} ...")
-    V = np.stack([embed(value_text(i, t)) for i, t in zip(d["input_id"], d["target_id"])])
-    P = {tid: embed(purpose_text(tid)) for tid in targets}
-    np.savez_compressed(CACHE, V=V, ids=np.array(d["input_id"]), **{f"P_{k}": v for k, v in P.items()})
+# The cache is keyed by input_id and topped up: a value's embedding does not depend on its label,
+# so relabelling the run only ever adds ids, and nothing already embedded is recomputed.
+have = {}
+if CACHE.exists() and "--rebuild" not in sys.argv:
+    z0 = np.load(CACHE, allow_pickle=True)
+    have = {str(i): z0["V"][k] for k, i in enumerate(z0["ids"])}
+    have.update({str(k): z0[k] for k in z0.files if k.startswith("P_")})
+missing = [i for i in d["input_id"] if i not in have] + [f"P_{t}" for t in targets if f"P_{t}" not in have]
+if missing:
+    print(f"embedding {len(missing)} new items through {MODEL} ...")
+    tid_of = dict(zip(d["input_id"], d["target_id"]))
+    for n, m in enumerate(missing, 1):
+        have[m] = embed(purpose_text(m[2:]) if m.startswith("P_") else value_text(m, tid_of[m]))
+        if n % 200 == 0: print(f"  {n}/{len(missing)}")
+    ids = [i for i in have if not i.startswith("P_")]
+    np.savez_compressed(CACHE, V=np.stack([have[i] for i in ids]), ids=np.array(ids),
+                        **{k: v for k, v in have.items() if k.startswith("P_")})
     print("cached to", CACHE)
-z = np.load(CACHE, allow_pickle=True)
-order = {i: k for k, i in enumerate(z["ids"])}
-V = z["V"][[order[i] for i in d["input_id"]]]
-P = np.stack([z[f"P_{t}"] for t in d["target_id"]])
+V = np.stack([have[i] for i in d["input_id"]])
+P = np.stack([have[f"P_{t}"] for t in d["target_id"]])
 norm = lambda M: M / (np.linalg.norm(M, axis=1, keepdims=True) + 1e-9)
 Vn, Pn = norm(V), norm(P)
 cos = (Vn * Pn).sum(1, keepdims=True)

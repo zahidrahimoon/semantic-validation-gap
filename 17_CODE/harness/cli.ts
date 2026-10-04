@@ -15,7 +15,7 @@ import { TARGETS, byId } from "./config/fields.js";
 import { RULES } from "./lib/rules_text.js";
 import { generateLLM, type Family, type GenRecord } from "./generate/llm.js";
 import { programmaticRecords } from "./generate/programmatic.js";
-import { appendJsonl, mulberry32, nowRunId, readJsonl, runDir, writeManifest } from "./lib/io.js";
+import { appendJsonl, writeJsonl, mulberry32, nowRunId, readJsonl, runDir, writeManifest } from "./lib/io.js";
 import { courseIdFor, measure, type StructRecord } from "./measure/structural.js";
 import { evaluateRules, type Verdict } from "./groundtruth/rules.js";
 import { judge, CONTEXT_RULES, type JudgeRecord } from "./groundtruth/judge.js";
@@ -270,7 +270,8 @@ function cmdMerge() {
   const r3 = new Map((existsSync(hf) ? readJsonl<HumanRow>(hf) : []).filter((r) => !r.repeat).map((r) => [r.input_id, r.verdicts]));
   if (r3.size) console.log(`  using ${r3.size} human-annotated inputs (R3)`);
   const rows = struct.map((s) => mergeLabel({ input_id: s.input_id, target_id: s.target_id, group: s.group, prompt_family: s.prompt_family, structural_pass: s.structural_pass, applicableRules: byId(s.target_id).rules, r1: r1.get(s.input_id) ?? {}, r2: r2.get(s.input_id) ?? {}, r3: r3.get(s.input_id) }));
-  appendJsonl(join(dir, "semantic_labels.jsonl"), rows);
+  // merge recomputes every label from the verdict files, so the file is rewritten, not appended
+  writeJsonl(join(dir, "semantic_labels.jsonl"), rows);
   console.log(`merge done: ${rows.length} labels → ${join(dir, "semantic_labels.jsonl")}`);
 }
 

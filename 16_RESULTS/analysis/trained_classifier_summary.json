@@ -1,0 +1,15 @@
+{
+  "design": "EMB-TRAINED",
+  "n": 1933,
+  "tp": 15,
+  "fp": 40,
+  "fn": 761,
+  "tn": 1117,
+  "recall_at_fpr05": 0.019329896907216496,
+  "recall_ci_lo": 0.010663157894736841,
+  "recall_ci_hi": 0.029412706183625816,
+  "precision": 0.2727272727272727,
+  "fpr": 0.03457216940363008,
+  "auroc": 0.43324307888335456,
+  "population": "all decided inputs, leave-fields-out"
+}

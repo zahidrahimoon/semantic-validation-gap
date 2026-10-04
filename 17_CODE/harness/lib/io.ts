@@ -16,6 +16,18 @@ export function appendJsonl(file: string, rows: unknown[]): void {
   appendFileSync(file, rows.map((r) => JSON.stringify(r)).join("\n") + "\n", "utf8");
 }
 
+/**
+ * Truncating JSONL write, for DERIVED files only.
+ *
+ * `semantic_labels.jsonl` is recomputed in full from the verdict files on every merge, so appending
+ * it duplicates every row and silently doubles every population count downstream. Raw measurement
+ * files stay append-only (EXPERIMENT_SAFETY.md); this is for files merge regenerates.
+ */
+export function writeJsonl(file: string, rows: unknown[]): void {
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, rows.map((r) => JSON.stringify(r)).join("\n") + "\n", "utf8");
+}
+
 export function readJsonl<T>(file: string): T[] {
   if (!existsSync(file)) return [];
   const out: T[] = [];

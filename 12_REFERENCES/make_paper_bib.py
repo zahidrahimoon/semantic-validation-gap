@@ -64,6 +64,13 @@ def fix_entry(block: str) -> str:
             t = re.sub(rf"(?<![{{\w]){w}(?![}}\w])", "{" + w + "}", t)
         return t
     block = re.sub(r"(\btitle\s*=\s*\{)(.*?)(\}\s*,)", lambda x: x.group(1) + title_fix(x.group(2)) + x.group(3), block, flags=re.S)
+    # An arXiv entry already prints its id ("arXiv preprint arXiv:2608.03311"), so the abs URL adds
+    # a printed line that carries no information a reader cannot already resolve. Non-arXiv online
+    # sources (USENIX, author pages) keep their url, which is the only way to reach them.
+    m_url = re.search(r"\n\s*url\s*=\s*\{([^}]*)\},?", block)
+    if m_url and "arxiv.org/abs/" in m_url.group(1) and re.search(r"\n\s*eprint\s*=\s*\{", block):
+        block = block.replace(m_url.group(0), "")
+        block = re.sub(r",(\s*\n\})\s*$", r"\1", block.rstrip()) + "\n"
     # A DOI already resolves, so a separate url field only lengthens the printed reference.
     if re.search(r"\n\s*doi\s*=\s*\{", block):
         block = re.sub(r"\n\s*url\s*=\s*\{[^}]*\},?", "", block)

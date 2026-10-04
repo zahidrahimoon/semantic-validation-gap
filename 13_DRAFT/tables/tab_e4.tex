@@ -1,32 +1,32 @@
 \begin{table}[t]
 \caption{Request-path overhead of each configuration (production build, four-core CPU, no GPU). Each
-value is the median over three 60\,s runs, given as the range across the three endpoints (profile,
-review, course). Added latency is relative to structural-only validation on the same endpoint and
-concurrency. H6 is evaluated on the added p97.5, the nearest tail percentile the load generator reports.
-``Ok'' is the share of layer calls that returned a verdict rather than failing open. ``$>$60\,000'': the configuration saturated, completing no request within at least two of
+value is the median over three 60\,s runs, as the range across the three endpoints, relative to
+structural-only validation on the same endpoint and concurrency. H6 is evaluated on the added p97.5,
+the nearest tail percentile the load generator reports. ``Ok'' is the share of layer calls returning a
+verdict rather than failing open. ``$>$60\,000'': saturated, no request completed in at least two of
 the three runs. Per-endpoint values are in the repository.}
 \label{tab:e4}
 \centering
 \footnotesize
-\setlength{\tabcolsep}{2pt}
+\setlength{\tabcolsep}{1.5pt}
 \begin{tabular}{lrrrrl}
 \toprule
 Config. & $\Delta$p50 (ms) & $\Delta$p97.5 (ms) & req/s & Ok (\%) & H6 \\
 \midrule
 \multicolumn{6}{l}{\emph{Concurrency 1}} \\
-structural & 0 & 0 & 42.9--47.4 & -- &  \\
-R & 0--2 & 0--1 & 41.9--46.0 & 100 & holds \\
-EMB & 27--48 & 65--96 & 13.2--19.2 & 100 & fails \\
-HYB & 26--45 & 65--82 & 13.6--19.2 & 100 &  \\
-SLM & 527--534 & 655--761 & 1.7--1.8 & 100 &  \\
-JUDGE & 1611--7704 & 7683--10824 & 0.1--0.5 & 100 & holds \\
+structural & 0 & 0 & 42.9 to 47.4 & n/a &  \\
+R & 0 to 2 & 0 to 1 & 41.9 to 46.0 & 100 & holds \\
+EMB & 27 to 48 & 65 to 96 & 13.2 to 19.2 & 100 & fails \\
+HYB & 26 to 45 & 65 to 82 & 13.6 to 19.2 & 100 &  \\
+SLM & 527 to 534 & 655 to 761 & 1.7 to 1.8 & 100 &  \\
+JUDGE & 1611 to 7704 & 7683 to 10824 & 0.1 to 0.5 & 100 & holds \\
 \multicolumn{6}{l}{\emph{Concurrency 8}} \\
-structural & 0 & 0 & 41.7--48.3 & -- &  \\
-R & 2--6 & -136--14 & 43.9--47.6 & 100 & holds \\
-EMB & 126--288 & 122--751 & 16.0--27.9 & 100 & fails \\
-HYB & 103--270 & 131--396 & 17.7--29.0 & 100 &  \\
-SLM & 4149--4210 & 6780--7180 & 1.7--1.7 & 100 &  \\
-JUDGE & 14282--$>$60\,000 & 23474--$>$60\,000 & 0.0--0.4 & 100 & holds \\
+structural & 0 & 0 & 41.7 to 48.3 & n/a &  \\
+R & 2 to 6 & -136 to 14 & 43.9 to 47.6 & 100 & holds \\
+EMB & 126 to 288 & 122 to 751 & 16.0 to 27.9 & 100 & fails \\
+HYB & 103 to 270 & 131 to 396 & 17.7 to 29.0 & 100 &  \\
+SLM & 4149 to 4210 & 6780 to 7180 & 1.7 to 1.7 & 100 &  \\
+JUDGE & 14282 to $>$60\,000 & 23474 to $>$60\,000 & 0.0 to 0.4 & 100 & holds \\
 \bottomrule
 \end{tabular}
 \end{table}

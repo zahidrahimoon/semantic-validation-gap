@@ -54,11 +54,11 @@
       "svsi_obj_rate": 0.011278195488721804,
       "svsi_obj_lo": 0.005944590114272728,
       "svsi_obj_hi": 0.021294705028309047,
-      "decided": 327,
-      "svsi_all": 73,
-      "svsi_all_rate": 0.22324159021406728,
-      "svsi_all_lo": 0.18146815443776093,
-      "svsi_all_hi": 0.2714422413528531
+      "decided": 328,
+      "svsi_all": 99,
+      "svsi_all_rate": 0.3018292682926829,
+      "svsi_all_lo": 0.2546786696543336,
+      "svsi_all_hi": 0.35356815654226137
     },
     {
       "condition": "qwen3:8b T0.8",
@@ -111,8 +111,8 @@
     {
       "metric": "all_decided",
       "comparison": "qwen3:1.7b T0.8 vs qwen3:4b T0.8 (E1)",
-      "odds_ratio": 1.8765584115745728,
-      "p": 0.005405376234313981
+      "odds_ratio": 1.247531494722506,
+      "p": 0.3255923508914923
     },
     {
       "metric": "objective",
@@ -123,8 +123,8 @@
     {
       "metric": "all_decided",
       "comparison": "qwen3:8b T0.8 vs qwen3:4b T0.8 (E1)",
-      "odds_ratio": 1.0438356164383562,
-      "p": 0.9013939296664315
+      "odds_ratio": 0.693939393939394,
+      "p": 0.13561987248666457
     },
     {
       "metric": "objective",
@@ -135,8 +135,8 @@
     {
       "metric": "all_decided",
       "comparison": "qwen3:4b T0 vs qwen3:4b T0.8 (E1)",
-      "odds_ratio": 1.2392568962281854,
-      "p": 0.41773110897731797
+      "odds_ratio": 0.8238549882385499,
+      "p": 0.5289029876573362
     }
   ]
 }

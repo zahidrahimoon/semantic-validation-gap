@@ -18,6 +18,18 @@ _km = excluded_ids(RUN)  # DV-14
 print(f"key-mismatch records excluded (DV-14): {d[d['design'] == 'R']['input_id'].isin(_km).sum()}")
 d = d[~d["input_id"].isin(_km)].copy()
 if d.empty: sys.exit("no e3 decisions")
+# DV-22: a design's SCORE does not depend on the label, so re-labelling the run (DV-20) does not
+# invalidate the scores already written. The label column is therefore refreshed from the current
+# semantic_labels.jsonl rather than re-scoring every design, and inputs that are no longer decided
+# are dropped. Scores are never recomputed here.
+_lab = {}
+for _l in open(RUN / "semantic_labels.jsonl"):
+    if _l.strip():
+        _r = json.loads(_l); _lab[_r["input_id"]] = _r["final_label"]
+_stale = int((d["label"] != d["input_id"].map(_lab)).sum())
+d["label"] = d["input_id"].map(_lab)
+d = d[d["label"].isin(["VALID", "SV-SI"])].copy()
+print(f"labels refreshed from semantic_labels.jsonl (DV-22): {_stale} decision rows changed")
 d["y"] = (d["label"] == "SV-SI").astype(int)
 
 # DV-08: the model-based designs (SLM, JUDGE) were scored on a stratified sample; the fast designs on

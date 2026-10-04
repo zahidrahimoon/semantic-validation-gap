@@ -14,9 +14,9 @@
     0.09198786092943734,
     0.20937426684782834
   ],
-  "observed_judgement_rate": 0.15722120658135283,
-  "observed_k": 172,
-  "observed_n": 1094,
-  "corrected_judgement_rate": 0.025552157866084356,
+  "observed_judgement_rate": 0.22445255474452555,
+  "observed_k": 246,
+  "observed_n": 1096,
+  "corrected_judgement_rate": 0.12979108159733657,
   "note": "C is deliberately blatant, so its recall is optimistic and the correction is a lower bound on the true rate"
 }

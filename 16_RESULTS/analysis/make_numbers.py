@@ -17,7 +17,7 @@ N = {}
 
 
 def pct(x, nd=1): return f"{100 * float(x):.{nd}f}"
-def ci(lo, hi): return f"{100 * float(lo):.1f}--{100 * float(hi):.1f}"
+def ci(lo, hi): return f"{100 * float(lo):.1f} to {100 * float(hi):.1f}"
 def f2(x): return f"{float(x):.2f}"
 def pval(p):
     p = float(p)
@@ -97,7 +97,7 @@ cmh = pd.read_csv(A / "table3c_within_target_cmh.csv")
 for _, row in cmh.iterrows():
     k = "cmh." + row["contrast"].replace(" vs ", "v")
     put(k + ".or", f2(row["mh_odds_ratio"]) if row["mh_odds_ratio"] < 10 else f"{row['mh_odds_ratio']:.1f}")
-    put(k + ".ci", f"{row['ci_lo']:.2f}--{row['ci_hi']:.2f}" if row["ci_hi"] < 10 else f"{row['ci_lo']:.1f}--{row['ci_hi']:.1f}")
+    put(k + ".ci", f"{row['ci_lo']:.2f} to {row['ci_hi']:.2f}" if row["ci_hi"] < 10 else f"{row['ci_lo']:.1f} to {row['ci_hi']:.1f}")
     put(k + ".p", pval(row["p_two_sided"]))
 put("cmh.EvD.reduction", f"{100 * (1 - cmh.set_index('contrast').loc['E vs D', 'mh_odds_ratio']):.0f}")
 
@@ -206,6 +206,15 @@ if ag.exists():
         if r.get("human_unsure") is not None and r["rule_verdicts"]:
             put(f"unsure.{k}", pct(r["human_unsure"] / r["rule_verdicts"]))
 
+# ---- EMB-TRAINED: the trained embedding classifier the frozen plan anticipated
+_tr = A / "trained_classifier_summary.json"
+if _tr.exists():
+    tr = json.loads(_tr.read_text())
+    put("e3.trained.recall", pct(tr["recall_at_fpr05"]))
+    put("e3.trained.ci", ci(tr["recall_ci_lo"], tr["recall_ci_hi"]))
+    put("e3.trained.fpr", pct(tr["fpr"])); put("e3.trained.auroc", f"{tr['auroc']:.2f}")
+    put("e3.trained.n", tr["n"])
+
 # ---- judge calibration against the designed conditions (A and C)
 _cal = A / "judge_calibration_summary.json"
 if _cal.exists():
@@ -217,6 +226,16 @@ if _cal.exists():
     put("cal.obs", pct(cal["observed_judgement_rate"]))
     if cal.get("corrected_judgement_rate") is not None:
         put("cal.corrected", pct(cal["corrected_judgement_rate"]))
+        # Share of the observed judgement-rule signal that the correction attributes to judge error,
+        # so the sentence describing the shrinkage cannot drift from the numbers behind it.
+        _o, _c = cal["observed_judgement_rate"], cal["corrected_judgement_rate"]
+        put("cal.errorshare", pct((_o - _c) / _o) if _o else "n/a")
+    _t = pd.read_csv(A / "table10_judge_calibration.csv")
+    _w = _t.sort_values(["judge_false_positives", "designed_violations"], ascending=False).iloc[0]
+    put("cal.worstrule", _w["rule"]); put("cal.worstfpr", pct(_w["fpr"]))
+    put("cal.worstfp", int(_w["judge_false_positives"])); put("cal.worstn", int(_w["valid_inputs"]))
+    put("cal.nfprules", int((_t["judge_false_positives"] > 0).sum()))
+    put("cal.rules", int(len(_t)))
 
 # ---- cluster-robust intervals
 _cb = A / "cluster_bootstrap_summary.json"
