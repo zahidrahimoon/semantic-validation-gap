@@ -1,7 +1,7 @@
 # AI-USE DISCLOSURE
 
 Paper: *Structurally Valid, Semantically Wrong: Measuring the Validation Gap for AI-Generated Web
-Inputs* · Author: Zahid Rahimoon · Date: 2026-09-24
+Inputs* · Authors: Zahid Rahimoon, Fida Hussain Khoso · Date: 2026-09-24, updated 2026-10-17
 
 The manuscript itself carries a one-sentence disclosure in the acknowledgment. This file is the full
 version kept with the artefacts, for venues that ask for detail.
@@ -56,7 +56,14 @@ from an executed run whose raw output is in `16_RESULTS/raw/`, with provenance i
 Where a measurement had not been made, the draft carried an explicit placeholder rather than an
 estimate.
 
+## Authorship note (2026-10-17)
+
+Fida Hussain Khoso was added as second author on 2026-10-17 (D-011). Everything above describes the
+first author's work with AI assistance between 2026-09-20 and 2026-10-04. The second author's
+contribution is not recorded in this project and must be stated by the authors before submission
+(TODO-HUMAN TH-13); venues that require a CRediT-style contribution statement will ask for it.
+
 ## Responsibility
 
 The research questions, the design decisions, the interpretation and the final manuscript are the
-author's responsibility. AI tools are not listed as authors.
+authors' responsibility. AI tools are not listed as authors.

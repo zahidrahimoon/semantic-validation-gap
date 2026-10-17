@@ -9,11 +9,11 @@ nothing else is needed.
 
 | File | What it is |
 |---|---|
-| `main.tex` | the manuscript (IEEEtran, conference mode, 10 pages) |
+| `main.tex` | the manuscript (IEEEtran, journal mode, two authors; updated 2026-10-17) |
 | `references.bib` | 48 references, all cited, all verified |
 | `tables/numbers.tex` | every number used in the prose, as `\R{...}` macros |
 | `tables/tab_*.tex` | the six tables |
-| `paper-reference.pdf` | the PDF this bundle produced, to compare your build against |
+| `paper-reference.pdf` | a build of this bundle made with Tectonic (XeTeX, Times substituted, 11 pages); your pdfLaTeX build on Overleaf is the reference, it will differ slightly in fonts and page breaks |
 
 ## How the numbers work
 
@@ -44,11 +44,12 @@ exploratory; turning it off would overclaim, so leave it on.
 
 ## Before you submit
 
-- Author block: the affiliation reads "Independent Researcher" and the e-mail is in `main.tex`.
-  Add an ORCID if you have one.
+- Author block: the second author's affiliation and e-mail are placeholders in the `\thanks` lines,
+  and `\markboth` still says "Journal of LaTeX Class Files". Fill both. Add ORCIDs if you have them.
 - Keywords: currently free text. Many IEEE venues want terms from the IEEE Thesaurus.
-- Venue: the layout is generic IEEEtran conference. Check the specific call for page limit,
-  anonymisation and whether references count toward the limit.
+- Venue: the layout is generic IEEEtran journal mode. Check the chosen journal's page budget,
+  abstract and keyword rules, and whether it wants the conference layout instead (the 10-page
+  conference version is `13_DRAFT/paper_v0.9-before-journal-coauthor.tex` in the study repository).
 - Some conferences require the PDF to pass IEEE PDF eXpress.
 - Run a similarity check. The text is original, but venues expect the author to have checked.
 - The Acknowledgment carries the repository URL and the AI-use disclosure. Keep the disclosure:
@@ -56,7 +57,7 @@ exploratory; turning it off would overclaim, so leave it on.
 
 ## Page budget
 
-The paper is exactly 10 pages, so almost any addition pushes it to 11. There is a fuller 11-page
+In conference mode the paper was exactly 10 pages; in journal mode expect about the same or one more. There is a fuller 11-page
 version in the study repository at `13_DRAFT/paper_v0.9-before-10page-trim.tex`, which keeps two
 extra tables (prompt families, field categories) and the cost-versus-detection figure. If your venue
 allows 11 pages or excludes references from the count, that version is the better one to submit.
