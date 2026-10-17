@@ -76,3 +76,13 @@ IEEE Xplore/ACM DL metadata, arXiv, Semantic Scholar and Crossref up to 20 Septe
 establishes the schema-valid-but-semantically-wrong phenomenon for LLM outputs; this work investigates
 it for LLM-generated *inputs* at a web application's validation boundary, against explicit business
 rules, with non-LLM and human-written baselines, and evaluates the cost of closing it on CPU hardware."
+
+## Follow-up screening of the two deferred kill-search leads (2026-10-17, TH-08)
+
+| Lead | What it is | Overlap with this study |
+|---|---|---|
+| ShopGym, arXiv 2605.16116 (Savadikar et al., 15 May 2026) | Framework that turns live storefronts into sandbox shops (ShopArena) and generates benchmark tasks for e-commerce web agents (ShopGuru); 224 tasks over six shops | None. It benchmarks agents that act on a shop; it does not measure whether agent-produced inputs pass schema validation or break business rules, and evaluates no validation layer |
+| US 12288159 B2, Intuit Inc., granted 2025-04-29, "Deep learning based context embedding approach for detecting data entry errors" | A character-level 1D CNN embeds a submitted numeric value together with historical reference values; statistics over recent values form a second vector; a gradient-boosted classifier labels the value valid or invalid | Adjacent only. It is a learned anomaly detector over numeric fields with historical data, not a check of free-text input against an explicit rule reference, and it involves no language model. It belongs with the trained-classifier family that EMB-TRAINED (E3) represents; cite only if a reviewer asks for industrial precedent |
+
+Neither lead changes the gap statement G1 to G3 or the novelty risk rating.
+

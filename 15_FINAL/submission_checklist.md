@@ -1,7 +1,7 @@
 # SUBMISSION CHECKLIST
 
 Paper: *Structurally Valid, Semantically Wrong: Measuring the Validation Gap for AI-Generated Web
-Inputs* · Status 2026-09-22: **DRAFT — all experiments run; researcher tasks outstanding (see BLOCKING)**
+Inputs* · Status 2026-10-17: **DRAFT — experiments, review, provenance and annotation complete; journal-mode manuscript with two authors; author tasks outstanding (see HUMAN MUST VERIFY)**
 
 The protocol's highest permitted status is `READY FOR HUMAN VERIFICATION`. No AI system may decide
 this paper is ready to submit; that decision is the author's.
@@ -21,22 +21,23 @@ this paper is ready to submit; that decision is the author's.
 | Diagrams | DONE — generated from data by `16_RESULTS/analysis/make_figures.py` |
 | Paper draft | DONE — every prose number generated (`make_numbers.py`), every table generated (`make_latex_tables.py`) |
 | Reviewer simulation and fix loop | DONE, cycle 1 — R1–R4 (71 issues) in `14_REVIEWS/`; status of each in `issue_tracker.md` |
-| IEEE formatting | DONE — IEEEtran conference, 10 pages, no errors or overfull boxes, clickable citations and DOIs |
-| AI-use disclosure | DONE — `15_FINAL/ai_disclosure.md` |
+| IEEE formatting | DONE — IEEEtran journal mode (2026-10-17; 10-page conference version kept as paper_v0.9-before-journal-coauthor.tex), clickable citations and DOIs |
+| AI-use disclosure | DONE — `15_FINAL/ai_disclosure.md`; one-sentence version in the manuscript acknowledgment (kept per E8, D-011) |
+| Model licences for released data | DONE 2026-10-17 — Qwen3 and nomic-embed-text Apache-2.0; Gemma Terms claim no rights in outputs (TH-11) |
+| Novelty leads from the kill search | DONE 2026-10-17 — ShopGym and US 12288159 screened, no overlap (TH-08, 06_NOVELTY.md) |
 
 ## BLOCKING — must be true before submission
 
 - [x] **Experiments complete.** E1–E4 finished; every number traceable to `16_RESULTS/raw/` via scripts.
 - [x] **Result claims audited.** No number in the paper is typed by hand; R1 recomputed every figure from raw data independently.
-- [ ] **Human-written conditions resolved.** `10_DATASETS/human_inputs/PROVENANCE.md` signed, or the
-      paper relabels conditions A and G as AI-drafted and withdraws hypothesis H3b. Currently
-      unresolved (deviation DV-03).
-- [ ] **Annotation done.** The stratified sample labelled and imported; judge–human agreement
-      reported. Without it the semantic labels rest on one model's judgement.
+- [x] **Human-written conditions resolved.** `10_DATASETS/human_inputs/PROVENANCE.md` signed 2026-09-23
+      (262 kept, 7 deleted, 3 replaced); the paper calls A and G human-curated and H3b is reported with
+      that caveat (DV-03).
+- [x] **Annotation done.** 200 + 20 items annotated and imported 2026-09-23 (DV-19); judge–human kappa
+      0.238 reported, so judgement-rule results are labelled exploratory as pre-registered.
 - [x] **Reviewer simulation run** (cycle 1) and issues resolved or escalated (`14_REVIEWS/issue_tracker.md`).
 
-- [ ] **Judge re-run with full record context (recommended).** Seven judgement rules were judged without
-      the fields they depend on; a sensitivity analysis is reported, but re-judging (~1 h CPU) would remove the caveat.
+- [x] **Judge re-run with full record context.** Done 2026-10-03 (DV-20); all results regenerated (DV-22, DV-23).
 
 ## HUMAN MUST VERIFY
 
@@ -44,16 +45,16 @@ this paper is ready to submit; that decision is the author's.
 |---|---|
 | Research claims and novelty | The phenomenon is established for model outputs; this paper extends it to the input side. Do not let the framing drift toward discovery. |
 | Citation accuracy, especially the 50 V2 entries | Cited for existence and abstract-level statements only |
-| Two flagged references | `saleem2026layered` (wrong first author, venue unverified) and `ahmed2026reflexguard` (placeholder references, inconsistent tables) — decide whether to cite |
-| Two unscreened novelty leads | ShopGym (arXiv 2605.16116) and USPTO 12288159 |
+| Two flagged references | `saleem2026layered` (arXiv 2606.19660: arXiv metadata lists Saleem first, PDF byline lists N. Ahmed first; typeset for "ICCK Transactions on Information Security and Cryptography" with placeholder DOI and dates, venue legitimacy unverified) and `ahmed2026reflexguard` (arXiv 2608.17556: IEEE template header with unfilled biography block) — both are cited only as preprints for GPU latency figures in three sentences of Related Work. Options: keep as arXiv preprints (current), or drop both and keep `jacob2025promptshield` and `wang2026sokguardrails` for the same point. Author decides |
+| Two novelty leads | Screened 2026-10-17, no overlap (06_NOVELTY.md). Nothing to do |
 | Experimental results and provenance | Spot-check numbers against `16_RESULTS/raw/` |
-| Dataset licences | Model licences for releasing generated data (Qwen3, Gemma, embedding model) |
+| Dataset licences | Checked 2026-10-17 (TH-11): releasing generated inputs and verdicts is permitted under all three model licences |
 | Ethics | No human subjects; confirm no institutional requirement applies |
 | Figures | Original, generated from our data only |
 | Similarity check | Run before submission |
-| Author information | Email set (zahidrahimoon22@gmail.com); no ORCID; affiliation, funding and conflicts still to confirm |
-| Venue requirements | Not yet researched — no venue chosen. Run `/rs-venue <name>` once decided. |
-| Page limit and format | 10 pages (IEEEtran conference), references included. Check the chosen venue's limit; if it is 8+2, the text already fits in 8 |
+| Author information | First author: email set, no ORCID. Second author (F. H. Khoso, added 2026-10-17): affiliation and email are placeholders in `\\thanks`; contribution statement not recorded (TH-13). Running head `\\markboth` is a placeholder (TH-14). Funding and conflicts to confirm |
+| Venue requirements | No venue chosen. Shortlist of no-fee venues in `15_FINAL/venue_shortlist.md` (2026-10-17). Run `/rs-venue <name>` once decided. |
+| Page limit and format | Journal mode, about 10 to 11 pages. The conference version (10 pages) is kept if a conference is chosen instead |
 | Preprint policy | If posting to ResearchGate or arXiv, confirm the target venue permits preprints |
 | Final submission decision | The author's alone |
 
@@ -64,7 +65,7 @@ Public artefacts: https://github.com/zahidrahimoon/semantic-validation-gap
   testbed-main                  the testbed's own history, tag v1.0-frozen (commit 62a7267) as used for E1-E3
   testbed-e4-semantic-layer     the overhead branch, tag v1.2-semantic (commit 33f2685) as used for E4
 Licences: MIT for software (LICENSE), CC BY 4.0 for data and manuscript (LICENSE-DATA).
-TODO-HUMAN: set the default branch to `main` in the GitHub repository settings.
+Default branch is `main` (verified 2026-10-17).
 
 ## Artefacts to release with the paper
 

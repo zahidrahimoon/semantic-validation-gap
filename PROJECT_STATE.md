@@ -8,7 +8,7 @@ Slug:               semantic-validation-gap
 Version:            v0.9.2 (journal format, two authors) — all experiments complete, DV-20 re-judge applied
 Current stage:      17 (final QA) — paper DRAFT, status at most READY FOR HUMAN VERIFICATION
 Operating mode:     FULL (Ollama in Docker, CPU only)
-Last updated:       2026-10-17 10:50 PKT
+Last updated:       2026-10-17 11:30 PKT
 Completed stages:   0–16; Gates A and B; E1, E2, E2b, E3, E4; review cycle 1 (71 issues) + cycle-2
   verification; senior academic review (external) and the fixes it prompted (DV-20 to DV-23)
 Open gates awaiting human decision: none
@@ -26,7 +26,7 @@ Paper:  13_DRAFT/paper.tex — IEEEtran JOURNAL mode, two authors (second affili
 Testbed: main @ 62a7267 (v1.0-frozen), checked out; E4 branch e4-semantic-layer @ 33f2685 (v1.2-semantic)
 Repository: https://github.com/zahidrahimoon/semantic-validation-gap (public, pushed 2026-09-24).
   Branches: main (study) + testbed-main (v1.0-frozen) + testbed-e4-semantic-layer (v1.2-semantic).
-  TODO-HUMAN: set default branch to main in GitHub settings. Licences: MIT (code), CC BY 4.0 (data/manuscript)
+  Default branch is main (verified via the GitHub API 2026-10-17). Licences: MIT (code), CC BY 4.0 (data/manuscript)
 Regenerate all results: `cd 16_RESULTS/analysis && ./rerun_all.sh`
 Next actions (ordered):
   1. HUMAN: fill the second author's affiliation and e-mail in paper.tex (\thanks line) and the journal name
@@ -35,7 +35,7 @@ Next actions (ordered):
      IEEE Transactions title; IEEE Thesaurus keywords; ORCIDs; similarity check
   3. HUMAN: a second independent annotator for the judgement rules (the senior reviewer's main point;
      the calibration mitigates it but does not replace it)
-  4. HUMAN: set the GitHub default branch to main
+  4. HUMAN: decide the two flagged references TH-06/TH-07 (evidence in submission_checklist.md) and ethics TH-09
 Blocked on human: items 1–4 above
 ```
 
@@ -97,13 +97,13 @@ OPERATING MODE:             FULL for literature and drafting; LLM-generation exp
 | TH-02 | Supply PDF for P08 (Hanna & Munro 2018, Inderscience) | 3 | 2026-09-20 | |
 | TH-03 | Confirm current URL of OWASP WSTG "Test Business Logic Data Validation" (fetch 404) | 3 | 2026-09-20 | |
 | TH-04 | Review testbed (17_CODE/testbed @ 21d347a) and BUSINESS_RULES.md before Gate B freeze | 10a | 2026-09-20 | |
-| TH-05 | Decide licence for released code/data (suggest MIT / CC BY 4.0) | 12 | 2026-09-20 | |
+| TH-05 | Decide licence for released code/data (suggest MIT / CC BY 4.0) | 12 | 2026-09-20 | 2026-09-24: MIT (LICENSE) and CC BY 4.0 (LICENSE-DATA) in the repository |
 | TH-06 | P64 (Saleem/Ahmed 2026): first author and ICCK venue legitimacy NOT VERIFIED — decide whether to cite | 5 | 2026-09-20 | |
 | TH-07 | P61 (Reflex-Guard): placeholder references and inconsistent latency figures flagged in note — decide whether to cite numbers | 5 | 2026-09-20 | |
-| TH-08 | Screen adjacent leads from kill search: ShopGym arXiv 2605.16116, USPTO 12288159 (V0) | 8 | 2026-09-20 | |
+| TH-08 | Screen adjacent leads from kill search: ShopGym arXiv 2605.16116, USPTO 12288159 (V0) | 8 | 2026-09-20 | 2026-10-17: both screened, neither overlaps. ShopGym (arXiv 2605.16116) is a sandbox + task benchmark for e-commerce web agents, no input validation. US 12288159 (Intuit, granted 2025-04-29) detects numeric data-entry errors with a character-level CNN embedding + gradient-boosted classifier trained on historical values; no LLM, no business rules. Note added to 06_NOVELTY.md |
 | TH-09 | Confirm no institutional ethics requirement applies (researcher-only annotation, synthetic data) | 11 | 2026-09-20 | |
-| TH-10 | **REVIEW** the AI-drafted group A/G values (272 short values) and sign the review record in 10_DATASETS/human_inputs/PROVENANCE.md — decides whether H3b is an AI-vs-human contrast (DV-03); later annotate 200 + 20 items | 12 | 2026-09-20 | files drafted 2026-09-20, review outstanding |
-| TH-11 | Confirm model licences (Qwen3 Apache-2.0; Gemma/Llama community terms; embedding model) for releasing generated data | 12 | 2026-09-20 | |
+| TH-10 | **REVIEW** the AI-drafted group A/G values (272 short values) and sign the review record in 10_DATASETS/human_inputs/PROVENANCE.md — decides whether H3b is an AI-vs-human contrast (DV-03); later annotate 200 + 20 items | 12 | 2026-09-20 | 2026-09-23: review signed in PROVENANCE.md (262 kept / 7 deleted / 3 replaced); 220 annotations imported (DV-19) |
+| TH-11 | Confirm model licences (Qwen3 Apache-2.0; Gemma/Llama community terms; embedding model) for releasing generated data | 12 | 2026-09-20 | 2026-10-17: Qwen3-4B Apache-2.0 and nomic-embed-text-v1.5 Apache-2.0 (Hugging Face model cards); Gemma Terms of Use s.3.3 "Google claims no rights in Outputs" and s.1.1(e) outputs are not Model Derivatives. Generated inputs and judge verdicts can be released; no model weights are redistributed |
 | TH-12 | Review the harness before E1 (17_CODE/harness: field targets, adversarial templates, rule functions, judge rubric) | 12 | 2026-09-20 | |
 | TH-13 | Second author (F. H. Khoso) added 2026-10-17: fill affiliation and e-mail in the `\thanks` line of paper.tex and state the contribution (ai_disclosure.md Authorship note) | 17 | 2026-10-17 | |
 | TH-14 | Journal mode: replace the `\markboth` placeholder "Journal of LaTeX Class Files" with the target journal and confirm the journal's page budget against the 11-page Tectonic build | 17 | 2026-10-17 | |
