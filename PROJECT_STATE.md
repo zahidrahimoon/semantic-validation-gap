@@ -8,7 +8,7 @@ Slug:               semantic-validation-gap
 Version:            v0.9.2 (journal format, two authors) — all experiments complete, DV-20 re-judge applied
 Current stage:      17 (final QA) — paper DRAFT, status at most READY FOR HUMAN VERIFICATION
 Operating mode:     FULL (Ollama in Docker, CPU only)
-Last updated:       2026-10-17 12:10 PKT
+Last updated:       2026-10-19 18:30 PKT
 Completed stages:   0–16; Gates A and B; E1, E2, E2b, E3, E4; review cycle 1 (71 issues) + cycle-2
   verification; senior academic review (external) and the fixes it prompted (DV-20 to DV-23)
 Open gates awaiting human decision: none
@@ -23,6 +23,8 @@ Paper:  13_DRAFT/paper.tex — IEEEtran JOURNAL mode, two authors (second affili
   AUTHOR BLOCK WITHHELD since 2026-10-17 for the supervisor's similarity check: \author{} is empty and the
   running head carries no names; the original block is commented out just above it in paper.tex. Restore
   before any submission. The repository URL in the acknowledgment still names the first author.
+  Word copy for the similarity check: 15_FINAL/paper-draft.docx (2026-10-19, regenerate with
+  `python3 tools/tex2docx.py projects/semantic-validation-gap/13_DRAFT <out.docx>` from the workspace root).
   paper.pdf was built 2026-10-17 with Tectonic (XeTeX, Times substituted): 11 pages there; the Overleaf
   pdfLaTeX build is the reference for page count. The 10-page conference version is kept as
   13_DRAFT/paper_v0.9-before-journal-coauthor.tex. Local machine has no pdfLaTeX (needs sudo dnf install perl-core).
